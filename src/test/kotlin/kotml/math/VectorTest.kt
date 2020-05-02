@@ -57,6 +57,15 @@ class VectorTest {
     }
 
     @Test
+    fun `det() returns the determinant for square matrices`() {
+        assertEquals(-2.0, Vector(Vector(1.0, 2.0), Vector(3.0, 4.0)).det())
+        assertEquals(12.0, Vector(
+            Vector(-1.0, 1.0, 3.0),
+            Vector(2.0, 1.0, 0.0),
+            Vector(4.0, 3.0, -2.0)).det())
+    }
+
+    @Test
     fun `clone() creates a copy of the vector`() {
         val rowVector = Vector(1.0, 2.0, 3.0)
         val rowVectorCopy = rowVector.clone()

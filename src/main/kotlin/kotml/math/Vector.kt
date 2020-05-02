@@ -218,6 +218,30 @@ class Vector private constructor(val shape: IntArray) {
         }
     }
 
+    fun det(): Double {
+        validateSquareMatrix()
+
+        if (dimensions == 1)
+            throw ShapeException("1x1 matrices do not have inverses")
+
+        if (shape[0] == 2)
+            return this[0](0) * this[1](1) - this[0](1) * this[1](0)
+
+        val toAdd = (0 until shape[0]).fold(0.0) { sumAcc, topIndex ->
+            sumAcc + (0 until shape[0]).fold(1.0) { productAcc, offset ->
+                val col = (topIndex + offset) % shape[0]
+                productAcc * this[offset](col)
+            }
+        }
+        val toSubtract = (0 until shape[0]).fold(0.0) { diffAcc, topIndex ->
+            diffAcc + ((shape[0] - 1) downTo 0).fold(1.0) { productAcc, offset ->
+                val col = (shape[0] + topIndex - offset) % shape[0]
+                productAcc * this[offset](col)
+            }
+        }
+        return toAdd - toSubtract
+    }
+
     fun clone(): Vector =
         if (dimensions == 1) {
             Vector(*scalarValues.clone())
@@ -248,6 +272,14 @@ class Vector private constructor(val shape: IntArray) {
         } else {
             "[" + vectorValues.joinToString("\n") + "]"
         }
+
+    private fun validateSquareMatrix() {
+        if (dimensions > 2 || (dimensions == 1 && shape[0] != 1) || shape[0] != shape[1]) {
+            throw ShapeException(
+                "Only 2-dimensional square matrices have defined inverses"
+            )
+        }
+    }
 
     private fun validateShapesMatch(vector: Vector) {
         if (!shapeEquals(vector.shape)) {

@@ -195,6 +195,29 @@ class Vector private constructor(val shape: IntArray) {
         })
     }
 
+    fun transpose(): Vector {
+        if (dimensions > 2) {
+            throw ShapeException(
+                "Only vectors with 1 or 2 dimensions can be transposed"
+            )
+        }
+        if (dimensions == 1) {
+            return Vector(*Array<Vector>(shape[0]) { index ->
+                Vector(scalarValues[index])
+            })
+        } else if (shape[0] == 1) {
+            return Vector(*DoubleArray(shape[1]) { index ->
+                vectorValues[index](0)
+            })
+        } else {
+            return Vector(*Array<Vector>(shape[1]) { row ->
+                Vector(*DoubleArray(shape[0]) { col ->
+                    vectorValues[col](row)
+                })
+            })
+        }
+    }
+
     fun clone(): Vector =
         if (dimensions == 1) {
             Vector(*scalarValues.clone())

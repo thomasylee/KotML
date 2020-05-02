@@ -43,7 +43,21 @@ class VectorTest {
     }
 
     @Test
-    fun `clone() creates a copy of the Vector`() {
+    fun `transpose() correctly transposes the vector`() {
+        assertEquals(Vector(Vector(1.0), Vector(2.0)), Vector(1.0, 2.0).transpose())
+        assertEquals(Vector(1.0, 2.0), Vector(Vector(1.0), Vector(2.0)).transpose())
+        assertEquals(
+            Vector(
+                Vector(1.0, 4.0),
+                Vector(2.0, 5.0),
+                Vector(3.0, 6.0)),
+            Vector(
+                Vector(1.0, 2.0, 3.0),
+                Vector(4.0, 5.0, 6.0)).transpose())
+    }
+
+    @Test
+    fun `clone() creates a copy of the vector`() {
         val rowVector = Vector(1.0, 2.0, 3.0)
         val rowVectorCopy = rowVector.clone()
         assertEquals(Vector(1.0, 2.0, 3.0), rowVectorCopy)

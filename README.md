@@ -1,2 +1,2 @@
-# KML (Kotlin Machine Learning)
+# KotML (Kotlin Machine Learning)
 Machine learning library written in Kotlin

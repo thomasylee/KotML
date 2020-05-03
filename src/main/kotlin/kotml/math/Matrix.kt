@@ -1,24 +1,24 @@
 package kotml.math
 
 /**
- * Vector stores a collection of values in one or more dimensions. Every
- * vector has a `dimensions` variable that indicates how many dimensions
- * the vector has, with the size of each dimension given by `shape`. For
- * example, a 3x4 2-dimensional vector would have `dimensions` = 2 and
+ * Matrix stores a collection of values in one or more dimensions. Every
+ * matrix has a `dimensions` variable that indicates how many dimensions
+ * the matrix has, with the size of each dimension given by `shape`. For
+ * example, a 3x4 2-dimensional matrix would have `dimensions` = 2 and
  * `shape` = [3, 4], where 3 is the row count and 4 is the column count.
  *
- * The following operations can be performed on vectors. Note that vectors
- * are immutable, so each operation returns a new Vector instance.
- * -a = Negates the values of the vector (e.g. -[1, 2] = [-1, -2])
+ * The following operations can be performed on matrices. Note that matrices
+ * are immutable, so each operation returns a new Matrix instance.
+ * -a = Negates the values of the matrix (e.g. -[1, 2] = [-1, -2])
  * a + b = Entrywise summation (e.g. [1, 2] + [3, 4] = [4, 6])
  * a - b = Entrywise difference (e.g. [3, 0] - [1, 5] = [2, -5])
  * a * b = Entrywise product (e.g. [-1, 2] * [3, 4] = [-3, 8])
  * a / b = Entrywise quotient (e.g. [9, 2] / [3, 1] = [3, 2])
  * a x b = Matrix multiplication product (e.g. [1, -2, 3] x [[4, 1], [0, 0], [-1, 2]] = [1, 7])
  */
-class Vector private constructor(val shape: IntArray) {
+class Matrix private constructor(val shape: IntArray) {
     private val scalarValues: DoubleArray
-    private val vectorValues: Array<Vector>
+    private val matrixValues: Array<Matrix>
     val dimensions: Int
 
     companion object {
@@ -43,15 +43,15 @@ class Vector private constructor(val shape: IntArray) {
     init {
         dimensions = shape.size
         if (dimensions == 0) {
-            throw ShapeException("Vectors must have at least 1 dimension")
+            throw ShapeException("Matrices must have at least 1 dimension")
         }
 
         if (dimensions == 1) {
             scalarValues = DoubleArray(shape[0]) { 0.0 }
-            vectorValues = arrayOf()
+            matrixValues = arrayOf()
         } else {
             scalarValues = doubleArrayOf()
-            vectorValues = Array<Vector>(shape[0]) { Vector(intArrayOf(0)) }
+            matrixValues = Array<Matrix>(shape[0]) { Matrix(intArrayOf(0)) }
         }
     }
 
@@ -59,160 +59,160 @@ class Vector private constructor(val shape: IntArray) {
         System.arraycopy(values, 0, scalarValues, 0, values.size)
     }
 
-    constructor(vararg values: Vector) : this(
+    constructor(vararg values: Matrix) : this(
         if (values.size == 1) {
             values.first().shape
         } else {
             addDimensionToShape(
                 values.size,
-                values.elementAtOrElse(0) { Vector(intArrayOf()) }.shape)
+                values.elementAtOrElse(0) { Matrix(intArrayOf()) }.shape)
         }
     ) {
         if (values.size == 1) {
-            val vector = values.first()
-            if (vector.dimensions == 1) {
-                System.arraycopy(vector.scalarValues, 0, scalarValues, 0, vector.shape[0])
+            val matrix = values.first()
+            if (matrix.dimensions == 1) {
+                System.arraycopy(matrix.scalarValues, 0, scalarValues, 0, matrix.shape[0])
             } else {
-                (0 until vector.shape[0]).forEach {
-                    vectorValues[it] = vector.vectorValues[it].clone()
+                (0 until matrix.shape[0]).forEach {
+                    matrixValues[it] = matrix.matrixValues[it].clone()
                 }
             }
         } else {
             (0 until values.size).forEach {
-                vectorValues[it] = values[it]
+                matrixValues[it] = values[it]
             }
         }
     }
 
-    operator fun get(index: Int): Vector {
+    operator fun get(index: Int): Matrix {
         if (dimensions == 1) {
             throw ShapeException(
-                "Use () instead of [] to access elements of row vectors"
+                "Use () instead of [] to access elements of row matrices"
             )
         }
-        return vectorValues[index]
+        return matrixValues[index]
     }
 
     operator fun invoke(index: Int): Double {
         if (dimensions != 1) {
             throw ShapeException(
-                "Use [] instead of () to access elements of multidimensional vectors"
+                "Use [] instead of () to access elements of multidimensional matrices"
             )
         }
         return scalarValues[index]
     }
 
-    operator fun unaryMinus(): Vector =
+    operator fun unaryMinus(): Matrix =
         if (dimensions == 1) {
-            Vector(*DoubleArray(shape[0]) { -scalarValues[it] })
+            Matrix(*DoubleArray(shape[0]) { -scalarValues[it] })
         } else {
-            Vector(*Array<Vector>(shape[0]) { -vectorValues[it] })
+            Matrix(*Array<Matrix>(shape[0]) { -matrixValues[it] })
         }
 
-    operator fun plus(vector: Vector): Vector {
-        validateShapesMatch(vector)
+    operator fun plus(matrix: Matrix): Matrix {
+        validateShapesMatch(matrix)
         if (dimensions == 1) {
-            return Vector(*DoubleArray(shape[0]) {
-                scalarValues[it] + vector.scalarValues[it]
+            return Matrix(*DoubleArray(shape[0]) {
+                scalarValues[it] + matrix.scalarValues[it]
             })
         }
-        return Vector(*Array<Vector>(shape[0]) {
-            vectorValues[it] + vector.vectorValues[it]
+        return Matrix(*Array<Matrix>(shape[0]) {
+            matrixValues[it] + matrix.matrixValues[it]
         })
     }
 
-    operator fun minus(vector: Vector): Vector {
-        validateShapesMatch(vector)
+    operator fun minus(matrix: Matrix): Matrix {
+        validateShapesMatch(matrix)
         if (dimensions == 1) {
-            return Vector(*DoubleArray(shape[0]) {
-                scalarValues[it] - vector.scalarValues[it]
+            return Matrix(*DoubleArray(shape[0]) {
+                scalarValues[it] - matrix.scalarValues[it]
             })
         }
-        return Vector(*Array<Vector>(shape[0]) {
-            vectorValues[it] - vector.vectorValues[it]
+        return Matrix(*Array<Matrix>(shape[0]) {
+            matrixValues[it] - matrix.matrixValues[it]
         })
     }
 
-    operator fun times(vector: Vector): Vector {
-        validateShapesMatch(vector)
+    operator fun times(matrix: Matrix): Matrix {
+        validateShapesMatch(matrix)
         if (dimensions == 1) {
-            return Vector(*DoubleArray(shape[0]) {
-                scalarValues[it] * vector.scalarValues[it]
+            return Matrix(*DoubleArray(shape[0]) {
+                scalarValues[it] * matrix.scalarValues[it]
             })
         }
-        return Vector(*Array<Vector>(shape[0]) {
-            vectorValues[it] * vector.vectorValues[it]
+        return Matrix(*Array<Matrix>(shape[0]) {
+            matrixValues[it] * matrix.matrixValues[it]
         })
     }
 
-    operator fun div(vector: Vector): Vector {
-        validateShapesMatch(vector)
+    operator fun div(matrix: Matrix): Matrix {
+        validateShapesMatch(matrix)
         if (dimensions == 1) {
-            return Vector(*DoubleArray(shape[0]) {
-                scalarValues[it] / vector.scalarValues[it]
+            return Matrix(*DoubleArray(shape[0]) {
+                scalarValues[it] / matrix.scalarValues[it]
             })
         }
-        return Vector(*Array<Vector>(shape[0]) {
-            vectorValues[it] / vector.vectorValues[it]
+        return Matrix(*Array<Matrix>(shape[0]) {
+            matrixValues[it] / matrix.matrixValues[it]
         })
     }
 
     /**
-     * Returns the matrix multiplication product of this vector x the
-     * provided vector.
-     * @param vector Vector to matrix multiply with this vector
+     * Returns the matrix multiplication product of this matrix x the
+     * provided matrix.
+     * @param matrix Matrix to matrix multiply with this matrix
      * @return the matrix multiplication product
      */
-    infix fun x(other: Vector): Vector {
+    infix fun x(other: Matrix): Matrix {
         if (dimensions > 2 || other.dimensions > 2) {
-            throw ShapeException("Matrix multiplication can only be performed on 2-dimensional vectors")
+            throw ShapeException("Matrix multiplication can only be performed on 2-dimensional matrices")
         }
         if ((dimensions == 1 && other.dimensions == 1 && shape[0] != 1) ||
                 (dimensions == 1 && shape[0] != other.shape[0]) ||
                 (dimensions == 2 && shape[1] != other.shape[0])) {
             throw ShapeException(
-                "Matrix multiplication requires the column count of the first vector to equal the row count of the second vector"
+                "Matrix multiplication requires the column count of the first matrix to equal the row count of the second matrix"
             )
         }
 
         if (dimensions == 1) {
             if (other.dimensions == 1) {
-                return Vector(scalarValues[0] * other.scalarValues[0])
+                return Matrix(scalarValues[0] * other.scalarValues[0])
             } else {
-                return Vector(*DoubleArray(other.shape[1]) { col ->
+                return Matrix(*DoubleArray(other.shape[1]) { col ->
                     (0 until shape[0]).fold(0.0) { acc, offset ->
                         acc + scalarValues[offset] * other[offset](col)
                     }
                 })
             }
         }
-        return Vector(*Array<Vector>(shape[0]) { row ->
-            Vector(*DoubleArray(other.shape[1]) { col ->
+        return Matrix(*Array<Matrix>(shape[0]) { row ->
+            Matrix(*DoubleArray(other.shape[1]) { col ->
                 (0 until shape[1]).fold(0.0) { acc, offset ->
-                    acc + vectorValues[row](offset) * other[offset](col)
+                    acc + matrixValues[row](offset) * other[offset](col)
                 }
             })
         })
     }
 
-    fun transpose(): Vector {
+    fun transpose(): Matrix {
         if (dimensions > 2) {
             throw ShapeException(
-                "Only vectors with 1 or 2 dimensions can be transposed"
+                "Only matrices with 1 or 2 dimensions can be transposed"
             )
         }
         if (dimensions == 1) {
-            return Vector(*Array<Vector>(shape[0]) { index ->
-                Vector(scalarValues[index])
+            return Matrix(*Array<Matrix>(shape[0]) { index ->
+                Matrix(scalarValues[index])
             })
         } else if (shape[0] == 1) {
-            return Vector(*DoubleArray(shape[1]) { index ->
-                vectorValues[index](0)
+            return Matrix(*DoubleArray(shape[1]) { index ->
+                matrixValues[index](0)
             })
         } else {
-            return Vector(*Array<Vector>(shape[1]) { row ->
-                Vector(*DoubleArray(shape[0]) { col ->
-                    vectorValues[col](row)
+            return Matrix(*Array<Matrix>(shape[1]) { row ->
+                Matrix(*DoubleArray(shape[0]) { col ->
+                    matrixValues[col](row)
                 })
             })
         }
@@ -242,21 +242,21 @@ class Vector private constructor(val shape: IntArray) {
         return toAdd - toSubtract
     }
 
-    fun clone(): Vector =
+    fun clone(): Matrix =
         if (dimensions == 1) {
-            Vector(*scalarValues.clone())
+            Matrix(*scalarValues.clone())
         } else {
-            Vector(*Array<Vector>(shape[0]) { vectorValues[it].clone() })
+            Matrix(*Array<Matrix>(shape[0]) { matrixValues[it].clone() })
         }
 
     override fun equals(other: Any?): Boolean =
-        if (other != null && other is Vector) {
+        if (other != null && other is Matrix) {
             shapeEquals(other.shape) &&
                 (0 until scalarValues.size).all {
                     scalarValues[it] == other.scalarValues[it]
                 } &&
-                (0 until vectorValues.size).all {
-                    vectorValues[it] == other.vectorValues[it]
+                (0 until matrixValues.size).all {
+                    matrixValues[it] == other.matrixValues[it]
                 }
         } else {
             false
@@ -270,7 +270,7 @@ class Vector private constructor(val shape: IntArray) {
         if (dimensions == 1) {
             "[" + scalarValues.joinToString(", ") + "]"
         } else {
-            "[" + vectorValues.joinToString("\n") + "]"
+            "[" + matrixValues.joinToString("\n") + "]"
         }
 
     private fun validateSquareMatrix() {
@@ -281,10 +281,10 @@ class Vector private constructor(val shape: IntArray) {
         }
     }
 
-    private fun validateShapesMatch(vector: Vector) {
-        if (!shapeEquals(vector.shape)) {
+    private fun validateShapesMatch(matrix: Matrix) {
+        if (!shapeEquals(matrix.shape)) {
             throw ShapeException(
-                "Vector sizes do not match: ${shapeToString(shape)} and ${shapeToString(vector.shape)}"
+                "Matrix sizes do not match: ${shapeToString(shape)} and ${shapeToString(matrix.shape)}"
             )
         }
     }

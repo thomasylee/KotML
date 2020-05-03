@@ -1,31 +1,27 @@
 package kotml.regression.linear
 
+import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionEstimator
+import kotml.regression.cost.CostFunction
+import kotml.regression.functions.FunctionEstimator
 
 /**
  * StochasticGradientDescent incrementally estimates weights based on
  * observations as they are provided.
  */
 class StochasticGradientDescent(
-    regressorCount: Int,
-    val stepSize: Double
-) : RegressionEstimator(regressorCount) {
+    val stepSize: Double,
+    function: FunctionEstimator,
+    val costFunction: CostFunction
+) : RegressionEstimator(function) {
     val weights: DoubleArray = DoubleArray(regressorCount + 1)
 
     internal override fun addObservationSafe(response: Double, regressors: Vector) {
-        val newWeights = DoubleArray(regressorCount + 1) { index ->
-            weights[index] - stepSize * 2.0 * DoubleArray(index).fold(1.0) { prodAcc, _ ->
-                prodAcc * regressors(index - 1)
-            } * (0..regressorCount).fold(-response) { sumAcc, term ->
-                if (term == 0) {
-                    sumAcc + weights[term]
-                } else {
-                    sumAcc + weights[term] * regressors(term - 1)
-                }
-            }
+        val gradient = costFunction.gradient(function, weights, regressors, response)
+        (0..regressorCount).forEach { index ->
+            weights[index] = weights[index] - stepSize * gradient(index)
         }
-        System.arraycopy(newWeights, 0, weights, 0, regressorCount + 1)
     }
 
     /**
@@ -37,9 +33,6 @@ class StochasticGradientDescent(
      */
     override fun calculate(): Vector = Vector(*weights)
 
-    internal override fun estimateSafe(regressors: Vector): Double = (0..regressorCount).fold(0.0) { acc, index ->
-        acc + weights[index] * (0 until index).fold(1.0) { prodAcc, _ ->
-            prodAcc * regressors(index - 1)
-        }
-    }
+    internal override fun estimateSafe(regressors: Vector): Double =
+        function.estimate(weights, regressors)
 }

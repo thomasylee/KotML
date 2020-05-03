@@ -2,6 +2,7 @@ package kotml.regression
 
 import kotml.math.ShapeException
 import kotml.math.Vector
+import kotml.regression.functions.FunctionEstimator
 
 /**
  * A RegressionEstimator develops a model of any kind of linear function
@@ -10,7 +11,11 @@ import kotml.math.Vector
  * method must be called before estimate() can be used, due to batched
  * calculations required to build the model.
  */
-abstract class RegressionEstimator(val regressorCount: Int) {
+abstract class RegressionEstimator(
+    val function: FunctionEstimator
+) {
+    val regressorCount: Int = function.regressorCount
+
     init {
         if (regressorCount < 1) {
             println(regressorCount)

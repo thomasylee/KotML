@@ -195,6 +195,69 @@ class Vector private constructor(val shape: IntArray) {
         })
     }
 
+    /**
+     * Returns the fold along the specified axis using the function `fn`.
+     * @param initial the initial value used in the fold operation
+     * @param axis the axis used to fold on
+     * @param fn the function applied on the accumulator and individual value
+     * @return vector of the results
+     */
+    fun fold(initial: Double, axis: Int = 0, fn: (Double, Double) -> Double): Vector {
+        if (axis > dimensions)
+            throw ShapeException("Axis $axis must be less than or equal to the  number of dimensions $dimensions")
+
+        if (dimensions == 1) {
+            return Vector(scalarValues.fold(initial, fn))
+        }
+
+        // Example: [[1,2,3],[4,5,6]].sum(axis=0) = [5,7,9]
+        if (dimensions == 2 && axis == 0) {
+            return Vector(*DoubleArray(shape[1]) { col ->
+                (0 until shape[0]).fold(initial) { acc, row ->
+                    fn(acc, vectorValues[row](col))
+                }
+            })
+        }
+
+        // Example: [[1,2,3],[4,5,6]].sum(axis=2) = [6, 15]
+        if (dimensions == 2 && axis == 1) {
+            return Vector(*DoubleArray(shape[0]) { row ->
+                (0 until shape[1]).fold(initial) { acc, col ->
+                    fn(acc, vectorValues[row](col))
+                }
+            })
+        }
+
+        return this
+    }
+
+    /**
+     * Returns the sum of elements along a particular axis.
+     * @param axis the axis used to calculate the summation vector
+     */
+    fun sum(axis: Int = 0): Vector = fold(0.0, axis) {
+        acc, value -> acc + value
+    }
+
+    /**
+     * Returns the product of elements along a particular axis.
+     * @param axis the axis used to calculate the product vector
+     */
+    fun product(axis: Int = 0): Vector = fold(1.0, axis) {
+        acc, value -> acc * value
+    }
+
+    /**
+     * Returns the dot product of this vector with `other`.
+     * @param other the vector to dot product with this vector
+     * @return dot product of this vector and `other`
+     */
+    infix fun dot(other: Vector): Double = (this * other).sum()(0)
+
+    /**
+     * Returns the transposition of this vector.
+     * @return vector that is the transpose of this vector
+     */
     fun transpose(): Vector {
         if (dimensions > 2) {
             throw ShapeException(
@@ -218,6 +281,10 @@ class Vector private constructor(val shape: IntArray) {
         }
     }
 
+    /**
+     * Returns the determinant of this vector.
+     * @return determinant of the vector
+     */
     fun det(): Double {
         validateSquareMatrix()
 
@@ -242,6 +309,10 @@ class Vector private constructor(val shape: IntArray) {
         return toAdd - toSubtract
     }
 
+    /**
+     * Returns a copy of this vector.
+     * @return copy of this vector
+     */
     fun clone(): Vector =
         if (dimensions == 1) {
             Vector(*scalarValues.clone())
@@ -249,6 +320,12 @@ class Vector private constructor(val shape: IntArray) {
             Vector(*Array<Vector>(shape[0]) { vectorValues[it].clone() })
         }
 
+    /**
+     * Returns true if `other` is a Vector with the same shape and values
+     * as this vector.
+     * @param other vector to check equality against
+     * @return true if the vectors have equivalent values, false otherwise
+     */
     override fun equals(other: Any?): Boolean =
         if (other != null && other is Vector) {
             shapeEquals(other.shape) &&
@@ -262,10 +339,19 @@ class Vector private constructor(val shape: IntArray) {
             false
         }
 
+    /**
+     * Returns true if this vector's shape equals the given shape.
+     * @param otherShape shape to compare to this vector's shape
+     * @return true if the shapes have the same values, false otherwise
+     */
     fun shapeEquals(otherShape: IntArray): Boolean =
         dimensions == otherShape.size &&
             (0 until dimensions).all { shape[it] == otherShape[it] }
 
+    /**
+     * Returns a human-readable String representation of this vector.
+     * @return String representation of the vector
+     */
     override fun toString(): String =
         if (dimensions == 1) {
             "[" + scalarValues.joinToString(", ") + "]"

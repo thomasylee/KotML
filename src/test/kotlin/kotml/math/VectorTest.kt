@@ -236,4 +236,42 @@ class VectorTest {
                     Vector(1.0, 2.0))
         }
     }
+
+    @Test
+    fun `sum(axis) returns the sum along the correct axis`() {
+        assertEquals(Vector(2.0), Vector(2.0).sum(0))
+        assertEquals(Vector(3.0), Vector(1.0, 2.0).sum(0))
+        assertEquals(
+            Vector(5.0, 7.0, 9.0),
+            Vector(Vector(1.0, 2.0, 3.0), Vector(4.0, 5.0, 6.0)).sum(0))
+        assertEquals(
+            Vector(6.0, 15.0),
+            Vector(Vector(1.0, 2.0, 3.0), Vector(4.0, 5.0, 6.0)).sum(1))
+    }
+
+    @Test
+    fun `product(axis) returns the product along the correct axis`() {
+        assertEquals(Vector(2.0), Vector(2.0).product(0))
+        assertEquals(Vector(-2.0), Vector(-1.0, 2.0).product(0))
+        assertEquals(
+            Vector(4.0, 10.0, 18.0),
+            Vector(Vector(1.0, 2.0, 3.0), Vector(4.0, 5.0, 6.0)).product(0))
+        assertEquals(
+            Vector(6.0, -120.0),
+            Vector(Vector(1.0, 2.0, 3.0), Vector(-4.0, 5.0, 6.0)).product(1))
+    }
+
+    @Test
+    fun `dot() returns the correct dot product`() {
+        assertEquals(5.0, Vector(1.0, 2.0, 3.0) dot Vector(-1.0, 0.0, 2.0))
+    }
+
+    @Test
+    fun `transpose() returns the transpose of the vector`() {
+        assertEquals(Vector(Vector(1.0), Vector(2.0)), Vector(1.0, 2.0).transpose())
+        assertEquals(Vector(1.0, 2.0), Vector(Vector(1.0), Vector(2.0)).transpose())
+        assertEquals(
+            Vector(Vector(1.0, 4.0), Vector(2.0, 5.0), Vector(3.0, 6.0)),
+            Vector(Vector(1.0, 2.0, 3.0), Vector(4.0, 5.0, 6.0)).transpose())
+    }
 }

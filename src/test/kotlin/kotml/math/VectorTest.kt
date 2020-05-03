@@ -1,5 +1,9 @@
 package kotml.math
 
+import kotml.extensions.div
+import kotml.extensions.minus
+import kotml.extensions.plus
+import kotml.extensions.times
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -40,6 +44,14 @@ class VectorTest {
         assertEquals(Vector(1.0, 2.0, 3.0), Vector(Vector(1.0, 2.0, 3.0)))
         assertEquals(Vector(Vector(1.0), Vector(2.0)),
             Vector(Vector(Vector(1.0), Vector(2.0))))
+    }
+
+    @Test
+    fun `zeros() initializes a vector with all zero values`() {
+        assertEquals(Vector(0.0, 0.0, 0.0), Vector.zeros(intArrayOf(3)))
+        assertEquals(
+            Vector(Vector(0.0, 0.0), Vector(0.0, 0.0), Vector(0.0, 0.0)),
+            Vector.zeros(intArrayOf(3, 2)))
     }
 
     @Test
@@ -127,6 +139,13 @@ class VectorTest {
     }
 
     @Test
+    fun `+ adds doubles and vectors correctly`() {
+        assertEquals(Vector(2.0, 3.0), 1.0 + Vector(1.0, 2.0))
+        assertEquals(Vector(Vector(2.0), Vector(3.0)),
+            Vector(Vector(1.0), Vector(2.0)) + 1.0)
+    }
+
+    @Test
     fun `- subtracts vectors correctly`() {
         val vector1 = Vector(
             Vector(-1.0, 0.0, 1.0),
@@ -139,6 +158,13 @@ class VectorTest {
             Vector(1.0, -1.0, -3.0))
 
         assertEquals(vector3, vector1 - vector2)
+    }
+
+    @Test
+    fun `- subtracts doubles and vectors correctly`() {
+        assertEquals(Vector(0.0, -1.0), 1.0 - Vector(1.0, 2.0))
+        assertEquals(Vector(Vector(0.0), Vector(1.0)),
+            Vector(Vector(1.0), Vector(2.0)) - 1.0)
     }
 
     @Test
@@ -157,6 +183,13 @@ class VectorTest {
     }
 
     @Test
+    fun `* multiplies doubles and vectors correctly`() {
+        assertEquals(Vector(1.0, 2.0), 1.0 * Vector(1.0, 2.0))
+        assertEquals(Vector(Vector(1.0), Vector(2.0)),
+            Vector(Vector(1.0), Vector(2.0)) * 1.0)
+    }
+
+    @Test
     fun `div() divides vectors correctly`() {
         val vector1 = Vector(
             Vector(-4.0, 9.0, 1.0),
@@ -169,6 +202,13 @@ class VectorTest {
             Vector(0.0, -3.0, -5.0))
 
         assertEquals(vector3, vector1 / vector2)
+    }
+
+    @Test
+    fun `div() divides doubles and vectors correctly`() {
+        assertEquals(Vector(1.0, 0.5), 1.0 / Vector(1.0, 2.0))
+        assertEquals(Vector(Vector(0.5), Vector(1.0)),
+            Vector(Vector(1.0), Vector(2.0)) / 2.0)
     }
 
     @Test
@@ -235,6 +275,26 @@ class VectorTest {
                     Vector(1.0, 2.0),
                     Vector(1.0, 2.0))
         }
+    }
+
+    @Test
+    fun `mapIndexed() maps with index correctly`() {
+        assertEquals(
+            Vector(Vector(0.0, 2.0), Vector(4.0, 6.0)),
+            Vector.zeros(intArrayOf(2, 2)).mapIndexed { index, value ->
+                value + index * 2.0
+            }
+        )
+    }
+
+    @Test
+    fun `map() maps correctly`() {
+        assertEquals(
+            Vector(Vector(1.0, 1.0), Vector(1.0, 1.0)),
+            Vector.zeros(intArrayOf(2, 2)).map { value ->
+                value + 1.0
+            }
+        )
     }
 
     @Test

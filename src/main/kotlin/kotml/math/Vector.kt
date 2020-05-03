@@ -23,6 +23,9 @@ class Vector private constructor(val shape: IntArray) {
 
     companion object {
         @JvmStatic
+        fun zeros(shape: IntArray): Vector = Vector(shape)
+
+        @JvmStatic
         private fun addDimensionToShape(dimension: Int, shape: IntArray): IntArray =
             IntArray(shape.size + 1) { index ->
                 if (index == 0)
@@ -36,7 +39,7 @@ class Vector private constructor(val shape: IntArray) {
             IntArray(shape.size - 1) { shape[it + 1] }
 
         @JvmStatic
-        private fun shapeToString(shape: IntArray): String =
+        fun shapeToString(shape: IntArray): String =
             "[" + shape.joinToString(", ") + "]"
     }
 
@@ -51,7 +54,9 @@ class Vector private constructor(val shape: IntArray) {
             vectorValues = arrayOf()
         } else {
             scalarValues = doubleArrayOf()
-            vectorValues = Array<Vector>(shape[0]) { Vector(intArrayOf(0)) }
+            vectorValues = Array<Vector>(shape[0]) {
+                Vector(removeDimensionFromShape(shape))
+            }
         }
     }
 
@@ -121,6 +126,10 @@ class Vector private constructor(val shape: IntArray) {
         })
     }
 
+    operator fun plus(value: Double): Vector = map { it + value }
+
+    operator fun plus(value: Int): Vector = map { it + value }
+
     operator fun minus(vector: Vector): Vector {
         validateShapesMatch(vector)
         if (dimensions == 1) {
@@ -132,6 +141,10 @@ class Vector private constructor(val shape: IntArray) {
             vectorValues[it] - vector.vectorValues[it]
         })
     }
+
+    operator fun minus(value: Double): Vector = map { it - value }
+
+    operator fun minus(value: Int): Vector = map { it - value }
 
     operator fun times(vector: Vector): Vector {
         validateShapesMatch(vector)
@@ -145,6 +158,10 @@ class Vector private constructor(val shape: IntArray) {
         })
     }
 
+    operator fun times(value: Double): Vector = map { it * value }
+
+    operator fun times(value: Int): Vector = map { it * value }
+
     operator fun div(vector: Vector): Vector {
         validateShapesMatch(vector)
         if (dimensions == 1) {
@@ -156,6 +173,10 @@ class Vector private constructor(val shape: IntArray) {
             vectorValues[it] / vector.vectorValues[it]
         })
     }
+
+    operator fun div(value: Double): Vector = map { it / value }
+
+    operator fun div(value: Int): Vector = map { it / value }
 
     /**
      * Returns the matrix multiplication product of this vector x the
@@ -193,6 +214,36 @@ class Vector private constructor(val shape: IntArray) {
                 }
             })
         })
+    }
+
+    private fun mapIndexed(startIndex: Int, fn: (Int, Double) -> Double): Vector =
+        if (dimensions == 1) {
+            Vector(*DoubleArray(shape[0]) { fn(startIndex + it, scalarValues[it]) })
+        } else {
+            Vector(*Array<Vector>(shape[0]) {
+                vectorValues[it].mapIndexed(
+                    it * removeDimensionFromShape(shape).fold(1) { acc, dim ->
+                        acc * dim
+                    },
+                    fn
+                )
+            })
+        }
+
+    /**
+     * Returns a vector with values mapped to the given function `fn`.
+     * @param fn function to apply to each element of the vector
+     * @return the mapped vector
+     */
+    fun mapIndexed(fn: (Int, Double) -> Double): Vector = mapIndexed(0, fn)
+
+    /**
+     * Returns a vector with values mapped to the given function `fn`.
+     * @param fn function to apply to each element of the vector
+     * @return the mapped vector
+     */
+    fun map(fn: (Double) -> Double): Vector = mapIndexed { _, value ->
+        fn(value)
     }
 
     /**

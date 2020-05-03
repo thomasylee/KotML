@@ -8,9 +8,9 @@ import kotml.regression.RegressionEstimator
  * observations as they are provided.
  */
 class StochasticGradientDescent(
-    val stepSize: Double = 0.0001,
-    vararg regressorFunctions: (Double) -> Double
-) : RegressionEstimator(regressorFunctions) {
+    regressorCount: Int,
+    val stepSize: Double
+) : RegressionEstimator(regressorCount) {
     val weights: DoubleArray = DoubleArray(regressorCount + 1)
 
     internal override fun addObservationSafe(response: Double, regressors: Vector) {
@@ -21,7 +21,7 @@ class StochasticGradientDescent(
                 if (term == 0) {
                     sumAcc + weights[term]
                 } else {
-                    sumAcc + weights[term] * regressorFunctions[term - 1](regressors(term - 1))
+                    sumAcc + weights[term] * regressors(term - 1)
                 }
             }
         }

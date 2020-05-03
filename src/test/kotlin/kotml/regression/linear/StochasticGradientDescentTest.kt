@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class StochasticGradientDescentTest {
     @Test
     fun `calculates weights correctly`() {
-        val estimator = StochasticGradientDescent(0.001, { x -> x })
+        val estimator = StochasticGradientDescent(1, 0.001)
         estimator.addObservation(-19.0, Vector(-9.0))
         estimator.addObservation(-17.0, Vector(-8.0))
         estimator.addObservation(-15.0, Vector(-7.0))

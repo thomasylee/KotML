@@ -10,9 +10,7 @@ import kotml.math.Vector
  * method must be called before estimate() can be used, due to batched
  * calculations required to build the model.
  */
-abstract class RegressionEstimator(val regressorFunctions: Array<out (Double) -> Double>) {
-    val regressorCount = regressorFunctions.size
-
+abstract class RegressionEstimator(val regressorCount: Int) {
     init {
         if (regressorCount < 1) {
             println(regressorCount)

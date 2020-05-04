@@ -35,11 +35,11 @@ abstract class RegressionEstimator(
     internal abstract fun addObservationSafe(response: Double, regressors: Vector)
 
     /**
-     * Returns a vector representation of the model, which is generally a
-     * series of weights.
-     * @return vector containing the model representation
+     * Returns a representation of the model, which is generally an array
+     * of weights.
+     * @return the model representation
      */
-    abstract fun calculate(): Vector
+    abstract fun calculate(): DoubleArray
 
     /**
      * Returns an estimate of the response given a complete set of

@@ -41,7 +41,7 @@ class StochasticGradientDescent(
      * values into the new Vector instance.
      * @return weights contained in a vector
      */
-    override fun calculate(): Vector = Vector(*weights)
+    override fun calculate(): DoubleArray = weights
 
     internal override fun estimateSafe(regressors: Vector): Double =
         function.evaluate(weights, regressors)

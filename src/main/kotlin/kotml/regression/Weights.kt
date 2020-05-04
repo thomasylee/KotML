@@ -1,5 +1,8 @@
 package kotml.regression
 
+import kotml.distributions.DistributionSampler
+import kotml.distributions.UniformSampler
+
 class Weights(
     val hasBias: Boolean = true,
     setBias: Double = 0.0,
@@ -11,7 +14,20 @@ class Weights(
         bias = if (hasBias) setBias else 0.0
     }
 
-    constructor(hasBias: Boolean = true, coeffCount: Int) : this(hasBias, 0.0, DoubleArray(coeffCount))
+    /**
+     * Creates weights with the values determined by the provided sampler.
+     * Note that if hasBias is true, the first sample will go to the bias.
+     * @param hasBias whether a bias should be included in the weights
+     * @param coeffCount number of coefficients to create
+     * @param sampler sampler used to set initial values for bias and coefficients
+     */
+    constructor(
+        hasBias: Boolean = true,
+        coeffCount: Int,
+        sampler: DistributionSampler = UniformSampler(0.0)
+    ) : this(hasBias, sampler.sample(), DoubleArray(coeffCount) {
+        sampler.sample()
+    })
 
     constructor(setBias: Double, coeffs: DoubleArray) : this(true, setBias, coeffs)
 

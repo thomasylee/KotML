@@ -1,5 +1,6 @@
 package kotml.regression.optimization
 
+import kotml.distributions.DistributionSampler
 import kotml.math.Vector
 import kotml.regression.RegressionException
 import kotml.regression.Weights
@@ -15,6 +16,16 @@ abstract class WeightedOptimizer(
     val objectiveFunction: ObjectiveFunction,
     val weights: Weights
 ) {
+    /**
+     * Copies all property-like attributes of the optimizer except for
+     * the weights. This simplifies specifying an optimizer one time and
+     * being able to use it in multiple places (such as for different
+     * neurons in a neural network).
+     * @param sampler sampler used to initialize the weights
+     * @return a copy of this WeightedOptimizer, but with different weights
+     */
+    internal abstract fun copy(sampler: DistributionSampler): WeightedOptimizer
+
     /**
      * Adds an observation to the training model.
      * @param response the dependent variable value

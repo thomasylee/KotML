@@ -1,5 +1,7 @@
 package kotml.regression.optimization
 
+import kotml.distributions.DistributionSampler
+import kotml.distributions.UniformSampler
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.Weights
@@ -28,6 +30,15 @@ class StochasticGradientDescent(
         costFunction = costFunction,
         weights = Weights(hasBias, regressorCount)
     )
+
+    internal fun copy(): WeightedOptimizer = copy(UniformSampler(0.0))
+
+    internal override fun copy(sampler: DistributionSampler): WeightedOptimizer =
+        StochasticGradientDescent(
+            stepSize = stepSize,
+            function = function,
+            costFunction = costFunction,
+            weights = Weights(weights.hasBias, weights.coeffs.size, sampler))
 
     internal override fun addObservation(response: Double, regressors: Vector) {
         val gradient = costFunction.gradient(function, weights, regressors, response)

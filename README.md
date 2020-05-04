@@ -100,6 +100,6 @@ estimator.addObservation(3.7, Vector(-2.0))
 estimator.addObservation(8.8, Vector(-3.0))
 estimator.addObservation(16.1, Vector(-4.0))
 
-val twoSquaredEstimate = estimator.function.evaluate(Vector(2.0))
+val twoSquaredEstimate = estimator.function.evaluate(estimator.weights, Vector(2.0))
 (10.0 * twoSquaredEstimate).toInt() / 10.0 == 4.3
 ```

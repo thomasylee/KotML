@@ -3,6 +3,7 @@ package kotml.regression.optimization
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionEstimator
+import kotml.regression.RegressionException
 import kotml.regression.functions.FunctionEstimator
 import kotml.regression.objectives.CostFunction
 
@@ -13,9 +14,17 @@ import kotml.regression.objectives.CostFunction
 class StochasticGradientDescent(
     val stepSize: Double,
     function: FunctionEstimator,
-    val costFunction: CostFunction
+    val costFunction: CostFunction,
+    initWeights: DoubleArray = DoubleArray(function.regressorCount + 1)
 ) : RegressionEstimator(function) {
     val weights: DoubleArray = DoubleArray(regressorCount + 1)
+
+    init {
+        if (initWeights.size != regressorCount + 1) {
+            throw RegressionException("Number of initial weights must equal the regressorCount + 1")
+        }
+        System.arraycopy(initWeights, 0, weights, 0, initWeights.size)
+    }
 
     internal override fun addObservationSafe(response: Double, regressors: Vector) {
         val gradient = costFunction.gradient(function, weights, regressors, response)

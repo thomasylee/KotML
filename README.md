@@ -4,7 +4,7 @@ Kotlin Machine Learning
 ## Vectors
 
 Use a `Vector` instance to represent an n-dimensional array of values, similarly to in numpy's array class.
-```
+```kotlin
 import kotml.math.Vector
 
 // Initialize with vararg Double values.
@@ -24,7 +24,7 @@ Vector(intArray(2, 3)) { 2 * it } == Vector(Vector(0, 2, 4), Vector(6, 8, 10))
 ```
 
 Vectors support basic mathematical operations.
-```
+```kotlin
 import kotml.extensions.plus // Provides 1 + vector for Double and Int
 import kotml.extensions.minus // Provides 1 - vector for Double and Int
 import kotml.extensions.times // Provides 1 * vector for Double and Int
@@ -51,7 +51,7 @@ vector x vector.transpose() == Vector(85)
 ```
 
 Vectors also support mapping, as well as folding, adding, and multiplying along an axis, similarly to in numpy.
-```
+```kotlin
 Vector(Vector(1, 2), Vector(3, 4)).map { it * 2 } ==
     Vector(Vector(2, 4), Vector(6, 8))
 
@@ -78,7 +78,7 @@ A `FunctionModel` represents a mathemtical function such as a polynomial (`Polyn
 A `CostFunction` represents a differentiable cost function such as least squared error (`OrdinaryLeastSquares` object).
 
 You can use `StochasticGradientDescent` to estimate functions by building weights that minimize cost.
-```
+```kotlin
 import kotml.math.Vector
 import kotml.regression.functions.Polynomial
 import kotml.regression.objectives.OrdinaryLeastSquares
@@ -100,6 +100,6 @@ estimator.addObservation(3.7, Vector(-2.0))
 estimator.addObservation(8.8, Vector(-3.0))
 estimator.addObservation(16.1, Vector(-4.0))
 
-val twoSquaredEstimate = estimator.estimate(Vector(2.0)
-(10 * twoSquaredEstimate).toInt() / 10.0 == 4.3
+val twoSquaredEstimate = estimator.estimate(Vector(2.0))
+(10.0 * twoSquaredEstimate).toInt() / 10.0 == 4.3
 ```

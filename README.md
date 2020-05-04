@@ -23,7 +23,7 @@ Vector.zeros(intArray(2, 4)) == Vector(Vector(0, 0, 0, 0), Vector(0, 0, 0, 0))
 Vector(intArray(2, 3)) { 2 * it } == Vector(Vector(0, 2, 4), Vector(6, 8, 10))
 ```
 
-Vectors support a range of mathematical operations.
+Vectors support basic mathematical operations.
 ```
 import kotml.extensions.plus // Provides 1 + vector for Double and Int
 import kotml.extensions.minus // Provides 1 - vector for Double and Int
@@ -48,6 +48,27 @@ vector dot vector == 85.0
 
 // Matrix multiplication
 vector x vector.transpose() == Vector(85)
+```
+
+Vectors also support mapping, as well as folding, adding, and multiplying along an axis, similarly to in numpy.
+```
+Vector(Vector(1, 2), Vector(3, 4)).map { it * 2 } ==
+    Vector(Vector(2, 4), Vector(6, 8))
+
+// Setting axis = 0 is the default.
+Vector(Vector(1), Vector(2), Vector(3)).fold(initial = 0.0, axis = 0) { acc, value ->
+    acc + 2 * value
+} == Vector(12.0)
+
+Vector(Vector(1), Vector(2), Vector(3)).fold(initial = 0.0, axis = 1) { acc, value ->
+    acc + 2 * value
+} == Vector(2, 4, 6)
+
+Vector(1, 2).sum() == Vector(3)
+Vector(Vector(1), Vector(2)).sum(axis = 1) == Vector(1, 2)
+
+Vector(1, 2).product() == Vector(2)
+Vector(Vector(1), Vector(2)).product(axis = 1) == Vector(1, 2)
 ```
 
 ## Regression

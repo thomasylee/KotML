@@ -23,6 +23,21 @@ Vector.zeros(intArray(2, 4)) == Vector(Vector(0, 0, 0, 0), Vector(0, 0, 0, 0))
 Vector(intArray(2, 3)) { 2 * it } == Vector(Vector(0, 2, 4), Vector(6, 8, 10))
 ```
 
+Due to Kotlin's static typing, we use `[]` to access `Vector` elements, and `()` to access `Double` elements.
+```kotlin
+val vector = Vector(
+    Vector(
+        Vector(1, 2, 3),
+        Vector(4, 5, 6)),
+    Vector(
+        Vector(7, 8, 9),
+        Vector(10, 11, 12)))
+
+vector[0][0](0) == 1.0
+vector[0][1](1) == 5.0
+vector[1][1](2) == 12.0
+```
+
 Vectors support basic mathematical operations.
 ```kotlin
 import kotml.extensions.plus // Provides 1 + vector for Double and Int
@@ -77,7 +92,7 @@ A `FunctionModel` represents a mathemtical function such as a polynomial (`Polyn
 
 A `CostFunction` represents a differentiable cost function such as least squared error (`OrdinaryLeastSquares` object).
 
-You can use `StochasticGradientDescent` to build models of functions by selecting weights that minimize a cost function.
+You can use a `WeightedOptimizer` like `StochasticGradientDescent` to build models of functions by selecting weights that minimize a cost function.
 ```kotlin
 import kotml.math.Vector
 import kotml.regression.functions.Polynomial

@@ -1,4 +1,4 @@
-package kotml.regression.cost
+package kotml.regression.objectives
 
 import kotml.math.Vector
 import kotml.regression.functions.FunctionEstimator

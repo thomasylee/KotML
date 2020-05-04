@@ -1,9 +1,9 @@
-package kotml.regression.cost
+package kotml.regression.objectives
 
 import kotml.math.Vector
 import kotml.regression.functions.FunctionEstimator
 
-object LeastSquares : CostFunction() {
+object OrdinaryLeastSquares : CostFunction() {
     /**
      * Returns the least squares cost.
      * @param function estimating function

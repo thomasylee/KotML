@@ -1,10 +1,10 @@
-package kotml.regression.linear
+package kotml.regression.optimization
 
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionEstimator
-import kotml.regression.cost.CostFunction
 import kotml.regression.functions.FunctionEstimator
+import kotml.regression.objectives.CostFunction
 
 /**
  * StochasticGradientDescent incrementally estimates weights based on

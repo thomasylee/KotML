@@ -20,19 +20,31 @@ class Polynomial(val exponents: Vector) : FunctionModel {
     override fun evaluate(weights: DoubleArray, regressors: Vector): Double {
         validateRegressorsShape(regressors)
 
-        return (0 until regressorCount).fold(weights[0]) { sumAcc, index ->
-            sumAcc + weights[index + 1] * regressors(index).pow(exponents(index))
+        // Offset the regressors if weights[0] is a bias.
+        if (weights.size == regressorCount + 1) {
+            return (0 until regressorCount).fold(weights[0]) { sumAcc, index ->
+                sumAcc + weights[index + 1] * regressors(index).pow(exponents(index))
+            }
+        }
+        return (0 until regressorCount).fold(0.0) { sumAcc, index ->
+            sumAcc + weights[index] * regressors(index).pow(exponents(index))
         }
     }
 
     override fun gradient(weights: DoubleArray, regressors: Vector): Vector {
         validateRegressorsShape(regressors)
 
+        // Offset the regressors if weights[0] is a bias.
+        if (weights.size == regressorCount + 1) {
+            return Vector(*DoubleArray(weights.size) { index ->
+                if (index == 0)
+                    1.0
+                else
+                    regressors(index - 1).pow(exponents(index - 1))
+            })
+        }
         return Vector(*DoubleArray(weights.size) { index ->
-            if (index == 0)
-                1.0
-            else
-                regressors(index - 1).pow(exponents(index - 1))
+            regressors(index).pow(exponents(index))
         })
     }
 

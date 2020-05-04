@@ -8,9 +8,10 @@ import org.junit.jupiter.api.Test
 
 class StochasticGradientDescentTest {
     @Test
-    fun `calculates weights correctly`() {
+    fun `calculates weights correctly with bias`() {
         val estimator = StochasticGradientDescent(
             0.001, 1, Polynomial(Vector(1.0)), OrdinaryLeastSquares)
+        assertEquals(2, estimator.weights.size)
         estimator.addObservation(-19.0, Vector(-9.0))
         estimator.addObservation(-17.0, Vector(-8.0))
         estimator.addObservation(-15.0, Vector(-7.0))
@@ -20,13 +21,28 @@ class StochasticGradientDescentTest {
     }
 
     @Test
+    fun `calculates weights correctly without bias`() {
+        val estimator = StochasticGradientDescent(
+            0.02, 1, Polynomial(Vector(1.0)), OrdinaryLeastSquares, false)
+        estimator.addObservation(0.0, Vector(0.0))
+        estimator.addObservation(2.0, Vector(1.0))
+        estimator.addObservation(4.0, Vector(2.0))
+        estimator.addObservation(6.0, Vector(3.0))
+        estimator.addObservation(8.0, Vector(4.0))
+        estimator.addObservation(10.0, Vector(5.0))
+        assertEquals(1, estimator.weights.size)
+        assertEquals(2.0, estimator.weights[0])
+        assertEquals(12.0, estimator.function.evaluate(estimator.weights, Vector(6.0)))
+    }
+
+    @Test
     fun `providing initWeights sets the weights correctly`() {
         val estimator = StochasticGradientDescent(
             stepSize = 0.001,
             regressorCount = 1,
             function = Polynomial(Vector(1.0)),
             costFunction = OrdinaryLeastSquares,
-            initWeights = doubleArrayOf(-0.038, 0.342)
+            weights = doubleArrayOf(-0.038, 0.342)
         )
         estimator.addObservation(-17.0, Vector(-8.0))
         estimator.addObservation(-15.0, Vector(-7.0))

@@ -103,3 +103,5 @@ estimator.addObservation(16.1, Vector(-4.0))
 val twoSquaredEstimate = estimator.function.evaluate(estimator.weights, Vector(2.0))
 (10.0 * twoSquaredEstimate).toInt() / 10.0 == 4.3
 ```
+
+Note that the number of weights in StochasticGradientDescent can be regressorCount (no bias) or gressorCount + 1 (with bias), either by initializing with includeBias=true/false, or by providing weights of the appropriate size.

@@ -15,20 +15,31 @@ class StochasticGradientDescent(
     regressorCount: Int,
     function: FunctionModel,
     val costFunction: CostFunction,
-    initWeights: DoubleArray = DoubleArray(regressorCount + 1)
+    val includeBias: Boolean,
+    val weights: DoubleArray = DoubleArray(
+        regressorCount + if (includeBias) 1 else 0
+    )
 ) : Optimizer(regressorCount, function, costFunction) {
-    val weights: DoubleArray
-
     init {
-        if (initWeights.size != regressorCount + 1) {
-            throw RegressionException("Number of initial weights must equal the regressorCount + 1")
+        val weightCount = regressorCount + if (includeBias) 1 else 0
+        if (weights.size != weightCount) {
+            throw RegressionException(
+                "Number of weights ${weights.size} was expected to be $weightCount"
+            )
         }
-        weights = initWeights
     }
+
+    constructor(
+        stepSize: Double,
+        regressorCount: Int,
+        function: FunctionModel,
+        costFunction: CostFunction,
+        weights: DoubleArray = DoubleArray(regressorCount + 1)
+    ) : this(stepSize, regressorCount, function, costFunction, weights.size > regressorCount, weights)
 
     internal override fun addObservation(response: Double, regressors: Vector) {
         val gradient = costFunction.gradient(function, weights, regressors, response)
-        (0..regressorCount).forEach { index ->
+        (0 until weights.size).forEach { index ->
             weights[index] = weights[index] - stepSize * gradient(index)
         }
     }

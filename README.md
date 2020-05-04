@@ -73,9 +73,9 @@ Vector(Vector(1), Vector(2)).product(axis = 1) == Vector(1, 2)
 
 ## Regression
 
-A `FunctionModel` represents a mathemtical function such as a polynomial (Polynomial class) or logistic function (LogisticFunction object).
+A `FunctionModel` represents a mathemtical function such as a polynomial (`Polynomial` class) or logistic function (`LogisticFunction` object).
 
-A `CostFunction` represents a differentiable cost function such as least squared error (OrdinaryLeastSquares object).
+A `CostFunction` represents a differentiable cost function such as least squared error (`OrdinaryLeastSquares` object).
 
 You can use `StochasticGradientDescent` to estimate functions by building weights that minimize cost.
 ```

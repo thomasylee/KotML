@@ -13,17 +13,18 @@ import kotml.regression.objectives.CostFunction
  */
 class StochasticGradientDescent(
     val stepSize: Double,
+    regressorCount: Int,
     function: FunctionEstimator,
     val costFunction: CostFunction,
-    initWeights: DoubleArray = DoubleArray(function.regressorCount + 1)
-) : RegressionEstimator(function) {
-    val weights: DoubleArray = DoubleArray(regressorCount + 1)
+    initWeights: DoubleArray = DoubleArray(regressorCount + 1)
+) : RegressionEstimator(regressorCount, function) {
+    val weights: DoubleArray
 
     init {
         if (initWeights.size != regressorCount + 1) {
             throw RegressionException("Number of initial weights must equal the regressorCount + 1")
         }
-        System.arraycopy(initWeights, 0, weights, 0, initWeights.size)
+        weights = initWeights
     }
 
     internal override fun addObservationSafe(response: Double, regressors: Vector) {

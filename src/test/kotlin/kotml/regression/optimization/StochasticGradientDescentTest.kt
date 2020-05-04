@@ -10,7 +10,7 @@ class StochasticGradientDescentTest {
     @Test
     fun `calculates weights correctly`() {
         val estimator = StochasticGradientDescent(
-            0.001, Polynomial(Vector(1.0)), OrdinaryLeastSquares)
+            0.001, 1, Polynomial(Vector(1.0)), OrdinaryLeastSquares)
         estimator.addObservation(-19.0, Vector(-9.0))
         estimator.addObservation(-17.0, Vector(-8.0))
         estimator.addObservation(-15.0, Vector(-7.0))
@@ -22,9 +22,10 @@ class StochasticGradientDescentTest {
     @Test
     fun `providing initWeights sets the weights correctly`() {
         val estimator = StochasticGradientDescent(
-            0.001,
-            Polynomial(Vector(1.0)),
-            OrdinaryLeastSquares,
+            stepSize = 0.001,
+            regressorCount = 1,
+            function = Polynomial(Vector(1.0)),
+            costFunction = OrdinaryLeastSquares,
             initWeights = doubleArrayOf(-0.038, 0.342)
         )
         estimator.addObservation(-17.0, Vector(-8.0))

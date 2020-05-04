@@ -35,11 +35,10 @@ class StochasticGradientDescent(
     }
 
     /**
-     * Returns a Vector instance containing the weights. Since the weights
-     * are estimated as each observation is added, no heavy calculations
-     * are required on calls to calculate() aside from copying the weight
-     * values into the new Vector instance.
-     * @return weights contained in a vector
+     * Returns the weights. Since the weights are estimated as each
+     * observation is added, no heavy calculations are required on calls
+     * to this method.
+     * @return weights
      */
     override fun calculate(): DoubleArray = weights
 

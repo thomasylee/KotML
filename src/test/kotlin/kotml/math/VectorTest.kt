@@ -53,7 +53,7 @@ class VectorTest {
     @Test
     fun `Vector(vararg Vector) initializes Vector with correct values`() {
         val vector = Vector(
-            Vector(-2.0, -1.0),
+            Vector(-2, -1),
             Vector(0.0, 1.0),
             Vector(2.0, 3.0))
         assertEquals(2, vector.dimensions)
@@ -71,7 +71,7 @@ class VectorTest {
     fun `zeros() initializes a vector with all zero values`() {
         assertEquals(Vector(0.0, 0.0, 0.0), Vector.zeros(intArrayOf(3)))
         assertEquals(
-            Vector(Vector(0.0, 0.0), Vector(0.0, 0.0), Vector(0.0, 0.0)),
+            Vector(Vector(0, 0), Vector(0, 0), Vector(0, 0)),
             Vector.zeros(intArrayOf(3, 2)))
     }
 
@@ -82,19 +82,6 @@ class VectorTest {
             Vector(-1.0, 1.0, 3.0),
             Vector(2.0, 1.0, 0.0),
             Vector(4.0, 3.0, -2.0)).det())
-    }
-
-    @Test
-    fun `clone() creates a copy of the vector`() {
-        val rowVector = Vector(1.0, 2.0, 3.0)
-        val rowVectorCopy = rowVector.clone()
-        assertEquals(Vector(1.0, 2.0, 3.0), rowVectorCopy)
-
-        val multidimensionalVector = Vector(
-            Vector(1.0, 2.0),
-            Vector(3.0, 4.0))
-        val multidimensionalVectorCopy = multidimensionalVector.clone()
-        assertEquals(Vector(Vector(1.0, 2.0), Vector(3.0, 4.0)), multidimensionalVectorCopy)
     }
 
     @Test

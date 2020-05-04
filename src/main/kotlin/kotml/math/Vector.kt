@@ -360,17 +360,6 @@ class Vector private constructor(initIndex: Int, val shape: IntArray, mapValues:
     }
 
     /**
-     * Returns a copy of this vector.
-     * @return copy of this vector
-     */
-    fun clone(): Vector =
-        if (dimensions == 1) {
-            Vector(*scalarValues.clone())
-        } else {
-            Vector(*Array<Vector>(shape[0]) { vectorValues[it].clone() })
-        }
-
-    /**
      * Returns true if `other` is a Vector with the same shape and values
      * as this vector.
      * @param other vector to check equality against

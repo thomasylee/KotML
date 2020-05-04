@@ -77,7 +77,7 @@ A `FunctionModel` represents a mathemtical function such as a polynomial (`Polyn
 
 A `CostFunction` represents a differentiable cost function such as least squared error (`OrdinaryLeastSquares` object).
 
-You can use `StochasticGradientDescent` to estimate functions by building weights that minimize cost.
+You can use `StochasticGradientDescent` to build models of functions by selecting weights that minimize a cost function.
 ```kotlin
 import kotml.math.Vector
 import kotml.regression.functions.Polynomial
@@ -100,6 +100,6 @@ estimator.addObservation(3.7, Vector(-2.0))
 estimator.addObservation(8.8, Vector(-3.0))
 estimator.addObservation(16.1, Vector(-4.0))
 
-val twoSquaredEstimate = estimator.estimate(Vector(2.0))
+val twoSquaredEstimate = estimator.function.evaluate(Vector(2.0))
 (10.0 * twoSquaredEstimate).toInt() / 10.0 == 4.3
 ```

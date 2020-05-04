@@ -3,7 +3,7 @@ package kotml.regression.objectives
 import kotml.math.Vector
 import kotml.regression.functions.FunctionModel
 
-object OrdinaryLeastSquares : CostFunction() {
+object OrdinaryLeastSquares : CostFunction {
     /**
      * Returns the least squares cost.
      * @param function model function
@@ -12,7 +12,7 @@ object OrdinaryLeastSquares : CostFunction() {
      * @param response dependent variable value
      * @return least squares cost
      */
-    override fun cost(function: FunctionModel, weights: DoubleArray, regressors: Vector, response: Double): Double {
+    override fun evaluate(function: FunctionModel, weights: DoubleArray, regressors: Vector, response: Double): Double {
         val error = function.evaluate(weights, regressors) - response
         return error * error
     }

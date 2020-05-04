@@ -4,7 +4,7 @@ import kotlin.math.pow
 import kotml.math.Vector
 import kotml.regression.RegressionException
 
-class Polynomial(val exponents: Vector) : FunctionEstimator {
+class Polynomial(val exponents: Vector) : FunctionModel {
     private val regressorCount = exponents.shape[0]
 
     init {
@@ -17,7 +17,7 @@ class Polynomial(val exponents: Vector) : FunctionEstimator {
 
     constructor(vararg exponents: Int) : this(Vector(*DoubleArray(exponents.size) { exponents[it].toDouble() }))
 
-    override fun estimate(weights: DoubleArray, regressors: Vector): Double {
+    override fun evaluate(weights: DoubleArray, regressors: Vector): Double {
         validateRegressorsShape(regressors)
 
         return (0 until regressorCount).fold(weights[0]) { sumAcc, index ->

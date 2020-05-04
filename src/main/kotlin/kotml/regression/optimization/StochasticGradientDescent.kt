@@ -4,7 +4,7 @@ import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionEstimator
 import kotml.regression.RegressionException
-import kotml.regression.functions.FunctionEstimator
+import kotml.regression.functions.FunctionModel
 import kotml.regression.objectives.CostFunction
 
 /**
@@ -14,7 +14,7 @@ import kotml.regression.objectives.CostFunction
 class StochasticGradientDescent(
     val stepSize: Double,
     regressorCount: Int,
-    function: FunctionEstimator,
+    function: FunctionModel,
     val costFunction: CostFunction,
     initWeights: DoubleArray = DoubleArray(regressorCount + 1)
 ) : RegressionEstimator(regressorCount, function) {
@@ -44,5 +44,5 @@ class StochasticGradientDescent(
     override fun calculate(): Vector = Vector(*weights)
 
     internal override fun estimateSafe(regressors: Vector): Double =
-        function.estimate(weights, regressors)
+        function.evaluate(weights, regressors)
 }

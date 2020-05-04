@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class LogisticFunctionTest {
     @Test
     fun `estimate() returns the correct estimate value`() {
-        assertEquals(0.9046505351008906, LogisticFunction.estimate(
+        assertEquals(0.9046505351008906, LogisticFunction.evaluate(
             doubleArrayOf(-4.5, 2.0, 1.5),
             Vector(3.0, 0.5)
         ))

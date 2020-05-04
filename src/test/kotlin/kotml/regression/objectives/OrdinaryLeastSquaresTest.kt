@@ -1,6 +1,7 @@
 package kotml.regression.objectives
 
 import kotml.math.Vector
+import kotml.regression.Weights
 import kotml.regression.functions.Polynomial
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -10,7 +11,7 @@ class OrdinaryLeastSquaresTest {
     fun `evaluate() returns the correct cost with bias`() {
         assertEquals(9.0, OrdinaryLeastSquares.evaluate(
             function = Polynomial(Vector(2)),
-            weights = doubleArrayOf(1.0, 2.0),
+            weights = Weights(1.0, doubleArrayOf(2.0)),
             regressors = Vector(3),
             response = 16.0))
     }
@@ -19,7 +20,7 @@ class OrdinaryLeastSquaresTest {
     fun `evaluate() returns the correct cost without bias`() {
         assertEquals(4.0, OrdinaryLeastSquares.evaluate(
             function = Polynomial(Vector(2)),
-            weights = doubleArrayOf(2.0),
+            weights = Weights(false, doubleArrayOf(2.0)),
             regressors = Vector(3),
             response = 16.0))
     }

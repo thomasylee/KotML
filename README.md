@@ -92,6 +92,21 @@ A `FunctionModel` represents a mathemtical function such as a polynomial (`Polyn
 
 A `CostFunction` represents a differentiable cost function such as least squared error (`OrdinaryLeastSquares` object).
 
+`Weights` tracks the coefficient weights and, optionally, bias weights.
+```kotlin
+Weights(0.1, doubleArray(0.2, 0.3)) // bias = 0.1, coeffs = 0.2, 0.3
+Weights(false, doubleArray(0.2, 0.3)) // no bias, coeffs = 0.2, 0.3
+
+Weights(3) // bias = 0, coeffs = 0, 0
+Weights(false, 3) // no bias, coeffs = 0, 0, 0
+
+val weights = Weights(3)
+weights.hasBias == true
+weights.bias == 0.0
+weights.coeffs[0] == 0
+weights.coeffs[1] == 0
+```
+
 You can use a `WeightedOptimizer` like `StochasticGradientDescent` to build models of functions by selecting weights that minimize a cost function.
 ```kotlin
 import kotml.math.Vector
@@ -103,9 +118,10 @@ import kotml.regression.optimization.StochasticGradientDescent
 // form a + b * x^2, with ordinary least squares cost.
 val estimator = StochasticGradientDescent(
     stepSize = 0.001,
-    regressorCount = 1,
     function = Polynomial(Vector(2.0)), // The only regressor has exponent = 2.
-    costFunction = OrdinaryLeastSquares)
+    costFunction = OrdinaryLeastSquares,
+    regressorCount = 1
+)
 
 // This should look similar to y = x^2.
 estimator.addObservation(24.8, Vector(5.0))
@@ -118,5 +134,3 @@ estimator.addObservation(16.1, Vector(-4.0))
 val twoSquaredEstimate = estimator.function.evaluate(estimator.weights, Vector(2.0))
 (10.0 * twoSquaredEstimate).toInt() / 10.0 == 4.3
 ```
-
-Note that the number of weights in StochasticGradientDescent can be regressorCount (no bias) or gressorCount + 1 (with bias), either by initializing with includeBias=true/false, or by providing weights of the appropriate size.

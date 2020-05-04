@@ -2,6 +2,7 @@ package kotml.regression.optimization
 
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
+import kotml.regression.Weights
 import kotml.regression.functions.FunctionModel
 import kotml.regression.objectives.CostFunction
 
@@ -11,26 +12,31 @@ import kotml.regression.objectives.CostFunction
  */
 class StochasticGradientDescent(
     val stepSize: Double,
-    regressorCount: Int,
     function: FunctionModel,
     val costFunction: CostFunction,
-    includeBias: Boolean,
-    weights: DoubleArray = DoubleArray(
-        regressorCount + if (includeBias) 1 else 0
-    )
-) : WeightedOptimizer(regressorCount, function, costFunction, includeBias, weights) {
+    weights: Weights
+) : WeightedOptimizer(function, costFunction, weights) {
     constructor(
         stepSize: Double,
-        regressorCount: Int,
         function: FunctionModel,
         costFunction: CostFunction,
-        weights: DoubleArray = DoubleArray(regressorCount + 1)
-    ) : this(stepSize, regressorCount, function, costFunction, weights.size > regressorCount, weights)
+        regressorCount: Int,
+        hasBias: Boolean = true
+    ) : this(
+        stepSize = stepSize,
+        function = function,
+        costFunction = costFunction,
+        weights = Weights(hasBias, regressorCount)
+    )
 
     internal override fun addObservation(response: Double, regressors: Vector) {
         val gradient = costFunction.gradient(function, weights, regressors, response)
-        (0 until weights.size).forEach { index ->
-            weights[index] = weights[index] - stepSize * gradient(index)
+
+        if (weights.hasBias)
+            weights.bias = weights.bias - stepSize * gradient.bias
+
+        weights.coeffs.forEachIndexed { index, coeff ->
+            weights.coeffs[index] = coeff - stepSize * gradient.coeffs[index]
         }
     }
 }

@@ -3,6 +3,7 @@ package kotml.regression.functions
 import kotlin.math.pow
 import kotml.math.Vector
 import kotml.regression.RegressionException
+import kotml.regression.Weights
 
 class Polynomial(val exponents: Vector) : FunctionModel {
     private val regressorCount = exponents.shape[0]
@@ -17,35 +18,23 @@ class Polynomial(val exponents: Vector) : FunctionModel {
 
     constructor(vararg exponents: Int) : this(Vector(*DoubleArray(exponents.size) { exponents[it].toDouble() }))
 
-    override fun evaluate(weights: DoubleArray, regressors: Vector): Double {
+    override fun evaluate(weights: Weights, regressors: Vector): Double {
         validateRegressorsShape(regressors)
 
-        // Offset the regressors if weights[0] is a bias.
-        if (weights.size == regressorCount + 1) {
-            return (0 until regressorCount).fold(weights[0]) { sumAcc, index ->
-                sumAcc + weights[index + 1] * regressors(index).pow(exponents(index))
-            }
-        }
-        return (0 until regressorCount).fold(0.0) { sumAcc, index ->
-            sumAcc + weights[index] * regressors(index).pow(exponents(index))
+        return weights.coeffs.foldIndexed(weights.bias) { index, acc, coeff ->
+            acc + coeff * regressors(index).pow(exponents(index))
         }
     }
 
-    override fun gradient(weights: DoubleArray, regressors: Vector): Vector {
+    override fun gradient(weights: Weights, regressors: Vector): Weights {
         validateRegressorsShape(regressors)
 
-        // Offset the regressors if weights[0] is a bias.
-        if (weights.size == regressorCount + 1) {
-            return Vector(*DoubleArray(weights.size) { index ->
-                if (index == 0)
-                    1.0
-                else
-                    regressors(index - 1).pow(exponents(index - 1))
-            })
-        }
-        return Vector(*DoubleArray(weights.size) { index ->
+        val coeffGradient = DoubleArray(weights.coeffs.size) { index ->
             regressors(index).pow(exponents(index))
-        })
+        }
+        if (weights.hasBias)
+            return Weights(1.0, coeffGradient)
+        return Weights(false, coeffGradient)
     }
 
     private fun validateRegressorsShape(regressors: Vector) {

@@ -16,14 +16,14 @@ package kotml.math
  * a / b = Entrywise quotient (e.g. [9, 2] / [3, 1] = [3, 2])
  * a x b = Matrix multiplication product (e.g. [1, -2, 3] x [[4, 1], [0, 0], [-1, 2]] = [1, 7])
  */
-class Vector private constructor(val shape: IntArray) {
+class Vector private constructor(initIndex: Int, val shape: IntArray, mapValues: (Int) -> Double) {
     private val scalarValues: DoubleArray
     private val vectorValues: Array<Vector>
     val dimensions: Int
 
     companion object {
         @JvmStatic
-        fun zeros(shape: IntArray): Vector = Vector(shape)
+        fun zeros(shape: IntArray): Vector = Vector(shape) { 0.0 }
 
         @JvmStatic
         private fun addDimensionToShape(dimension: Int, shape: IntArray): IntArray =
@@ -50,42 +50,39 @@ class Vector private constructor(val shape: IntArray) {
         }
 
         if (dimensions == 1) {
-            scalarValues = DoubleArray(shape[0]) { 0.0 }
+            scalarValues = DoubleArray(shape[0]) { mapValues(initIndex + it) }
             vectorValues = arrayOf()
         } else {
             scalarValues = doubleArrayOf()
-            vectorValues = Array<Vector>(shape[0]) {
-                Vector(removeDimensionFromShape(shape))
+            val subVectorShape = removeDimensionFromShape(shape)
+            val scalarsPerVector = subVectorShape.fold(1) { acc, dim ->
+                acc * dim
+            }
+            vectorValues = Array<Vector>(shape[0]) { index ->
+                Vector(initIndex + index * scalarsPerVector, subVectorShape, mapValues)
             }
         }
     }
 
-    constructor(vararg values: Double) : this(intArrayOf(values.size)) {
-        System.arraycopy(values, 0, scalarValues, 0, values.size)
-    }
+    constructor(shape: IntArray, mapValues: (Int) -> Double) : this(0, shape, mapValues)
+
+    constructor(vararg values: Double) : this(0, intArrayOf(values.size), {
+        values[it]
+    })
+
+    constructor(vararg values: Int) : this(0, intArrayOf(values.size), {
+        values[it].toDouble()
+    })
 
     constructor(vararg values: Vector) : this(
-        if (values.size == 1) {
-            values.first().shape
-        } else {
-            addDimensionToShape(
-                values.size,
-                values.elementAtOrElse(0) { Vector(intArrayOf()) }.shape)
-        }
+        0,
+        addDimensionToShape(
+            values.size,
+            values.elementAtOrNull(0)?.shape ?: intArrayOf()),
+        { 0.0 }
     ) {
-        if (values.size == 1) {
-            val vector = values.first()
-            if (vector.dimensions == 1) {
-                System.arraycopy(vector.scalarValues, 0, scalarValues, 0, vector.shape[0])
-            } else {
-                (0 until vector.shape[0]).forEach {
-                    vectorValues[it] = vector.vectorValues[it].clone()
-                }
-            }
-        } else {
-            (0 until values.size).forEach {
-                vectorValues[it] = values[it]
-            }
+        (0 until values.size).forEach {
+            vectorValues[it] = values[it]
         }
     }
 
@@ -315,12 +312,14 @@ class Vector private constructor(val shape: IntArray) {
                 "Only vectors with 1 or 2 dimensions can be transposed"
             )
         }
-        if (dimensions == 1) {
+        if (dimensions == 1 && shape[0] == 1) {
+            return this
+        } else if (dimensions == 1) {
             return Vector(*Array<Vector>(shape[0]) { index ->
                 Vector(scalarValues[index])
             })
-        } else if (shape[0] == 1) {
-            return Vector(*DoubleArray(shape[1]) { index ->
+        } else if (shape[1] == 1) {
+            return Vector(*DoubleArray(shape[0]) { index ->
                 vectorValues[index](0)
             })
         } else {

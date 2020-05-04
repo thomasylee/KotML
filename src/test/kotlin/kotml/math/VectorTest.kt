@@ -12,7 +12,24 @@ import org.junit.jupiter.api.Test
 
 class VectorTest {
     @Test
-    fun `Vector(vararg Double) returns Vector with correct values`() {
+    fun `Vector(shape, mapValues) initializes Vector with correct values`() {
+        val vector = Vector(intArrayOf(2, 3, 4)) { it * 2.0 }
+        assertEquals(3, vector.dimensions)
+        assertEquals(3, vector.shape.size)
+        assertTrue(vector.shapeEquals(intArrayOf(2, 3, 4)))
+        assertEquals(0.0, vector[0][0](0))
+        assertEquals(2.0, vector[0][0](1))
+        assertEquals(8.0, vector[0][1](0))
+        assertEquals(10.0, vector[0][1](1))
+        assertEquals(24.0, vector[1][0](0))
+        assertEquals(26.0, vector[1][0](1))
+        assertEquals(32.0, vector[1][1](0))
+        assertEquals(34.0, vector[1][1](1))
+        assertEquals(46.0, vector[1][2](3))
+    }
+
+    @Test
+    fun `Vector(vararg Double) initializes Vector with correct values`() {
         val vector = Vector(-1.5, 0.0, 1.5)
         assertEquals(1, vector.dimensions)
         assertEquals(1, vector.shape.size)
@@ -23,7 +40,18 @@ class VectorTest {
     }
 
     @Test
-    fun `Vector(vararg Vector) returns Vector with correct values`() {
+    fun `Vector(vararg Int) initializes Vector with correct values`() {
+        val vector = Vector(-1, 0, 1)
+        assertEquals(1, vector.dimensions)
+        assertEquals(1, vector.shape.size)
+        assertTrue(vector.shapeEquals(intArrayOf(3)))
+        assertEquals(-1.0, vector(0))
+        assertEquals(0.0, vector(1))
+        assertEquals(1.0, vector(2))
+    }
+
+    @Test
+    fun `Vector(vararg Vector) initializes Vector with correct values`() {
         val vector = Vector(
             Vector(-2.0, -1.0),
             Vector(0.0, 1.0),
@@ -40,32 +68,11 @@ class VectorTest {
     }
 
     @Test
-    fun `Vector(Vector) initializes as a copy of the vector`() {
-        assertEquals(Vector(1.0, 2.0, 3.0), Vector(Vector(1.0, 2.0, 3.0)))
-        assertEquals(Vector(Vector(1.0), Vector(2.0)),
-            Vector(Vector(Vector(1.0), Vector(2.0))))
-    }
-
-    @Test
     fun `zeros() initializes a vector with all zero values`() {
         assertEquals(Vector(0.0, 0.0, 0.0), Vector.zeros(intArrayOf(3)))
         assertEquals(
             Vector(Vector(0.0, 0.0), Vector(0.0, 0.0), Vector(0.0, 0.0)),
             Vector.zeros(intArrayOf(3, 2)))
-    }
-
-    @Test
-    fun `transpose() correctly transposes the vector`() {
-        assertEquals(Vector(Vector(1.0), Vector(2.0)), Vector(1.0, 2.0).transpose())
-        assertEquals(Vector(1.0, 2.0), Vector(Vector(1.0), Vector(2.0)).transpose())
-        assertEquals(
-            Vector(
-                Vector(1.0, 4.0),
-                Vector(2.0, 5.0),
-                Vector(3.0, 6.0)),
-            Vector(
-                Vector(1.0, 2.0, 3.0),
-                Vector(4.0, 5.0, 6.0)).transpose())
     }
 
     @Test
@@ -328,6 +335,7 @@ class VectorTest {
 
     @Test
     fun `transpose() returns the transpose of the vector`() {
+        assertEquals(Vector(5.0), Vector(5.0).transpose())
         assertEquals(Vector(Vector(1.0), Vector(2.0)), Vector(1.0, 2.0).transpose())
         assertEquals(Vector(1.0, 2.0), Vector(Vector(1.0), Vector(2.0)).transpose())
         assertEquals(

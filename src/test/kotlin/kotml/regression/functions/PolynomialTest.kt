@@ -17,7 +17,7 @@ class PolynomialTest {
     @Test
     fun `estimate() returns the correct estimate value without bias`() {
         assertEquals(7.25, Polynomial(1, 2).evaluate(
-            Weights(false, doubleArrayOf(-2.5, 1.0)),
+            Weights(doubleArrayOf(-2.5, 1.0)),
             Vector(2.0, 3.5)
         ))
     }
@@ -36,9 +36,9 @@ class PolynomialTest {
     @Test
     fun `gradient() returns the correct gradient without bias`() {
         assertEquals(
-            Weights(false, doubleArrayOf(2.0, 12.25)),
+            Weights(doubleArrayOf(2.0, 12.25)),
             Polynomial(1.0, 2.0).gradient(
-                Weights(false, doubleArrayOf(-2.5, 1.0)),
+                Weights(doubleArrayOf(-2.5, 1.0)),
                 Vector(2.0, 3.5)
             )
         )

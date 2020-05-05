@@ -4,15 +4,23 @@ import kotml.distributions.DistributionSampler
 import kotml.distributions.UniformSampler
 
 class Weights(
-    val hasBias: Boolean = true,
-    setBias: Double = 0.0,
+    bias: Double?,
     val coeffs: DoubleArray
 ) {
+    val hasBias: Boolean
     var bias: Double
 
     init {
-        bias = if (hasBias) setBias else 0.0
+        if (bias != null) {
+            hasBias = true
+            this.bias = bias
+        } else {
+            hasBias = false
+            this.bias = 0.0
+        }
     }
+
+    constructor(coeffs: DoubleArray) : this(null, coeffs)
 
     /**
      * Creates weights with the values determined by the provided sampler.
@@ -22,22 +30,12 @@ class Weights(
      * @param sampler sampler used to set initial values for bias and coefficients
      */
     constructor(
-        hasBias: Boolean = true,
         coeffCount: Int,
+        hasBias: Boolean = false,
         sampler: DistributionSampler = UniformSampler(0.0)
-    ) : this(hasBias, sampler.sample(), DoubleArray(coeffCount) {
-        sampler.sample()
-    })
-
-    constructor(setBias: Double, coeffs: DoubleArray) : this(true, setBias, coeffs)
-
-    constructor(hasBias: Boolean = true, values: DoubleArray) : this(
-        hasBias = hasBias,
-        setBias = if (hasBias) values[0] else 0.0,
-        coeffs =
-            if (hasBias)
-                DoubleArray(values.size - 1) { values[it - 1] }
-            else values
+    ) : this(
+        bias = if (hasBias) sampler.sample() else null,
+        coeffs = DoubleArray(coeffCount) { sampler.sample() }
     )
 
     override fun equals(other: Any?): Boolean =

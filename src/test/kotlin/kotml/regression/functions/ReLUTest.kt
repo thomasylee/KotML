@@ -19,10 +19,10 @@ class ReLUTest {
     @Test
     fun `evaluate() returns the correct estimate without bias`() {
         assertEquals(0.0, ReLU.evaluate(
-            Weights(false, doubleArrayOf(-2.0, 1.0)),
+            Weights(doubleArrayOf(-2.0, 1.0)),
             Vector(3, 2)))
         assertEquals(4.0, ReLU.evaluate(
-            Weights(false, doubleArrayOf(2.0, -1.0)),
+            Weights(doubleArrayOf(2.0, -1.0)),
             Vector(3, 2)))
     }
 
@@ -38,11 +38,11 @@ class ReLUTest {
 
     @Test
     fun `gradient() returns the correct gradient without bias`() {
-        assertEquals(Weights(false, doubleArrayOf(0.0, 0.0)), ReLU.gradient(
-            Weights(false, doubleArrayOf(-2.0, 1.0)),
+        assertEquals(Weights(doubleArrayOf(0.0, 0.0)), ReLU.gradient(
+            Weights(doubleArrayOf(-2.0, 1.0)),
             Vector(3, 2)))
-        assertEquals(Weights(false, doubleArrayOf(3.0, 2.0)), ReLU.gradient(
-            Weights(false, doubleArrayOf(2.0, -1.0)),
+        assertEquals(Weights(doubleArrayOf(3.0, 2.0)), ReLU.gradient(
+            Weights(doubleArrayOf(2.0, -1.0)),
             Vector(3, 2)))
     }
 }

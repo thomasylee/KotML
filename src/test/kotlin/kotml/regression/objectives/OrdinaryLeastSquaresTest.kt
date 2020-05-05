@@ -20,7 +20,7 @@ class OrdinaryLeastSquaresTest {
     fun `evaluate() returns the correct cost without bias`() {
         assertEquals(4.0, OrdinaryLeastSquares.evaluate(
             function = Polynomial(Vector(2)),
-            weights = Weights(false, doubleArrayOf(2.0)),
+            weights = Weights(doubleArrayOf(2.0)),
             regressors = Vector(3),
             response = 16.0))
     }

@@ -17,7 +17,7 @@ class LogisticFunctionTest {
     @Test
     fun `estimate() returns the correct estimate value without bias`() {
         assertEquals(0.9988304897349445, LogisticFunction.evaluate(
-            Weights(false, doubleArrayOf(2.0, 1.5)),
+            Weights(doubleArrayOf(2.0, 1.5)),
             Vector(3.0, 0.5)
         ))
     }
@@ -36,9 +36,9 @@ class LogisticFunctionTest {
     @Test
     fun `gradient() returns the correct gradient without bias`() {
         assertEquals(
-            Weights(false, doubleArrayOf(0.32684249064272103)),
+            Weights(doubleArrayOf(0.32684249064272103)),
             LogisticFunction.gradient(
-                Weights(false, doubleArrayOf(-0.5)),
+                Weights(doubleArrayOf(-0.5)),
                 Vector(1.5)
             )
         )

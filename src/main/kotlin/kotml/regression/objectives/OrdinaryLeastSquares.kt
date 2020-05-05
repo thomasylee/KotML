@@ -48,6 +48,6 @@ object OrdinaryLeastSquares : CostFunction {
         }
         if (weights.hasBias)
             return Weights(2.0 * (estimateValue - response) * gradient.bias, coeffs)
-        return Weights(false, coeffs)
+        return Weights(coeffs)
     }
 }

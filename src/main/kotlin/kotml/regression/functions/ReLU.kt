@@ -15,12 +15,15 @@ object ReLU : FunctionModel {
 
     override fun gradient(weights: Weights, regressors: Vector): Weights {
         val value = evaluate(weights, regressors)
+
         // Derivative for all weights is 0 when ReLU == 0.
         if (value == 0.0)
-            return Weights(weights.hasBias, 0.0, DoubleArray(weights.coeffs.size))
+            return Weights(weights.hasBias, weights.coeffs.size)
 
-        return Weights(weights.hasBias, 1.0, DoubleArray(regressors.shape[0]) {
+        val bias = if (weights.hasBias) 1.0 else null
+        val coeffs = DoubleArray(regressors.shape[0]) {
             regressors(it)
-        })
+        }
+        return Weights(bias, coeffs)
     }
 }

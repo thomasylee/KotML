@@ -32,9 +32,8 @@ class Polynomial(val exponents: Vector) : FunctionModel {
         val coeffGradient = DoubleArray(weights.coeffs.size) { index ->
             regressors(index).pow(exponents(index))
         }
-        if (weights.hasBias)
-            return Weights(1.0, coeffGradient)
-        return Weights(false, coeffGradient)
+        val bias = if (weights.hasBias) 1.0 else null
+        return Weights(bias, coeffGradient)
     }
 
     private fun validateRegressorsShape(regressors: Vector) {

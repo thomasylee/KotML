@@ -22,8 +22,11 @@ object LogisticFunction : FunctionModel {
             regressors(index) * expSum / (expSum + 1.0).pow(2.0)
         }
 
-        if (weights.hasBias)
-            return Weights(expSum / (expSum + 1.0).pow(2.0), coeffs)
-        return Weights(false, coeffs)
+        val bias =
+            if (weights.hasBias)
+                expSum / (expSum + 1.0).pow(2.0)
+            else
+                null
+        return Weights(bias, coeffs)
     }
 }

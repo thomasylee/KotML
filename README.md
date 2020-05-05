@@ -95,16 +95,16 @@ A `CostFunction` represents a differentiable cost function such as least squared
 `Weights` tracks the coefficient weights and, optionally, bias weights.
 ```kotlin
 Weights(0.1, doubleArray(0.2, 0.3)) // bias = 0.1, coeffs = 0.2, 0.3
-Weights(false, doubleArray(0.2, 0.3)) // no bias, coeffs = 0.2, 0.3
+Weights(doubleArray(0.2, 0.3)) // no bias, coeffs = 0.2, 0.3
 
-Weights(3) // bias = 0, coeffs = 0, 0
-Weights(false, 3) // no bias, coeffs = 0, 0, 0
+Weights(3, true) // bias = 0, coeffs = 0, 0, 0
+Weights(3) // no bias, coeffs = 0, 0, 0
 
-val weights = Weights(3)
+val weights = Weights(2, true, UniformSampler(1.0))
 weights.hasBias == true
-weights.bias == 0.0
-weights.coeffs[0] == 0
-weights.coeffs[1] == 0
+weights.bias == 1.0
+weights.coeffs[0] == 1.0
+weights.coeffs[1] == 1.0
 ```
 
 You can use a `WeightedOptimizer` like `StochasticGradientDescent` to build models of functions by selecting weights that minimize a cost function.

@@ -1,11 +1,19 @@
 package kotml.regression.objectives
 
-import kotml.math.Vector
-import kotml.regression.Weights
-import kotml.regression.functions.FunctionModel
-
 interface ObjectiveFunction {
-    abstract fun evaluate(function: FunctionModel, weights: Weights, regressors: Vector, response: Double): Double
+    /**
+     * Returns the evaluated value of the objective function.
+     * @param response dependent variable value
+     * @param estimate estimated value
+     * @return least squares error
+     */
+    abstract fun evaluate(response: Double, estimate: Double): Double
 
-    abstract fun gradient(function: FunctionModel, weights: Weights, regressors: Vector, response: Double, estimate: Double? = null): Weights
+    /**
+     * Returns the gradient of the objective function.
+     * @param response dependent variable value
+     * @param estimate estimated value
+     * @return gradient of the least squares error
+     */
+    abstract fun gradient(response: Double, estimate: Double): Double
 }

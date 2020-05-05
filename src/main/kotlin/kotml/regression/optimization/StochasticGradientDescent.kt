@@ -28,7 +28,7 @@ class StochasticGradientDescent(
         stepSize = stepSize,
         function = function,
         costFunction = costFunction,
-        weights = Weights(hasBias, regressorCount)
+        weights = Weights(regressorCount, hasBias)
     )
 
     internal fun copy(): WeightedOptimizer = copy(UniformSampler(0.0))
@@ -38,16 +38,17 @@ class StochasticGradientDescent(
             stepSize = stepSize,
             function = function,
             costFunction = costFunction,
-            weights = Weights(weights.hasBias, weights.coeffs.size, sampler))
+            weights = Weights(weights.coeffs.size, weights.hasBias, sampler))
 
     internal override fun addObservation(response: Double, regressors: Vector) {
-        val gradient = costFunction.gradient(function, weights, regressors, response)
+        val estimate = function.evaluate(weights, regressors)
+        val gradient = costFunction.gradient(response, estimate)
 
         if (weights.hasBias)
-            weights.bias = weights.bias - stepSize * gradient.bias
+            weights.bias -= stepSize * gradient
 
-        weights.coeffs.forEachIndexed { index, coeff ->
-            weights.coeffs[index] = coeff - stepSize * gradient.coeffs[index]
+        weights.coeffs.forEachIndexed { index, _ ->
+            weights.coeffs[index] -= stepSize * gradient * regressors(index)
         }
     }
 }

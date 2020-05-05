@@ -18,7 +18,7 @@ object ReLU : FunctionModel {
 
         // Derivative for all weights is 0 when ReLU == 0.
         if (value == 0.0)
-            return Weights(weights.hasBias, weights.coeffs.size)
+            return Weights(weights.coeffs.size, weights.hasBias)
 
         val bias = if (weights.hasBias) 1.0 else null
         val coeffs = DoubleArray(regressors.shape[0]) {

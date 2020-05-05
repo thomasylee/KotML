@@ -31,13 +31,13 @@ class Weights(
 
     constructor(setBias: Double, coeffs: DoubleArray) : this(true, setBias, coeffs)
 
-    constructor(hasBias: Boolean = true, coeffs: DoubleArray) : this(
+    constructor(hasBias: Boolean = true, values: DoubleArray) : this(
         hasBias = hasBias,
-        setBias = if (hasBias) coeffs[0] else 0.0,
+        setBias = if (hasBias) values[0] else 0.0,
         coeffs =
             if (hasBias)
-                DoubleArray(coeffs.size - 1) { coeffs[it - 1] }
-            else coeffs
+                DoubleArray(values.size - 1) { values[it - 1] }
+            else values
     )
 
     override fun equals(other: Any?): Boolean =

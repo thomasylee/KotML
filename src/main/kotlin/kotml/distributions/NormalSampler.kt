@@ -24,9 +24,9 @@ class NormalSampler(
         if (useCosine) {
             useCosine = false
             rand = Pair(Random.nextDouble(), Random.nextDouble())
-            sqrt(-2.0 * ln(rand.first)) * cos(2.0 * PI * rand.second)
+            sqrt(-2.0 * ln(rand.first)) * cos(2.0 * PI * rand.second) * stdev + mean
         } else {
             useCosine = true
-            sqrt(-2.0 * ln(rand.first)) * sin(2.0 * PI * rand.second)
+            sqrt(-2.0 * ln(rand.first)) * sin(2.0 * PI * rand.second) * stdev + mean
         }
 }

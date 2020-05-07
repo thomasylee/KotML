@@ -23,10 +23,10 @@ class LogisticFunctionTest {
     }
 
     @Test
-    fun `gradient() returns the correct gradient with bias`() {
+    fun `weightsGradient() returns the correct gradient with bias`() {
         assertEquals(
             Weights(0.22534771461105382, doubleArrayOf(0.3380215719165808)),
-            LogisticFunction.gradient(
+            LogisticFunction.weightsGradient(
                 Weights(0.1, doubleArrayOf(-0.5)),
                 Vector(1.5)
             )
@@ -34,13 +34,19 @@ class LogisticFunctionTest {
     }
 
     @Test
-    fun `gradient() returns the correct gradient without bias`() {
+    fun `weightsGradient() returns the correct gradient without bias`() {
         assertEquals(
             Weights(doubleArrayOf(0.32684249064272103)),
-            LogisticFunction.gradient(
+            LogisticFunction.weightsGradient(
                 Weights(doubleArrayOf(-0.5)),
                 Vector(1.5)
             )
         )
+    }
+
+    @Test
+    fun `netInputGradient() returns the correct gradient`() {
+        assertEquals(0.19661193324148188, LogisticFunction.netInputGradient(-1.0))
+        assertEquals(0.2350037122015945, LogisticFunction.netInputGradient(0.5))
     }
 }

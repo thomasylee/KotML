@@ -3,14 +3,24 @@ package kotml.regression.neural
 import kotml.distributions.DistributionSampler
 import kotml.distributions.NormalSampler
 import kotml.math.Vector
-import kotml.regression.optimization.WeightedOptimizer
+import kotml.regression.RegressionException
+import kotml.regression.functions.FunctionOfLinearRegressors
+import kotml.regression.objectives.ObjectiveFunction
 
 /**
  * `FeedforwardNeuralNetwork` contains a sequence of neural layers that
  * process data in the forward direction (from input layer toward the
  * output layer).
  */
-class FeedforwardNeuralNetwork(val layers: Array<NeuralLayer>) {
+class FeedforwardNeuralNetwork(
+    val stepSize: Double,
+    val layers: Array<NeuralLayer>
+) {
+    init {
+        if (layers.isEmpty())
+            throw RegressionException("Neural networks must have at least one neural layer")
+    }
+
     /**
      * Creates a `FeedforwardNeuralNetwork` with the given number and size of
      * layers, the optimizer, and the sampler to initialize weights.
@@ -18,10 +28,27 @@ class FeedforwardNeuralNetwork(val layers: Array<NeuralLayer>) {
      * @param optimizer optimizer copied into each neuron
      * @param sampler distribution sampler to generate initial weights
      */
-    constructor(layerSizes: IntArray, optimizer: WeightedOptimizer, sampler: DistributionSampler = NormalSampler()) : this(
+    constructor(
+        stepSize: Double,
+        inputCount: Int,
+        layerSizes: IntArray,
+        activationFunction: FunctionOfLinearRegressors,
+        objectiveFunction: ObjectiveFunction,
+        includeBias: Boolean = true,
+        sampler: DistributionSampler = NormalSampler()
+    ) : this(
+        stepSize,
         Array<NeuralLayer>(layerSizes.size) { index ->
+            val regressorCount = layerSizes.getOrElse(index - 1) { inputCount }
             NeuralLayer(Array<Neuron>(layerSizes[index]) {
-                Neuron(optimizer.copy(sampler))
+                Neuron(
+                    stepSize = stepSize,
+                    activationFunction = activationFunction,
+                    objectiveFunction = objectiveFunction,
+                    regressorCount = regressorCount,
+                    includeBias = includeBias,
+                    sampler = sampler
+                )
             })
         }
     )

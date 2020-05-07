@@ -26,7 +26,7 @@ class Polynomial(val exponents: Vector) : FunctionModel {
         }
     }
 
-    override fun gradient(weights: Weights, regressors: Vector): Weights {
+    override fun weightsGradient(weights: Weights, regressors: Vector): Weights {
         validateRegressorsShape(regressors)
 
         val coeffGradient = DoubleArray(weights.coeffs.size) { index ->

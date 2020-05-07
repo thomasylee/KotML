@@ -1,6 +1,6 @@
 package kotml.regression.objectives
 
-object OrdinaryLeastSquares : CostFunction {
+object OrdinaryLeastSquares : CostFunction() {
     /**
      * Returns the least squares error.
      * @param response dependent variable value

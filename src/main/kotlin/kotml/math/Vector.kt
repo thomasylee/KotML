@@ -270,9 +270,10 @@ open class Vector private constructor(
 
     /**
      * Returns the fold along the specified axis using the function `fn`.
-     * @param initial the initial value used in the fold operation
-     * @param axis the axis used to fold on
-     * @param fn the function applied on the accumulator and individual value
+     * @param initial initial value used in the fold operation
+     * @param initIndex initial index
+     * @param axis axis used to fold on
+     * @param fn function applied on the indices, accumulator, and individual value
      * @return vector of the results
      */
     private fun foldIndexed(initial: Double, initIndex: Int, axis: Int = 0, fn: (Int, Double, Double) -> Double): Vector {
@@ -306,9 +307,23 @@ open class Vector private constructor(
         throw ShapeException("Folding is currently only supported for vectors with 1 or 2 dimensions")
     }
 
+    /**
+     * Returns the fold along the specified axis using the function `fn`.
+     * @param initial the initial value used in the fold operation
+     * @param axis the axis used to fold on
+     * @param fn the function applied on the indices, accumulator, and individual values
+     * @return vector of the results
+     */
     fun foldIndexed(initial: Double, axis: Int = 0, fn: (Int, Double, Double) -> Double): Vector =
         foldIndexed(initial, 0, axis, fn)
 
+    /**
+     * Returns the fold along the specified axis using the function `fn`.
+     * @param initial the initial value used in the fold operation
+     * @param axis the axis used to fold on
+     * @param fn the function applied on the accumulator and individual value
+     * @return vector of the results
+     */
     fun fold(initial: Double, axis: Int = 0, fn: (Double, Double) -> Double): Vector =
         foldIndexed(initial, axis) { index, acc, value -> fn(acc, value) }
 

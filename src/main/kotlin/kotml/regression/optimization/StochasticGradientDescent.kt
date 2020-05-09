@@ -12,10 +12,10 @@ import kotml.regression.functions.FunctionModel
  */
 class StochasticGradientDescent(
     val stepSize: Double,
-    function: FunctionModel,
-    lossFunction: LossFunction,
-    weights: Weights
-) : IterativeOptimizer(function, lossFunction, weights) {
+    val function: FunctionModel,
+    val lossFunction: LossFunction,
+    val weights: Weights
+) : IterativeOptimizer(weights.coeffs.shape[0], 1) {
     constructor(
         stepSize: Double,
         function: FunctionModel,
@@ -29,9 +29,9 @@ class StochasticGradientDescent(
         weights = Weights(regressorCount, hasBias)
     )
 
-    internal override fun addObservation(response: Double, regressors: Vector) {
+    internal override fun addObservation(regressors: Vector, response: Vector) {
         val estimate = function.evaluate(weights, regressors)
-        val gradient = lossFunction.gradient(estimate, response)
+        val gradient = lossFunction.gradient(estimate, response[0])
 
         if (weights.hasBias)
             weights.bias -= stepSize * gradient

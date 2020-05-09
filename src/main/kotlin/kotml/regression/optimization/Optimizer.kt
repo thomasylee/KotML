@@ -2,35 +2,28 @@ package kotml.regression.optimization
 
 import kotml.math.Vector
 import kotml.regression.RegressionException
-import kotml.regression.Weights
-import kotml.regression.cost.CostFunction
-import kotml.regression.cost.loss.LossFunction
-import kotml.regression.functions.FunctionModel
 
 /**
- * Optimizer optimizes weights for a particular function to minimize a
- * loss or cost.
+ * Optimizer optimizes weights for a function to minimize a loss or cost.
  */
-sealed class Optimizer(
-    val function: FunctionModel,
-    val weights: Weights
-) {
+sealed class Optimizer(val regressorCount: Int, val outputCount: Int) {
     /**
      * Adds an observation to the training model.
-     * @param response the dependent variable value
      * @param regressors the independent variables
+     * @param response the dependent variable value
      */
-    fun observe(regressors: Vector, response: Double) {
-        validateRegressorsShape(regressors)
+    fun observe(regressors: Vector, response: Vector) {
+        validateShape("regressors", regressors, regressorCount)
+        validateShape("response", response, outputCount)
         addObservation(response, regressors)
     }
 
-    internal abstract fun addObservation(response: Double, regressors: Vector)
+    internal abstract fun addObservation(regressors: Vector, response: Vector)
 
-    internal fun validateRegressorsShape(regressors: Vector) {
-        if (regressors.dimensions != 1 || regressors.shape[0] != weights.coeffs.shape[0]) {
+    private fun validateShape(name: String, vector: Vector, count: Int) {
+        if (vector.dimensions != 1 || vector.shape[0] != count) {
             throw RegressionException(
-                "Shape of regressors [${regressors.shape.joinToString(", ")}] must be [${weights.coeffs.shape[0]}]"
+                "Shape of $name [${vector.shape.joinToString(", ")}] must be [$count]"
             )
         }
     }
@@ -41,19 +34,17 @@ sealed class Optimizer(
  * iteratively reducing a loss function.
  */
 abstract class IterativeOptimizer(
-    function: FunctionModel,
-    val lossFunction: LossFunction,
-    weights: Weights
-) : Optimizer(function, weights)
+    regressorCount: Int,
+    outputCount: Int
+) : Optimizer(regressorCount, outputCount)
 
 /**
  * BatchOptimizer develops a model of any kind of linear function by
  * updating weights in batches.
  */
 abstract class BatchOptimizer(
-    function: FunctionModel,
-    val costFunction: CostFunction,
-    weights: Weights
-) : Optimizer(function, weights) {
+    regressorCount: Int,
+    outputCount: Int
+) : Optimizer(regressorCount, outputCount) {
     abstract fun processBatch()
 }

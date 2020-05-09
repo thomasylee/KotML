@@ -10,7 +10,7 @@ import kotml.regression.Weights
 object ReLU : FunctionOfLinearRegressors {
     override fun evaluate(weights: Weights, regressors: Vector): Double =
         max(0.0, (0 until regressors.shape[0]).fold(weights.bias) { sumAcc, index ->
-            sumAcc + weights.coeffs[index] * regressors(index)
+            sumAcc + weights.coeffs[index] * regressors[index]
         })
 
     override fun netInputGradient(netInput: Double): Double =
@@ -28,7 +28,7 @@ object ReLU : FunctionOfLinearRegressors {
 
         val bias = if (weights.hasBias) 1.0 else null
         val coeffs = DoubleArray(regressors.shape[0]) {
-            regressors(it)
+            regressors[it]
         }
         return Weights(bias, coeffs)
     }

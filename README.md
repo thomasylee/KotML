@@ -35,9 +35,11 @@ val vector = Vector(
         Vector(7, 8, 9),
         Vector(10, 11, 12)))
 
-vector[0][0](0) == 1.0
-vector[0][1](1) == 5.0
-vector[1][1](2) == 12.0
+vector(0) == Vector(Vector(1, 2, 3), Vector(4, 5, 6))
+vector(0, 1) == Vector(4, 5, 6)
+vector[0, 0, 0] == 1.0
+vector[0, 1, 1] == 5.0
+vector[1, 1, 2] == 12.0
 ```
 
 Vectors support basic mathematical operations.

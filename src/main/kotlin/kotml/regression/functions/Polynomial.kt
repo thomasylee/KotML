@@ -22,7 +22,7 @@ class Polynomial(val exponents: Vector) : FunctionModel {
         validateRegressorsShape(regressors)
 
         return weights.coeffs.foldIndexed(weights.bias) { index, acc, coeff ->
-            acc + coeff * regressors(index).pow(exponents(index))
+            acc + coeff * regressors[index].pow(exponents[index])
         }
     }
 
@@ -30,7 +30,7 @@ class Polynomial(val exponents: Vector) : FunctionModel {
         validateRegressorsShape(regressors)
 
         val coeffGradient = DoubleArray(weights.coeffs.size) { index ->
-            regressors(index).pow(exponents(index))
+            regressors[index].pow(exponents[index])
         }
         val bias = if (weights.hasBias) 1.0 else null
         return Weights(bias, coeffGradient)

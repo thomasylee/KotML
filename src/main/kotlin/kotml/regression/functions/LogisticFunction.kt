@@ -9,7 +9,7 @@ object LogisticFunction : FunctionOfLinearRegressors {
     override fun evaluate(weights: Weights, regressors: Vector): Double =
         1.0 / (1.0 + exp(
             -(0 until regressors.shape[0]).fold(weights.bias) { sumAcc, index ->
-                sumAcc + weights.coeffs[index] * regressors(index)
+                sumAcc + weights.coeffs[index] * regressors[index]
             }
         ))
 
@@ -20,11 +20,11 @@ object LogisticFunction : FunctionOfLinearRegressors {
 
     override fun weightsGradient(weights: Weights, regressors: Vector): Weights {
         val sum = (0 until regressors.shape[0]).fold(weights.bias) { acc, index ->
-            acc + weights.coeffs[index] * regressors(index)
+            acc + weights.coeffs[index] * regressors[index]
         }
         val expSum = exp(-sum)
         val coeffs = DoubleArray(weights.coeffs.size) { index ->
-            regressors(index) * expSum / (expSum + 1.0).pow(2.0)
+            regressors[index] * expSum / (expSum + 1.0).pow(2.0)
         }
 
         val bias =

@@ -24,8 +24,8 @@ open class Vector private constructor(
     val shape: IntArray,
     mapValues: (Int) -> Double
 ) {
-    private val scalarValues: DoubleArray
-    private val vectorValues: Array<Vector>
+    protected val scalarValues: MutableList<Double>
+    protected val vectorValues: MutableList<Vector>
     val dimensions: Int
 
     companion object {
@@ -57,15 +57,15 @@ open class Vector private constructor(
         }
 
         if (dimensions == 1) {
-            scalarValues = DoubleArray(shape[0]) { mapValues(initIndex + it) }
-            vectorValues = arrayOf()
+            scalarValues = MutableList(shape[0]) { mapValues(initIndex + it) }
+            vectorValues = mutableListOf()
         } else {
-            scalarValues = doubleArrayOf()
+            scalarValues = mutableListOf()
             val subVectorShape = removeDimensionFromShape(shape)
             val scalarsPerVector = subVectorShape.fold(1) { acc, dim ->
                 acc * dim
             }
-            vectorValues = Array<Vector>(shape[0]) { index ->
+            vectorValues = MutableList<Vector>(shape[0]) { index ->
                 Vector(
                     initIndex = (initIndex + index * scalarsPerVector).toByte(),
                     shape = subVectorShape,
@@ -101,22 +101,30 @@ open class Vector private constructor(
         }
     }
 
-    operator fun get(index: Int): Vector {
-        if (dimensions == 1) {
+    operator fun get(vararg indices: Int): Double {
+        if (indices.size != dimensions) {
             throw ShapeException(
-                "Use () instead of [] to access elements of row vectors"
+                "Number of indices [${indices.joinToString(", ")}] does not match vector dimensions $dimensions"
             )
         }
-        return vectorValues[index]
+        var vector = this
+        (0 until (indices.size - 1)).forEach {
+            vector = vector.vectorValues[indices[it]]
+        }
+        return vector.scalarValues[indices.last()]
     }
 
-    operator fun invoke(index: Int): Double {
-        if (dimensions != 1) {
+    operator fun invoke(vararg indices: Int): Vector {
+        if (indices.size >= dimensions) {
             throw ShapeException(
-                "Use [] instead of () to access elements of multidimensional vectors"
+                "Number of indices [${indices.joinToString(", ")}] must be less than the number of vector dimensions $dimensions"
             )
         }
-        return scalarValues[index]
+        var vector = this
+        indices.forEach {
+            vector = vector.vectorValues[it]
+        }
+        return vector
     }
 
     operator fun unaryMinus(): Vector =
@@ -214,7 +222,7 @@ open class Vector private constructor(
             } else {
                 return Vector(*DoubleArray(other.shape[1]) { col ->
                     (0 until shape[0]).fold(0.0) { acc, offset ->
-                        acc + scalarValues[offset] * other[offset](col)
+                        acc + scalarValues[offset] * other(offset)[col]
                     }
                 })
             }
@@ -222,7 +230,7 @@ open class Vector private constructor(
         return Vector(*Array<Vector>(shape[0]) { row ->
             Vector(*DoubleArray(other.shape[1]) { col ->
                 (0 until shape[1]).fold(0.0) { acc, offset ->
-                    acc + vectorValues[row](offset) * other[offset](col)
+                    acc + vectorValues[row][offset] * other(offset)[col]
                 }
             })
         })
@@ -277,7 +285,7 @@ open class Vector private constructor(
         if (dimensions == 2 && axis == 0) {
             return Vector(*DoubleArray(shape[1]) { col ->
                 (0 until shape[0]).fold(initial) { acc, row ->
-                    fn(acc, vectorValues[row](col))
+                    fn(acc, vectorValues[row][col])
                 }
             })
         }
@@ -286,7 +294,7 @@ open class Vector private constructor(
         if (dimensions == 2 && axis == 1) {
             return Vector(*DoubleArray(shape[0]) { row ->
                 (0 until shape[1]).fold(initial) { acc, col ->
-                    fn(acc, vectorValues[row](col))
+                    fn(acc, vectorValues[row][col])
                 }
             })
         }
@@ -315,7 +323,7 @@ open class Vector private constructor(
      * @param other the vector to dot product with this vector
      * @return dot product of this vector and `other`
      */
-    infix fun dot(other: Vector): Double = (this * other).sum()(0)
+    infix fun dot(other: Vector): Double = (this * other).sum()[0]
 
     /**
      * Returns the transposition of this vector.
@@ -335,12 +343,12 @@ open class Vector private constructor(
             })
         } else if (shape[1] == 1) {
             return Vector(*DoubleArray(shape[0]) { index ->
-                vectorValues[index](0)
+                vectorValues[index][0]
             })
         } else {
             return Vector(*Array<Vector>(shape[1]) { row ->
                 Vector(*DoubleArray(shape[0]) { col ->
-                    vectorValues[col](row)
+                    vectorValues[col][row]
                 })
             })
         }
@@ -357,22 +365,41 @@ open class Vector private constructor(
             throw ShapeException("1x1 matrices do not have inverses")
 
         if (shape[0] == 2)
-            return this[0](0) * this[1](1) - this[0](1) * this[1](0)
+            return this[0, 0] * this[1, 1] - this[0, 1] * this[1, 0]
 
         val toAdd = (0 until shape[0]).fold(0.0) { sumAcc, topIndex ->
             sumAcc + (0 until shape[0]).fold(1.0) { productAcc, offset ->
                 val col = (topIndex + offset) % shape[0]
-                productAcc * this[offset](col)
+                productAcc * this[offset, col]
             }
         }
         val toSubtract = (0 until shape[0]).fold(0.0) { diffAcc, topIndex ->
             diffAcc + ((shape[0] - 1) downTo 0).fold(1.0) { productAcc, offset ->
                 val col = (shape[0] + topIndex - offset) % shape[0]
-                productAcc * this[offset](col)
+                productAcc * this[offset, col]
             }
         }
         return toAdd - toSubtract
     }
+
+    /**
+     * Returns the scalar values of the vector across all dimensions. For
+     * example, [[1, 2], [3, 4]].toDoubleArray() returns [1, 2, 3, 4].
+     * @return DoubleArray containing all scalar values in the vector
+     *
+    fun toDoubleArray(): DoubleArray {
+        if (dimensions == 1)
+            return DoubleArray(shape[0]) { scalarValues[it] }
+
+        val valuesPerVector = removeDimensionFromShape(shape).fold(1.0) { acc, dim ->
+            acc * dim
+        }
+        val valuesOfVectors = vectorValues.map { it.toDoubleArray() }
+        return DoubleArray(shape[0] * valuesPerVector) { index ->
+            val vectorIndex = index / valuesPerVector
+            valuesOfVectors[vectorIndex][index - vectorIndex * valuesPerVector]
+        }
+    }*/
 
     /**
      * Returns true if `other` is a Vector with the same shape and values

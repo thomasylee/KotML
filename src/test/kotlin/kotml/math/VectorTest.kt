@@ -17,15 +17,15 @@ class VectorTest {
         assertEquals(3, vector.dimensions)
         assertEquals(3, vector.shape.size)
         assertTrue(vector.shapeEquals(intArrayOf(2, 3, 4)))
-        assertEquals(0.0, vector[0][0](0))
-        assertEquals(2.0, vector[0][0](1))
-        assertEquals(8.0, vector[0][1](0))
-        assertEquals(10.0, vector[0][1](1))
-        assertEquals(24.0, vector[1][0](0))
-        assertEquals(26.0, vector[1][0](1))
-        assertEquals(32.0, vector[1][1](0))
-        assertEquals(34.0, vector[1][1](1))
-        assertEquals(46.0, vector[1][2](3))
+        assertEquals(0.0, vector[0, 0, 0])
+        assertEquals(2.0, vector(0)(0)[1])
+        assertEquals(8.0, vector(0, 1)[0])
+        assertEquals(10.0, vector[0, 1, 1])
+        assertEquals(24.0, vector[1, 0, 0])
+        assertEquals(26.0, vector[1, 0, 1])
+        assertEquals(32.0, vector[1, 1, 0])
+        assertEquals(34.0, vector[1, 1, 1])
+        assertEquals(46.0, vector[1, 2, 3])
     }
 
     @Test
@@ -34,9 +34,9 @@ class VectorTest {
         assertEquals(1, vector.dimensions)
         assertEquals(1, vector.shape.size)
         assertTrue(vector.shapeEquals(intArrayOf(3)))
-        assertEquals(-1.5, vector(0))
-        assertEquals(0.0, vector(1))
-        assertEquals(1.5, vector(2))
+        assertEquals(-1.5, vector[0])
+        assertEquals(0.0, vector[1])
+        assertEquals(1.5, vector[2])
     }
 
     @Test
@@ -45,9 +45,9 @@ class VectorTest {
         assertEquals(1, vector.dimensions)
         assertEquals(1, vector.shape.size)
         assertTrue(vector.shapeEquals(intArrayOf(3)))
-        assertEquals(-1.0, vector(0))
-        assertEquals(0.0, vector(1))
-        assertEquals(1.0, vector(2))
+        assertEquals(-1.0, vector[0])
+        assertEquals(0.0, vector[1])
+        assertEquals(1.0, vector[2])
     }
 
     @Test
@@ -59,12 +59,12 @@ class VectorTest {
         assertEquals(2, vector.dimensions)
         assertEquals(2, vector.shape.size)
         assertTrue(vector.shapeEquals(intArrayOf(3, 2)))
-        assertEquals(-2.0, vector[0](0))
-        assertEquals(-1.0, vector[0](1))
-        assertEquals(0.0, vector[1](0))
-        assertEquals(1.0, vector[1](1))
-        assertEquals(2.0, vector[2](0))
-        assertEquals(3.0, vector[2](1))
+        assertEquals(-2.0, vector[0, 0])
+        assertEquals(-1.0, vector[0, 1])
+        assertEquals(0.0, vector[1, 0])
+        assertEquals(1.0, vector[1, 1])
+        assertEquals(2.0, vector(2)[0])
+        assertEquals(3.0, vector(2)[1])
     }
 
     @Test

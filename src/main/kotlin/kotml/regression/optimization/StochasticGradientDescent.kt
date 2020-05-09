@@ -48,7 +48,7 @@ class StochasticGradientDescent(
             weights.bias -= stepSize * gradient
 
         weights.coeffs.forEachIndexed { index, _ ->
-            weights.coeffs[index] -= stepSize * gradient * regressors(index)
+            weights.coeffs[index] -= stepSize * gradient * regressors[index]
         }
     }
 }

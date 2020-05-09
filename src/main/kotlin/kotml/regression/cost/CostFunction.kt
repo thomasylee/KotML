@@ -1,6 +1,6 @@
-package kotml.regression.objectives
+package kotml.regression.cost
 
-sealed class ObjectiveFunction {
+interface CostFunction {
     /**
      * Returns the evaluated value of the objective function.
      * @param response dependent variable value
@@ -17,6 +17,3 @@ sealed class ObjectiveFunction {
      */
     abstract fun gradient(response: Double, estimate: Double): Double
 }
-
-abstract class CostFunction : ObjectiveFunction()
-abstract class RewardFunction : ObjectiveFunction()

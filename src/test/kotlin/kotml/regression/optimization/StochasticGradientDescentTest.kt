@@ -1,10 +1,9 @@
 package kotml.regression.optimization
 
-import kotml.distributions.UniformSampler
 import kotml.math.Vector
 import kotml.regression.Weights
+import kotml.regression.cost.loss.OrdinaryLeastSquares
 import kotml.regression.functions.Polynomial
-import kotml.regression.objectives.OrdinaryLeastSquares
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -46,7 +45,7 @@ class StochasticGradientDescentTest {
         val estimator = StochasticGradientDescent(
             stepSize = 0.001,
             function = Polynomial(Vector(1.0)),
-            costFunction = OrdinaryLeastSquares,
+            lossFunction = OrdinaryLeastSquares,
             weights = Weights(-0.038, Vector(0.342))
         )
         estimator.addObservation(-17.0, Vector(-8.0))
@@ -54,24 +53,5 @@ class StochasticGradientDescentTest {
         assertEquals(-0.088344472, estimator.weights.bias)
         assertEquals(0.722863304, estimator.weights.coeffs[0])
         assertEquals(3.525972048, estimator.function.evaluate(estimator.weights, Vector(5.0)))
-    }
-
-    @Test
-    fun `copy() creates a new instance with new weights`() {
-        val estimator = StochasticGradientDescent(
-            stepSize = 0.001,
-            function = Polynomial(Vector(1.0)),
-            costFunction = OrdinaryLeastSquares,
-            weights = Weights(-0.038, Vector(0.342)))
-        val newWeights = 5.0
-        val copy = estimator.copy(UniformSampler(newWeights)) as StochasticGradientDescent
-
-        assertEquals(estimator.stepSize, copy.stepSize)
-        assertEquals(estimator.function, copy.function)
-        assertEquals(estimator.costFunction, copy.costFunction)
-        assertEquals(estimator.weights.hasBias, copy.weights.hasBias)
-        assertEquals(estimator.weights.coeffs.shape[0], copy.weights.coeffs.shape[0])
-        assertEquals(newWeights, copy.weights.bias)
-        assertEquals(newWeights, copy.weights.coeffs[0])
     }
 }

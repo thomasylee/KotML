@@ -325,7 +325,7 @@ open class Vector private constructor(
      * @return vector of the results
      */
     fun fold(initial: Double, axis: Int = 0, fn: (Double, Double) -> Double): Vector =
-        foldIndexed(initial, axis) { index, acc, value -> fn(acc, value) }
+        foldIndexed(initial, axis) { _, acc, value -> fn(acc, value) }
 
     /**
      * Returns the sum of elements along a particular axis.

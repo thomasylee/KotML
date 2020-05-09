@@ -1,12 +1,10 @@
 package kotml.regression.optimization
 
-import kotml.distributions.DistributionSampler
-import kotml.distributions.UniformSampler
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.Weights
+import kotml.regression.cost.loss.LossFunction
 import kotml.regression.functions.FunctionModel
-import kotml.regression.objectives.CostFunction
 
 /**
  * StochasticGradientDescent incrementally estimates weights based on
@@ -15,34 +13,25 @@ import kotml.regression.objectives.CostFunction
 class StochasticGradientDescent(
     val stepSize: Double,
     function: FunctionModel,
-    val costFunction: CostFunction,
+    lossFunction: LossFunction,
     weights: Weights
-) : WeightedOptimizer(function, costFunction, weights) {
+) : IterativeOptimizer(function, lossFunction, weights) {
     constructor(
         stepSize: Double,
         function: FunctionModel,
-        costFunction: CostFunction,
+        lossFunction: LossFunction,
         regressorCount: Int,
         hasBias: Boolean = true
     ) : this(
         stepSize = stepSize,
         function = function,
-        costFunction = costFunction,
+        lossFunction = lossFunction,
         weights = Weights(regressorCount, hasBias)
     )
 
-    internal fun copy(): WeightedOptimizer = copy(UniformSampler(0.0))
-
-    internal override fun copy(sampler: DistributionSampler): WeightedOptimizer =
-        StochasticGradientDescent(
-            stepSize = stepSize,
-            function = function,
-            costFunction = costFunction,
-            weights = Weights(weights.coeffs.shape[0], weights.hasBias, sampler))
-
     internal override fun addObservation(response: Double, regressors: Vector) {
         val estimate = function.evaluate(weights, regressors)
-        val gradient = costFunction.gradient(response, estimate)
+        val gradient = lossFunction.gradient(estimate, response)
 
         if (weights.hasBias)
             weights.bias -= stepSize * gradient

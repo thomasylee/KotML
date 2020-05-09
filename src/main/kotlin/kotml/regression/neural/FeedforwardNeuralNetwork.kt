@@ -2,10 +2,11 @@ package kotml.regression.neural
 
 import kotml.distributions.DistributionSampler
 import kotml.distributions.NormalSampler
+import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionException
+import kotml.regression.cost.CostFunction
 import kotml.regression.functions.FunctionOfLinearRegressors
-import kotml.regression.objectives.ObjectiveFunction
 
 /**
  * `FeedforwardNeuralNetwork` contains a sequence of neural layers that
@@ -14,6 +15,7 @@ import kotml.regression.objectives.ObjectiveFunction
  */
 class FeedforwardNeuralNetwork(
     val stepSize: Double,
+    val costFunction: CostFunction,
     val layers: Array<NeuralLayer>
 ) {
     init {
@@ -33,18 +35,17 @@ class FeedforwardNeuralNetwork(
         inputCount: Int,
         layerSizes: IntArray,
         activationFunction: FunctionOfLinearRegressors,
-        objectiveFunction: ObjectiveFunction,
+        costFunction: CostFunction,
         includeBias: Boolean = true,
         sampler: DistributionSampler = NormalSampler()
     ) : this(
         stepSize,
+        costFunction,
         Array<NeuralLayer>(layerSizes.size) { index ->
             val regressorCount = layerSizes.getOrElse(index - 1) { inputCount }
             NeuralLayer(Array<Neuron>(layerSizes[index]) {
                 Neuron(
-                    stepSize = stepSize,
                     activationFunction = activationFunction,
-                    objectiveFunction = objectiveFunction,
                     regressorCount = regressorCount,
                     includeBias = includeBias,
                     sampler = sampler

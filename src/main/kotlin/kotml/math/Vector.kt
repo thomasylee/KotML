@@ -275,34 +275,42 @@ open class Vector private constructor(
      * @param fn the function applied on the accumulator and individual value
      * @return vector of the results
      */
-    fun fold(initial: Double, axis: Int = 0, fn: (Double, Double) -> Double): Vector {
+    private fun foldIndexed(initial: Double, initIndex: Int, axis: Int = 0, fn: (Int, Double, Double) -> Double): Vector {
         if (axis > dimensions)
             throw ShapeException("Axis $axis must be less than or equal to the  number of dimensions $dimensions")
 
         if (dimensions == 1) {
-            return Vector(scalarValues.fold(initial, fn))
+            return Vector(scalarValues.foldIndexed(initial) { index, acc, value ->
+                fn(initIndex + index, acc, value)
+            })
         }
 
         // Example: [[1,2,3],[4,5,6]].sum(axis=0) = [5,7,9]
         if (dimensions == 2 && axis == 0) {
-            return Vector(*DoubleArray(shape[1]) { col ->
-                (0 until shape[0]).fold(initial) { acc, row ->
-                    fn(acc, vectorValues[row][col])
+            return Vector(shape[1]) { scalarIndex ->
+                vectorValues.foldIndexed(initial) { vectorIndex, acc, vector ->
+                    fn(initIndex + vectorIndex * shape[1] + scalarIndex, acc, vector[scalarIndex])
                 }
-            })
+            }
         }
 
-        // Example: [[1,2,3],[4,5,6]].sum(axis=2) = [6, 15]
+        // Example: [[1,2,3],[4,5,6]].sum(axis=1) = [6, 15]
         if (dimensions == 2 && axis == 1) {
-            return Vector(*DoubleArray(shape[0]) { row ->
-                (0 until shape[1]).fold(initial) { acc, col ->
-                    fn(acc, vectorValues[row][col])
+            return Vector(*DoubleArray(shape[0]) { vectorIndex ->
+                (0 until shape[1]).foldIndexed(initial) { scalarIndex, acc, col ->
+                    fn(initIndex + vectorIndex * shape[1] + scalarIndex, acc, vectorValues[vectorIndex][col])
                 }
             })
         }
 
-        return this
+        throw ShapeException("Folding is currently only supported for vectors with 1 or 2 dimensions")
     }
+
+    fun foldIndexed(initial: Double, axis: Int = 0, fn: (Int, Double, Double) -> Double): Vector =
+        foldIndexed(initial, 0, axis, fn)
+
+    fun fold(initial: Double, axis: Int = 0, fn: (Double, Double) -> Double): Vector =
+        foldIndexed(initial, axis) { index, acc, value -> fn(acc, value) }
 
     /**
      * Returns the sum of elements along a particular axis.

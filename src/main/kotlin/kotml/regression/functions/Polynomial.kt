@@ -1,6 +1,7 @@
 package kotml.regression.functions
 
 import kotlin.math.pow
+import kotml.math.MutableVector
 import kotml.math.Vector
 import kotml.regression.RegressionException
 import kotml.regression.Weights
@@ -23,13 +24,13 @@ class Polynomial(val exponents: Vector) : FunctionModel {
 
         return weights.coeffs.foldIndexed(weights.bias) { index, acc, coeff ->
             acc + coeff * regressors[index].pow(exponents[index])
-        }
+        }[0]
     }
 
     override fun weightsGradient(weights: Weights, regressors: Vector): Weights {
         validateRegressorsShape(regressors)
 
-        val coeffGradient = DoubleArray(weights.coeffs.size) { index ->
+        val coeffGradient = MutableVector(weights.coeffs.shape[0]) { index ->
             regressors[index].pow(exponents[index])
         }
         val bias = if (weights.hasBias) 1.0 else null

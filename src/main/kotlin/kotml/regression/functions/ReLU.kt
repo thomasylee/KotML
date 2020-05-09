@@ -1,6 +1,7 @@
 package kotml.regression.functions
 
 import kotlin.math.max
+import kotml.math.MutableVector
 import kotml.math.Vector
 import kotml.regression.Weights
 
@@ -24,10 +25,10 @@ object ReLU : FunctionOfLinearRegressors {
 
         // Derivative for all weights is 0 when ReLU == 0.
         if (value == 0.0)
-            return Weights(weights.coeffs.size, weights.hasBias)
+            return Weights(weights.coeffs.shape[0], weights.hasBias)
 
         val bias = if (weights.hasBias) 1.0 else null
-        val coeffs = DoubleArray(regressors.shape[0]) {
+        val coeffs = MutableVector(regressors.shape[0]) {
             regressors[it]
         }
         return Weights(bias, coeffs)

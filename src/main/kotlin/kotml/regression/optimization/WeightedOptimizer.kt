@@ -39,9 +39,9 @@ abstract class WeightedOptimizer(
     internal abstract fun addObservation(response: Double, regressors: Vector)
 
     internal fun validateRegressorsShape(regressors: Vector) {
-        if (regressors.dimensions != 1 || regressors.shape[0] != weights.coeffs.size) {
+        if (regressors.dimensions != 1 || regressors.shape[0] != weights.coeffs.shape[0]) {
             throw RegressionException(
-                "Shape of regressors [${regressors.shape.joinToString(", ")}] must be [${weights.coeffs.size}]"
+                "Shape of regressors [${regressors.shape.joinToString(", ")}] must be [${weights.coeffs.shape[0]}]"
             )
         }
     }

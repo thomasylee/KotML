@@ -38,7 +38,7 @@ class StochasticGradientDescent(
             stepSize = stepSize,
             function = function,
             costFunction = costFunction,
-            weights = Weights(weights.coeffs.size, weights.hasBias, sampler))
+            weights = Weights(weights.coeffs.shape[0], weights.hasBias, sampler))
 
     internal override fun addObservation(response: Double, regressors: Vector) {
         val estimate = function.evaluate(weights, regressors)
@@ -47,7 +47,7 @@ class StochasticGradientDescent(
         if (weights.hasBias)
             weights.bias -= stepSize * gradient
 
-        weights.coeffs.forEachIndexed { index, _ ->
+        (0 until regressors.shape[0]).forEach { index ->
             weights.coeffs[index] -= stepSize * gradient * regressors[index]
         }
     }

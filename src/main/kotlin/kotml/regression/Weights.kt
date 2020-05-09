@@ -2,13 +2,16 @@ package kotml.regression
 
 import kotml.distributions.DistributionSampler
 import kotml.distributions.UniformSampler
+import kotml.math.MutableVector
+import kotml.math.Vector
 
 class Weights(
     bias: Double?,
-    val coeffs: DoubleArray
+    coeffs: Vector
 ) {
     val hasBias: Boolean
     var bias: Double
+    val coeffs: MutableVector
 
     init {
         if (bias != null) {
@@ -18,9 +21,13 @@ class Weights(
             hasBias = false
             this.bias = 0.0
         }
+        if (coeffs.dimensions != 1) {
+            throw RegressionException("Weights must have coeffs with only one dimension")
+        }
+        this.coeffs = coeffs.toMutableVector()
     }
 
-    constructor(coeffs: DoubleArray) : this(null, coeffs)
+    constructor(coeffs: Vector) : this(null, coeffs.toMutableVector())
 
     /**
      * Creates weights with the values determined by the provided sampler.
@@ -35,14 +42,13 @@ class Weights(
         sampler: DistributionSampler = UniformSampler(0.0)
     ) : this(
         bias = if (hasBias) sampler.sample() else null,
-        coeffs = DoubleArray(coeffCount) { sampler.sample() }
+        coeffs = MutableVector(coeffCount) { sampler.sample() }
     )
 
     override fun equals(other: Any?): Boolean =
-        other != null && other is Weights && other.bias == bias && (0 until coeffs.size).all { index ->
+        other != null && other is Weights && other.bias == bias && (0 until coeffs.shape[0]).all { index ->
             coeffs[index] == other.coeffs[index]
         }
 
-    override fun toString(): String =
-        "Weights(bias = $bias, coeffs = [${coeffs.joinToString(", ")}])"
+    override fun toString(): String = "Weights(bias = $bias, coeffs = $coeffs)"
 }

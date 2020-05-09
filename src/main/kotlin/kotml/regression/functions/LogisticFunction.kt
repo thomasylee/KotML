@@ -2,6 +2,7 @@ package kotml.regression.functions
 
 import kotlin.math.exp
 import kotlin.math.pow
+import kotml.math.MutableVector
 import kotml.math.Vector
 import kotml.regression.Weights
 
@@ -23,7 +24,7 @@ object LogisticFunction : FunctionOfLinearRegressors {
             acc + weights.coeffs[index] * regressors[index]
         }
         val expSum = exp(-sum)
-        val coeffs = DoubleArray(weights.coeffs.size) { index ->
+        val coeffs = MutableVector(weights.coeffs.shape[0]) { index ->
             regressors[index] * expSum / (expSum + 1.0).pow(2.0)
         }
 

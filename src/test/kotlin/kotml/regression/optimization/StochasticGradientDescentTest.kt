@@ -16,7 +16,7 @@ class StochasticGradientDescentTest {
         val estimator = StochasticGradientDescent(
             0.001, Polynomial(Vector(1.0)), OrdinaryLeastSquares, 1)
         assertTrue(estimator.weights.hasBias)
-        assertEquals(1, estimator.weights.coeffs.size)
+        assertEquals(1, estimator.weights.coeffs.shape[0])
         estimator.addObservation(-19.0, Vector(-9.0))
         estimator.addObservation(-17.0, Vector(-8.0))
         estimator.addObservation(-15.0, Vector(-7.0))
@@ -36,7 +36,7 @@ class StochasticGradientDescentTest {
         estimator.addObservation(8.0, Vector(4.0))
         estimator.addObservation(10.0, Vector(5.0))
         assertFalse(estimator.weights.hasBias)
-        assertEquals(1, estimator.weights.coeffs.size)
+        assertEquals(1, estimator.weights.coeffs.shape[0])
         assertEquals(2.0, estimator.weights.coeffs[0])
         assertEquals(12.0, estimator.function.evaluate(estimator.weights, Vector(6.0)))
     }
@@ -47,7 +47,7 @@ class StochasticGradientDescentTest {
             stepSize = 0.001,
             function = Polynomial(Vector(1.0)),
             costFunction = OrdinaryLeastSquares,
-            weights = Weights(-0.038, doubleArrayOf(0.342))
+            weights = Weights(-0.038, Vector(0.342))
         )
         estimator.addObservation(-17.0, Vector(-8.0))
         estimator.addObservation(-15.0, Vector(-7.0))
@@ -62,7 +62,7 @@ class StochasticGradientDescentTest {
             stepSize = 0.001,
             function = Polynomial(Vector(1.0)),
             costFunction = OrdinaryLeastSquares,
-            weights = Weights(-0.038, doubleArrayOf(0.342)))
+            weights = Weights(-0.038, Vector(0.342)))
         val newWeights = 5.0
         val copy = estimator.copy(UniformSampler(newWeights)) as StochasticGradientDescent
 
@@ -70,7 +70,7 @@ class StochasticGradientDescentTest {
         assertEquals(estimator.function, copy.function)
         assertEquals(estimator.costFunction, copy.costFunction)
         assertEquals(estimator.weights.hasBias, copy.weights.hasBias)
-        assertEquals(estimator.weights.coeffs.size, copy.weights.coeffs.size)
+        assertEquals(estimator.weights.coeffs.shape[0], copy.weights.coeffs.shape[0])
         assertEquals(newWeights, copy.weights.bias)
         assertEquals(newWeights, copy.weights.coeffs[0])
     }

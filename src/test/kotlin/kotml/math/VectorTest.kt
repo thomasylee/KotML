@@ -292,6 +292,53 @@ class VectorTest {
     }
 
     @Test
+    fun `foldIndexed() folds with correct indices`() {
+        assertEquals(
+            Vector(25),
+            // 5 + (0 * 1 + 1 * 2 + 2 * 3 + 3 * 4) = (25)
+            Vector(1, 2, 3, 4).foldIndexed(5.0) { index, acc, value ->
+                acc + index * value
+            }
+        )
+        assertEquals(
+            Vector(17, 27, 41),
+            // 5 + ([0 * 1 + 3 * 4], [1 * 2 + 4 * 5], [2 * 3 + 5 * 6]) =
+            // (17, 27, 41)
+            Vector(Vector(1, 2, 3), Vector(4, 5, 6)).foldIndexed(5.0, axis = 0) { index, acc, value ->
+                acc + index * value
+            }
+        )
+        assertEquals(
+            Vector(13, 67),
+            // 5 + ([0 * 1 + 1 * 2 + 2 * 3], [3 * 4 + 4 * 5 + 5 * 6]) =
+            // (13, 67)
+            Vector(Vector(1, 2, 3), Vector(4, 5, 6)).foldIndexed(5.0, axis = 1) { index, acc, value ->
+                acc + index * value
+            }
+        )
+    }
+
+    @Test
+    fun `fold() folds correctly`() {
+        assertEquals(
+            Vector(15),
+            Vector(1, 2, 3, 4).fold(5.0) { acc, value -> acc + value }
+        )
+        assertEquals(
+            Vector(4, 10, 18),
+            Vector(Vector(1, 2, 3), Vector(4, 5, 6)).fold(1.0, axis = 0) { acc, value ->
+                acc * value
+            }
+        )
+        assertEquals(
+            Vector(6, 120),
+            Vector(Vector(1, 2, 3), Vector(4, 5, 6)).fold(1.0, axis = 1) { acc, value ->
+                acc * value
+            }
+        )
+    }
+
+    @Test
     fun `sum(axis) returns the sum along the correct axis`() {
         assertEquals(Vector(2.0), Vector(2.0).sum(0))
         assertEquals(Vector(3.0), Vector(1.0, 2.0).sum(0))

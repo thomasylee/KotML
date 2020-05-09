@@ -3,13 +3,15 @@ package kotml.regression.optimization
 import kotml.math.Vector
 import kotml.regression.RegressionException
 import kotml.regression.Weights
+import kotml.regression.cost.CostFunction
+import kotml.regression.cost.loss.LossFunction
 import kotml.regression.functions.FunctionModel
 
 /**
  * Optimizer optimizes weights for a particular function to minimize a
  * loss or cost.
  */
-abstract class Optimizer(
+sealed class Optimizer(
     val function: FunctionModel,
     val weights: Weights
 ) {
@@ -32,4 +34,26 @@ abstract class Optimizer(
             )
         }
     }
+}
+
+/**
+ * IterativeOptimizer develops a model of any kind of linear function by
+ * iteratively reducing a loss function.
+ */
+abstract class IterativeOptimizer(
+    function: FunctionModel,
+    val lossFunction: LossFunction,
+    weights: Weights
+) : Optimizer(function, weights)
+
+/**
+ * BatchOptimizer develops a model of any kind of linear function by
+ * updating weights in batches.
+ */
+abstract class BatchOptimizer(
+    function: FunctionModel,
+    val costFunction: CostFunction,
+    weights: Weights
+) : Optimizer(function, weights) {
+    abstract fun processBatch()
 }

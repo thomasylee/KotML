@@ -70,4 +70,6 @@ class MutableVector : Vector {
         }
         vector.vectorValues[indices.last()] = value
     }
+
+    override fun toMutableVector(): MutableVector = this
 }

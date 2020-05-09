@@ -6,6 +6,7 @@ import kotml.extensions.minus
 import kotml.extensions.plus
 import kotml.extensions.times
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -108,5 +109,13 @@ class MutableVectorTest {
         assertFailsWith(ShapeException::class) {
             vector[0] = Vector(1, 2, 3, 4)
         }
+    }
+
+    @Test
+    fun `toMutableVector() returns this instead of creating a new vector`() {
+        val vector = Vector(1, 2, 3)
+        val mutable = vector.toMutableVector()
+        assertNotEquals(vector.hashCode(), mutable.hashCode())
+        assertEquals(mutable.hashCode(), mutable.toMutableVector().hashCode())
     }
 }

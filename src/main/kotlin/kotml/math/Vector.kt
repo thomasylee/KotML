@@ -413,7 +413,7 @@ open class Vector private constructor(
      * Returns a MutableVector with the same shape and values as this vector.
      * @return MutableVector copy of this vector
      */
-    fun toMutableVector(): MutableVector {
+    open fun toMutableVector(): MutableVector {
         if (dimensions == 1)
             return MutableVector(shape[0]) { scalarValues[it] }
 

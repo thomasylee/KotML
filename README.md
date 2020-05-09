@@ -96,6 +96,21 @@ Vector(1, 2).product() == Vector(2)
 Vector(Vector(1), Vector(2)).product(axis = 1) == Vector(1, 2)
 ```
 
+The usual `Vector` class is immutable, but you can use `MutableVector` to create vectors whose values can be updated. Note that the shape of the vector cannot change, but you can reassign subvector and scalar entries.
+```kotlin
+// You can also use Vector(Vector(1, 2), Vector(3, 4)).toMutableVector().
+// Note that the Vector arguments also get converted to MutableVectors.
+val mutable = MutableVector(Vector(1, 2), Vector(3, 4))
+
+mutable[0] = Vector(-1, -2)
+mutable[1] = MutableVector(-3, -4)
+mutable == MutableVector(Vector(-1, -2), Vector(-3, -4))
+
+mutable[0, 0] = 5
+mutable[0, 1] = 6.0
+mutable(0) == Vector(5, 6)
+```
+
 ## Regression
 
 A `FunctionModel` represents a mathemtical function such as a polynomial (`Polynomial` class) or logistic function (`LogisticFunction` object).

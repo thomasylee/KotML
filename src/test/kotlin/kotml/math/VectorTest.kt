@@ -329,4 +329,26 @@ class VectorTest {
             Vector(Vector(1.0, 4.0), Vector(2.0, 5.0), Vector(3.0, 6.0)),
             Vector(Vector(1.0, 2.0, 3.0), Vector(4.0, 5.0, 6.0)).transpose())
     }
+
+    @Test
+    fun `flatten() returns a row vector with the same scalar values`() {
+        assertEquals(Vector(1, 2, 3, 4, 5, 6, 7, 8), Vector(
+            Vector(Vector(1, 2), Vector(3, 4)),
+            Vector(Vector(5, 6), Vector(7, 8))).flatten())
+    }
+
+    @Test
+    fun `toDoubleArray() returns a DoubleArray containing all the values`() {
+        val array = Vector(Vector(1, 2), Vector(3, 4)).toDoubleArray()
+        array.forEachIndexed { index, value ->
+            assertEquals(index + 1.0, value)
+        }
+    }
+
+    @Test
+    fun `toMutableVector() returns a MutableVector copy of the vector`() {
+        val vector = Vector(Vector(1, 2, 3), Vector(4, 5, 6)).toMutableVector()
+        val mutable = vector.toMutableVector()
+        assertEquals(vector, mutable)
+    }
 }

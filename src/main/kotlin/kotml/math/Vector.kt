@@ -24,16 +24,18 @@ open class Vector private constructor(
     val shape: IntArray,
     mapValues: (Int) -> Double
 ) {
-    protected val scalarValues: MutableList<Double>
-    protected val vectorValues: MutableList<Vector>
     val dimensions: Int
+
+    // Unfortunately, these need to be internal for MutableVector to access them.
+    internal val scalarValues: MutableList<Double>
+    internal val vectorValues: MutableList<Vector>
 
     companion object {
         @JvmStatic
         fun zeros(vararg shape: Int): Vector = Vector(*shape) { 0.0 }
 
         @JvmStatic
-        private fun addDimensionToShape(dimension: Int, shape: IntArray): IntArray =
+        protected fun addDimensionToShape(dimension: Int, shape: IntArray): IntArray =
             IntArray(shape.size + 1) { index ->
                 if (index == 0)
                     dimension
@@ -42,7 +44,7 @@ open class Vector private constructor(
             }
 
         @JvmStatic
-        private fun removeDimensionFromShape(shape: IntArray): IntArray =
+        protected fun removeDimensionFromShape(shape: IntArray): IntArray =
             IntArray(shape.size - 1) { shape[it + 1] }
 
         @JvmStatic
@@ -383,15 +385,21 @@ open class Vector private constructor(
     }
 
     /**
+     * Returns a row vector containing the same scalar values.
+     * @return flattened row vector
+     */
+    fun flatten(): Vector = Vector(*toDoubleArray())
+
+    /**
      * Returns the scalar values of the vector across all dimensions. For
      * example, [[1, 2], [3, 4]].toDoubleArray() returns [1, 2, 3, 4].
      * @return DoubleArray containing all scalar values in the vector
-     *
+     */
     fun toDoubleArray(): DoubleArray {
         if (dimensions == 1)
             return DoubleArray(shape[0]) { scalarValues[it] }
 
-        val valuesPerVector = removeDimensionFromShape(shape).fold(1.0) { acc, dim ->
+        val valuesPerVector = removeDimensionFromShape(shape).fold(1) { acc, dim ->
             acc * dim
         }
         val valuesOfVectors = vectorValues.map { it.toDoubleArray() }
@@ -399,7 +407,22 @@ open class Vector private constructor(
             val vectorIndex = index / valuesPerVector
             valuesOfVectors[vectorIndex][index - vectorIndex * valuesPerVector]
         }
-    }*/
+    }
+
+    /**
+     * Returns a MutableVector with the same shape and values as this vector.
+     * @return MutableVector copy of this vector
+     */
+    fun toMutableVector(): MutableVector {
+        if (dimensions == 1)
+            return MutableVector(shape[0]) { scalarValues[it] }
+
+        val mutableVector = MutableVector(*shape) { 0.0 }
+        (0 until shape[0]).forEach {
+            mutableVector.vectorValues[it] = vectorValues[it].toMutableVector()
+        }
+        return mutableVector
+    }
 
     /**
      * Returns true if `other` is a Vector with the same shape and values

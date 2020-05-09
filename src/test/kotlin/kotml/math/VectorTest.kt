@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class VectorTest {
     @Test
     fun `Vector(shape, mapValues) initializes Vector with correct values`() {
-        val vector = Vector(intArrayOf(2, 3, 4)) { it * 2.0 }
+        val vector = Vector(2, 3, 4) { it * 2.0 }
         assertEquals(3, vector.dimensions)
         assertEquals(3, vector.shape.size)
         assertTrue(vector.shapeEquals(intArrayOf(2, 3, 4)))
@@ -69,10 +69,10 @@ class VectorTest {
 
     @Test
     fun `zeros() initializes a vector with all zero values`() {
-        assertEquals(Vector(0.0, 0.0, 0.0), Vector.zeros(intArrayOf(3)))
+        assertEquals(Vector(0.0, 0.0, 0.0), Vector.zeros(3))
         assertEquals(
             Vector(Vector(0, 0), Vector(0, 0), Vector(0, 0)),
-            Vector.zeros(intArrayOf(3, 2)))
+            Vector.zeros(3, 2))
     }
 
     @Test
@@ -275,7 +275,7 @@ class VectorTest {
     fun `mapIndexed() maps with index correctly`() {
         assertEquals(
             Vector(Vector(0.0, 2.0), Vector(4.0, 6.0)),
-            Vector.zeros(intArrayOf(2, 2)).mapIndexed { index, value ->
+            Vector.zeros(2, 2).mapIndexed { index, value ->
                 value + index * 2.0
             }
         )
@@ -285,7 +285,7 @@ class VectorTest {
     fun `map() maps correctly`() {
         assertEquals(
             Vector(Vector(1.0, 1.0), Vector(1.0, 1.0)),
-            Vector.zeros(intArrayOf(2, 2)).map { value ->
+            Vector.zeros(2, 2).map { value ->
                 value + 1.0
             }
         )

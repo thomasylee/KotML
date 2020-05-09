@@ -14,16 +14,23 @@ package kotml.math
  * a - b = Entrywise difference (e.g. [3, 0] - [1, 5] = [2, -5])
  * a * b = Entrywise product (e.g. [-1, 2] * [3, 4] = [-3, 8])
  * a / b = Entrywise quotient (e.g. [9, 2] / [3, 1] = [3, 2])
+ * a dot b = Dot product (e.g. [1, 2] dot [3, 4] = 1*3+2*4 = 11
  * a x b = Matrix multiplication product (e.g. [1, -2, 3] x [[4, 1], [0, 0], [-1, 2]] = [1, 7])
+ * a.transpose() = Matrix transpose (e.g. [1, 2].transpose() = [[1], [2]])
+ * a.det() = Matrix determinant (e.g. [[1, 2], [3, 4]].det() = -2)
  */
-class Vector private constructor(initIndex: Int, val shape: IntArray, mapValues: (Int) -> Double) {
+open class Vector private constructor(
+    initIndex: Byte,
+    val shape: IntArray,
+    mapValues: (Int) -> Double
+) {
     private val scalarValues: DoubleArray
     private val vectorValues: Array<Vector>
     val dimensions: Int
 
     companion object {
         @JvmStatic
-        fun zeros(shape: IntArray): Vector = Vector(shape) { 0.0 }
+        fun zeros(vararg shape: Int): Vector = Vector(*shape) { 0.0 }
 
         @JvmStatic
         private fun addDimensionToShape(dimension: Int, shape: IntArray): IntArray =
@@ -59,12 +66,20 @@ class Vector private constructor(initIndex: Int, val shape: IntArray, mapValues:
                 acc * dim
             }
             vectorValues = Array<Vector>(shape[0]) { index ->
-                Vector(initIndex + index * scalarsPerVector, subVectorShape, mapValues)
+                Vector(
+                    initIndex = (initIndex + index * scalarsPerVector).toByte(),
+                    shape = subVectorShape,
+                    mapValues = mapValues
+                )
             }
         }
     }
 
-    constructor(shape: IntArray, mapValues: (Int) -> Double) : this(0, shape, mapValues)
+    constructor(vararg shape: Int, mapValues: (Int) -> Double) : this(
+        initIndex = 0.toByte(),
+        shape = shape,
+        mapValues = mapValues
+    )
 
     constructor(vararg values: Double) : this(0, intArrayOf(values.size), {
         values[it]

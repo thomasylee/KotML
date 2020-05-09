@@ -7,7 +7,7 @@ Use a `Vector` instance to represent an n-dimensional array of values, similarly
 ```kotlin
 import kotml.math.Vector
 
-// Initialize with vararg Double values.
+// Initialize with vararg Double or Int values.
 Vector(-1.0, 0.0, 1.0)
 
 // Int values get converted to Double.
@@ -17,10 +17,12 @@ Vector(1, 2) == Vector(1.0, 2.0)
 Vector(Vector(1, 2), Vector(3, 4), Vector(5, 6)) // [[1,2], [3,4], [5,6]]
 
 // You can create a vector of zeros with any valid shape.
-Vector.zeros(intArray(2, 4)) == Vector(Vector(0, 0, 0, 0), Vector(0, 0, 0, 0))
+// Note that the 2, 4 arguments here are the shape of the vector.
+Vector.zeros(2, 4) == Vector(Vector(0, 0, 0, 0), Vector(0, 0, 0, 0))
 
 // You can even create vectors with values determined by index.
-Vector(intArray(2, 3)) { 2 * it } == Vector(Vector(0, 2, 4), Vector(6, 8, 10))
+// Note that the 2, 3 arguments here are the shape of the vector.
+Vector(2, 3) { 2 * it } == Vector(Vector(0, 2, 4), Vector(6, 8, 10))
 ```
 
 Due to Kotlin's static typing, we use `[]` to access `Vector` elements, and `()` to access `Double` elements.
@@ -61,8 +63,14 @@ vector / vector == Vector(1, 1)
 // Dot product
 vector dot vector == 85.0
 
+// Transpose
+vector.transpose() == Vector(Vector(2), Vector(9))
+
 // Matrix multiplication
 vector x vector.transpose() == Vector(85)
+
+// Determinant
+Vector(2, 2) { it }.det() == -2.0
 ```
 
 Vectors also support mapping, as well as folding, adding, and multiplying along an axis, similarly to in numpy.

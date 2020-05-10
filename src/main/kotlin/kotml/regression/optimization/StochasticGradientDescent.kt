@@ -33,8 +33,8 @@ class StochasticGradientDescent(
         val estimate = function.evaluate(weights, regressors)
         val gradient = lossFunction.gradient(estimate, targets[0])
 
-        if (weights.hasBias)
-            weights.bias -= stepSize * gradient
+        if (weights.hasConstant)
+            weights.constant -= stepSize * gradient
 
         (0 until regressors.shape[0]).forEach { index ->
             weights.coeffs[index] -= stepSize * gradient * regressors[index]

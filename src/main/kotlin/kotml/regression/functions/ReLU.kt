@@ -10,7 +10,7 @@ import kotml.regression.Weights
  */
 object ReLU : FunctionOfLinearRegressors {
     override fun evaluate(weights: Weights, regressors: Vector): Double =
-        max(0.0, (0 until regressors.shape[0]).fold(weights.bias) { sumAcc, index ->
+        max(0.0, (0 until regressors.shape[0]).fold(weights.constant) { sumAcc, index ->
             sumAcc + weights.coeffs[index] * regressors[index]
         })
 
@@ -25,12 +25,12 @@ object ReLU : FunctionOfLinearRegressors {
 
         // Derivative for all weights is 0 when ReLU == 0.
         if (value == 0.0)
-            return Weights(weights.coeffs.shape[0], weights.hasBias)
+            return Weights(weights.coeffs.shape[0], weights.hasConstant)
 
-        val bias = if (weights.hasBias) 1.0 else null
+        val constant = if (weights.hasConstant) 1.0 else null
         val coeffs = MutableVector(regressors.shape[0]) {
             regressors[it]
         }
-        return Weights(bias, coeffs)
+        return Weights(constant, coeffs)
     }
 }

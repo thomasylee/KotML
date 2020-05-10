@@ -9,7 +9,7 @@ import kotml.regression.Weights
 object LogisticFunction : FunctionOfLinearRegressors {
     override fun evaluate(weights: Weights, regressors: Vector): Double =
         1.0 / (1.0 + exp(
-            -(0 until regressors.shape[0]).fold(weights.bias) { sumAcc, index ->
+            -(0 until regressors.shape[0]).fold(weights.constant) { sumAcc, index ->
                 sumAcc + weights.coeffs[index] * regressors[index]
             }
         ))
@@ -20,7 +20,7 @@ object LogisticFunction : FunctionOfLinearRegressors {
     }
 
     override fun weightsGradient(weights: Weights, regressors: Vector): Weights {
-        val sum = (0 until regressors.shape[0]).fold(weights.bias) { acc, index ->
+        val sum = (0 until regressors.shape[0]).fold(weights.constant) { acc, index ->
             acc + weights.coeffs[index] * regressors[index]
         }
         val expSum = exp(-sum)
@@ -28,11 +28,11 @@ object LogisticFunction : FunctionOfLinearRegressors {
             regressors[index] * expSum / (expSum + 1.0).pow(2.0)
         }
 
-        val bias =
-            if (weights.hasBias)
+        val constant =
+            if (weights.hasConstant)
                 expSum / (expSum + 1.0).pow(2.0)
             else
                 null
-        return Weights(bias, coeffs)
+        return Weights(constant, coeffs)
     }
 }

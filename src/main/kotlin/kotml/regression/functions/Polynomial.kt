@@ -17,12 +17,12 @@ class Polynomial(val exponents: Vector) : FunctionModel {
 
     constructor(vararg exponents: Double) : this(Vector(*exponents))
 
-    constructor(vararg exponents: Int) : this(Vector(*DoubleArray(exponents.size) { exponents[it].toDouble() }))
+    constructor(vararg exponents: Int) : this(Vector(*exponents))
 
     override fun evaluate(weights: Weights, regressors: Vector): Double {
         validateRegressorsShape(regressors)
 
-        return weights.coeffs.foldIndexed(weights.bias) { index, acc, coeff ->
+        return weights.coeffs.foldIndexed(weights.constant) { index, acc, coeff ->
             acc + coeff * regressors[index].pow(exponents[index])
         }[0]
     }
@@ -33,8 +33,8 @@ class Polynomial(val exponents: Vector) : FunctionModel {
         val coeffGradient = MutableVector(weights.coeffs.shape[0]) { index ->
             regressors[index].pow(exponents[index])
         }
-        val bias = if (weights.hasBias) 1.0 else null
-        return Weights(bias, coeffGradient)
+        val constant = if (weights.hasConstant) 1.0 else null
+        return Weights(constant, coeffGradient)
     }
 
     private fun validateRegressorsShape(regressors: Vector) {

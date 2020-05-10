@@ -15,7 +15,7 @@ class StochasticGradientDescent(
     val function: FunctionModel,
     val lossFunction: LossFunction,
     val weights: Weights
-) : IterativeOptimizer(weights.coeffs.shape[0], 1) {
+) : IterativeOptimizer<Weights>(weights.coeffs.shape[0], 1, weights) {
     constructor(
         stepSize: Double,
         function: FunctionModel,
@@ -29,7 +29,7 @@ class StochasticGradientDescent(
         weights = Weights(regressorCount, hasBias)
     )
 
-    internal override fun addObservation(regressors: Vector, targets: Vector) {
+    protected override fun addObservation(regressors: Vector, targets: Vector) {
         val estimate = function.evaluate(weights, regressors)
         val gradient = lossFunction.gradient(estimate, targets[0])
 

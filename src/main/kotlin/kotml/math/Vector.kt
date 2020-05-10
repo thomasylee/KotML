@@ -387,7 +387,7 @@ open class Vector private constructor(
         validateSquareMatrix()
 
         if (dimensions == 1)
-            throw ShapeException("1x1 matrices do not have inverses")
+            throw ShapeException("1x1 matrices do not have determinants")
 
         if (shape[0] == 2)
             return this[0, 0] * this[1, 1] - this[0, 1] * this[1, 0]
@@ -405,6 +405,69 @@ open class Vector private constructor(
             }
         }
         return toAdd - toSubtract
+    }
+
+    /**
+     * Returns the inverse of the matrix represented by the vector.
+     * @return matrix inverse
+     */
+    fun inverse(): Vector {
+        validateSquareMatrix()
+
+        if (dimensions == 1)
+            return Vector(1.0 / scalarValues[0])
+
+        if (shape[0] == 2)
+            return Vector(
+                Vector(this[1, 1], -this[0, 1]),
+                Vector(-this[1, 0], this[0, 0])) / det()
+
+        val determinant = det()
+        if (determinant == 0.0)
+            throw ShapeException("Inverse matrix does not exist")
+
+        return Vector(shape[0], shape[0]) { index ->
+            val factor = -2.0 * (index % 2) + 1.0
+            val row = index / shape[0]
+            val col = index - row * shape[0]
+            factor * subMatrix(row, col).det()
+        }.transpose() / determinant
+    }
+
+    /**
+     * Returns the submatrix excluding a specific row and column. This
+     * method can only be invoked on square matrices with at least 2 elements
+     * per row and column.
+     * @param row row to exclude
+     * @param col column to exclude
+     * @return submatrix excluding the row and column
+     */
+    fun subMatrix(row: Int, col: Int): Vector {
+        validateSquareMatrix()
+
+        if (dimensions == 1)
+            throw ShapeException("1x1 matrices do not have matrix minors")
+
+        if (row < 0 || row >= shape[0] || col < 0 || col >= shape[0])
+            throw ShapeException("Invalid row and column for matrix minor")
+
+        var rowOffset = 0
+        var colOffset = 0
+        var prevRow = -1
+        val newDim = shape[0] - 1
+        return Vector(newDim, newDim) { index ->
+            val curRow = index / newDim
+            val curCol = index - curRow * newDim
+            if (curRow != prevRow) {
+                prevRow = curRow
+                colOffset = 0
+            }
+            if (curRow == row)
+                rowOffset = 1
+            if (curCol == col)
+                colOffset = 1
+            this[curRow + rowOffset, curCol + colOffset]
+        }
     }
 
     /**
@@ -531,7 +594,7 @@ open class Vector private constructor(
         }
 
     private fun validateSquareMatrix() {
-        if (dimensions > 2 || (dimensions == 1 && shape[0] != 1) || shape[0] != shape[1]) {
+        if (dimensions > 2 || (dimensions == 1 && shape[0] != 1) || (dimensions == 2 && shape[0] != shape[1])) {
             throw ShapeException(
                 "Only 2-dimensional square matrices have defined inverses"
             )

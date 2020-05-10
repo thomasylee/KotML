@@ -85,6 +85,23 @@ class VectorTest {
     }
 
     @Test
+    fun `inverse() returns the inverse of the square matrix`() {
+        assertEquals(Vector(0.5), Vector(2).inverse())
+        assertEquals(
+            Vector(Vector(0.6, -0.7), Vector(-0.2, 0.4)),
+            Vector(Vector(4, 7), Vector(2, 6)).inverse())
+        assertEquals(
+            Vector(
+                Vector(0.2, 0.2, 0.0),
+                Vector(-0.2, 0.3, 1.0),
+                Vector(0.2, -0.3, 0.0)),
+            Vector(
+                Vector(3, 0, 2),
+                Vector(2, 0, -2),
+                Vector(0, 1, 1)).inverse())
+    }
+
+    @Test
     fun `== returns correct result`() {
         val vector1 = Vector(
             Vector(-2.0, -1.0),

@@ -73,6 +73,13 @@ vector x vector.transpose() == Vector(85)
 
 // Determinant
 Vector(2, 2) { it }.det() == -2.0
+
+// Matrix inverse
+Vector(Vector(4, 7), Vector(2, 6)).inverse() == Vector(Vector(0.6, -0.7), Vector(-0.2, 0.4))
+
+// Submatrices from excluding a row and column
+Vector(Vector(1, 2, 3), Vector(4, 5, 6), Vector(7, 8, 9)).subMatrix(0, 1) ==
+    Vector(Vector(4, 6), Vector(7, 9))
 ```
 
 Vectors also support mapping, as well as folding, adding, and multiplying along an axis, similarly to in numpy.

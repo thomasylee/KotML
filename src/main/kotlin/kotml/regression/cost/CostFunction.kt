@@ -1,19 +1,22 @@
 package kotml.regression.cost
 
-interface CostFunction {
+import kotml.math.Vector
+import kotml.regression.cost.loss.LossFunction
+
+abstract class CostFunction(val lossFunction: LossFunction) {
     /**
-     * Returns the evaluated value of the objective function.
-     * @param response dependent variable value
-     * @param estimate estimated value
-     * @return least squares error
+     * Returns the evaluated value of the cost function.
+     * @param estimates row vector of estimates
+     * @param responses row vector of target values
+     * @return aggregated cost of the errors
      */
-    abstract fun evaluate(response: Double, estimate: Double): Double
+    abstract fun evaluate(estimates: Vector, responses: Vector): Double
 
     /**
-     * Returns the gradient of the objective function.
-     * @param response dependent variable value
-     * @param estimate estimated value
-     * @return gradient of the least squares error
+     * Returns the aggregated gradient of the cost.
+     * @param estimates row vector of estimates
+     * @param responses row vector of target values
+     * @return gradient of the cost
      */
-    abstract fun gradient(response: Double, estimate: Double): Double
+    abstract fun gradient(estimates: Vector, responses: Vector): Double
 }

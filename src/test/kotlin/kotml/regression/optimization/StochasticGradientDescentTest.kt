@@ -2,7 +2,7 @@ package kotml.regression.optimization
 
 import kotml.math.Vector
 import kotml.regression.Weights
-import kotml.regression.cost.loss.OrdinaryLeastSquares
+import kotml.regression.cost.loss.SquaredError
 import kotml.regression.functions.Polynomial
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -13,7 +13,7 @@ class StochasticGradientDescentTest {
     @Test
     fun `calculates weights correctly with bias`() {
         val estimator = StochasticGradientDescent(
-            0.001, Polynomial(Vector(1)), OrdinaryLeastSquares, 1)
+            0.001, Polynomial(Vector(1)), SquaredError, 1)
         assertTrue(estimator.weights.hasBias)
         assertEquals(1, estimator.weights.coeffs.shape[0])
         estimator.addObservation(Vector(-9), Vector(-19))
@@ -27,7 +27,7 @@ class StochasticGradientDescentTest {
     @Test
     fun `calculates weights correctly without bias`() {
         val estimator = StochasticGradientDescent(
-            0.02, Polynomial(Vector(1)), OrdinaryLeastSquares, 1, false)
+            0.02, Polynomial(Vector(1)), SquaredError, 1, false)
         estimator.addObservation(Vector(0.0), Vector(0))
         estimator.addObservation(Vector(1), Vector(2))
         estimator.addObservation(Vector(2), Vector(4))
@@ -45,7 +45,7 @@ class StochasticGradientDescentTest {
         val estimator = StochasticGradientDescent(
             stepSize = 0.001,
             function = Polynomial(Vector(1)),
-            lossFunction = OrdinaryLeastSquares,
+            lossFunction = SquaredError,
             weights = Weights(-0.038, Vector(0.342))
         )
         estimator.addObservation(Vector(-8), Vector(-17))

@@ -29,9 +29,9 @@ class StochasticGradientDescent(
         weights = Weights(regressorCount, hasBias)
     )
 
-    internal override fun addObservation(regressors: Vector, response: Vector) {
+    internal override fun addObservation(regressors: Vector, targets: Vector) {
         val estimate = function.evaluate(weights, regressors)
-        val gradient = lossFunction.gradient(estimate, response[0])
+        val gradient = lossFunction.gradient(estimate, targets[0])
 
         if (weights.hasBias)
             weights.bias -= stepSize * gradient

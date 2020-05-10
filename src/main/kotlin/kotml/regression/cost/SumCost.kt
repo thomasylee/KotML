@@ -4,13 +4,13 @@ import kotml.math.Vector
 import kotml.regression.cost.loss.LossFunction
 
 class SumCost(lossFunction: LossFunction) : CostFunction(lossFunction) {
-    override fun evaluate(estimates: Vector, responses: Vector): Double =
+    override fun evaluate(estimates: Vector, targets: Vector): Double =
         estimates.foldIndexed(0.0) { index, acc, estimate ->
-            acc + lossFunction.evaluate(estimate, responses[index])
+            acc + lossFunction.evaluate(estimate, targets[index])
         }[0]
 
-    override fun gradient(estimates: Vector, responses: Vector): Double =
+    override fun gradient(estimates: Vector, targets: Vector): Double =
         estimates.foldIndexed(0.0) { index, acc, estimate ->
-            acc + lossFunction.gradient(estimate, responses[index])
+            acc + lossFunction.gradient(estimate, targets[index])
         }[0]
 }

@@ -9,18 +9,18 @@ object SquaredError : LossFunction {
     /**
      * Returns the squared error.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return squared error
      */
-    override fun evaluate(estimate: Double, response: Double): Double =
-        (estimate - response) * (estimate - response)
+    override fun evaluate(estimate: Double, target: Double): Double =
+        (estimate - target) * (estimate - target)
 
     /**
      * Returns the gradient of the squared error.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return gradient of the squared error
      */
-    override fun gradient(estimate: Double, response: Double): Double =
-        2.0 * (estimate - response)
+    override fun gradient(estimate: Double, target: Double): Double =
+        2.0 * (estimate - target)
 }

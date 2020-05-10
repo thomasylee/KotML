@@ -10,18 +10,18 @@ object HalfSquaredError : LossFunction {
     /**
      * Returns half the squared error.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return half squared error
      */
-    override fun evaluate(estimate: Double, response: Double): Double =
-        0.5 * (estimate - response) * (estimate - response)
+    override fun evaluate(estimate: Double, target: Double): Double =
+        0.5 * (estimate - target) * (estimate - target)
 
     /**
      * Returns the gradient of half the squared error.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return gradient of half the squared error
      */
-    override fun gradient(estimate: Double, response: Double): Double =
-        estimate - response
+    override fun gradient(estimate: Double, target: Double): Double =
+        estimate - target
 }

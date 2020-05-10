@@ -1,5 +1,6 @@
 package kotml.regression.cost.loss
 
+import kotlin.math.ln
 import kotlin.math.log2
 
 /**
@@ -9,21 +10,23 @@ import kotlin.math.log2
  * the cross entropy and entropy of a sample.
  */
 object CrossEntropy : LossFunction {
+    private val ln2: Double = ln(2.0)
+
     /**
      * Returns the cross entropy error.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return cross entropy error
      */
-    override fun evaluate(estimate: Double, response: Double): Double =
-        -response * log2(estimate)
+    override fun evaluate(estimate: Double, target: Double): Double =
+        -target * log2(estimate)
 
     /**
      * Returns the gradient of the cross entropy error.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return gradient of the cross entropy error
      */
-    override fun gradient(estimate: Double, response: Double): Double =
-        2.0 * (estimate - response)
+    override fun gradient(estimate: Double, target: Double): Double =
+        -target / (estimate * ln2)
 }

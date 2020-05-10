@@ -10,15 +10,15 @@ sealed class Optimizer(val regressorCount: Int, val outputCount: Int) {
     /**
      * Adds an observation to the training model.
      * @param regressors the independent variables
-     * @param response the dependent variable value
+     * @param targets the dependent variable values
      */
-    fun observe(regressors: Vector, response: Vector) {
+    fun observe(regressors: Vector, targets: Vector) {
         validateShape("regressors", regressors, regressorCount)
-        validateShape("response", response, outputCount)
-        addObservation(response, regressors)
+        validateShape("targets", targets, outputCount)
+        addObservation(regressors, targets)
     }
 
-    internal abstract fun addObservation(regressors: Vector, response: Vector)
+    internal abstract fun addObservation(regressors: Vector, targets: Vector)
 
     private fun validateShape(name: String, vector: Vector, count: Int) {
         if (vector.dimensions != 1 || vector.shape[0] != count) {

@@ -9,16 +9,16 @@ interface LossFunction {
     /**
      * Returns the evaluated value of the loss function.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return loss of the estimate
      */
-    abstract fun evaluate(estimate: Double, response: Double): Double
+    abstract fun evaluate(estimate: Double, target: Double): Double
 
     /**
      * Returns the gradient of the loss function.
      * @param estimate estimated value
-     * @param response dependent variable value
+     * @param target dependent variable value
      * @return gradient of the loss function
      */
-    abstract fun gradient(estimate: Double, response: Double): Double
+    abstract fun gradient(estimate: Double, target: Double): Double
 }

@@ -45,6 +45,8 @@ class Weights(
         coeffs = MutableVector(coeffCount) { sampler.sample() }
     )
 
+    fun toVector(): Vector = coeffs.append(constant)
+
     override fun equals(other: Any?): Boolean =
         other is Weights && other.hasConstant == hasConstant &&
             (!hasConstant || other.constant == constant) && other.coeffs == coeffs

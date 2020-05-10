@@ -385,6 +385,29 @@ class VectorTest {
     }
 
     @Test
+    fun `insert() returns a row vector with the inserted value`() {
+        assertEquals(Vector(5, 1, 2), Vector(1, 2).insert(0, 5))
+        assertEquals(Vector(0, 5, 2), Vector(0, 2).insert(1, 5.0))
+        assertEquals(Vector(0, 1, 5), Vector(0, 1).insert(2, 5.0))
+
+        // Only row vectors can insert values.
+        assertThrows(ShapeException::class.java) {
+            Vector(Vector(1, 2), Vector(3, 4)).insert(0, 1.0)
+        }
+    }
+
+    @Test
+    fun `append() returns a row vector with the appended value`() {
+        assertEquals(Vector(0, 1, 2), Vector(0, 1).append(2))
+        assertEquals(Vector(0, 1, 2), Vector(0, 1).append(2.0))
+
+        // Only row vectors can insert values.
+        assertThrows(ShapeException::class.java) {
+            Vector(Vector(1, 2), Vector(3, 4)).append(1.0)
+        }
+    }
+
+    @Test
     fun `toDoubleArray() returns a DoubleArray containing all the values`() {
         val array = Vector(Vector(1, 2), Vector(3, 4)).toDoubleArray()
         array.forEachIndexed { index, value ->

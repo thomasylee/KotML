@@ -433,6 +433,50 @@ open class Vector private constructor(
     }
 
     /**
+     * Returns a new vector with the value inserted at the specified index.
+     * @param index index where the value should be inserted
+     * @param value value to insert
+     * @return new vector with the inserted value
+     */
+    fun insert(index: Int, value: Double): Vector {
+        if (dimensions != 1)
+            throw ShapeException("Only row vectors can insert values")
+        var found = 0
+        return Vector(shape[0] + 1) {
+            if (it == index) {
+                found = 1
+                value
+            } else {
+                scalarValues[it - found]
+            }
+        }
+    }
+
+    /**
+     * Returns a new vector with the value inserted at the specified index.
+     * @param index index where the value should be inserted
+     * @param value value to insert
+     * @return new vector with the inserted value
+     */
+    fun insert(index: Int, value: Int): Vector = insert(index, value.toDouble())
+
+    /**
+     * Returns a new vector with the value inserted at the specified index.
+     * @param index index where the value should be inserted
+     * @param value value to insert
+     * @return new vector with the inserted value
+     */
+    fun append(value: Double): Vector = insert(shape[0], value.toDouble())
+
+    /**
+     * Returns a new vector with the value inserted at the specified index.
+     * @param index index where the value should be inserted
+     * @param value value to insert
+     * @return new vector with the inserted value
+     */
+    fun append(value: Int): Vector = append(value.toDouble())
+
+    /**
      * Returns a MutableVector with the same shape and values as this vector.
      * @return MutableVector copy of this vector
      */

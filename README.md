@@ -80,6 +80,8 @@ Vectors also support mapping, as well as folding, adding, and multiplying along 
 Vector(Vector(1, 2), Vector(3, 4)).map { it * 2 } ==
     Vector(Vector(2, 4), Vector(6, 8))
 
+Vector(1, 2, 3).mapIndexed { index, value -> index * value } == Vector(0, 2, 6)
+
 // Setting axis = 0 is the default.
 Vector(Vector(1), Vector(2), Vector(3)).fold(initial = 0.0, axis = 0) { acc, value ->
     acc + 2 * value
@@ -117,17 +119,17 @@ A `FunctionModel` represents a mathemtical function such as a polynomial (`Polyn
 
 A `CostFunction` represents a differentiable cost function such as least squared error (`OrdinaryLeastSquares` object).
 
-`Weights` tracks the coefficient weights and, optionally, bias weights.
+`Weights` tracks the coefficient weights and, optionally, a constant.
 ```kotlin
-Weights(0.1, doubleArray(0.2, 0.3)) // bias = 0.1, coeffs = 0.2, 0.3
-Weights(doubleArray(0.2, 0.3)) // no bias, coeffs = 0.2, 0.3
+Weights(0.1, doubleArray(0.2, 0.3)) // constant = 0.1, coeffs = 0.2, 0.3
+Weights(doubleArray(0.2, 0.3)) // no constant, coeffs = 0.2, 0.3
 
-Weights(3, true) // bias = 0, coeffs = 0, 0, 0
-Weights(3) // no bias, coeffs = 0, 0, 0
+Weights(3, true) // constant = 0, coeffs = 0, 0, 0
+Weights(3) // no constant, coeffs = 0, 0, 0
 
 val weights = Weights(2, true, UniformSampler(1.0))
-weights.hasBias == true
-weights.bias == 1.0
+weights.hasConstant == true
+weights.constant == 1.0
 weights.coeffs[0] == 1.0
 weights.coeffs[1] == 1.0
 ```
@@ -135,8 +137,8 @@ weights.coeffs[1] == 1.0
 You can use a `WeightedOptimizer` like `StochasticGradientDescent` to build models of functions by selecting weights that minimize a cost function.
 ```kotlin
 import kotml.math.Vector
+import kotml.regression.cost.loss.SquaredError
 import kotml.regression.functions.Polynomial
-import kotml.regression.objectives.OrdinaryLeastSquares
 import kotml.regression.optimization.StochasticGradientDescent
 
 // Use stochastic gradient descent on a polynomial of the
@@ -144,7 +146,7 @@ import kotml.regression.optimization.StochasticGradientDescent
 val estimator = StochasticGradientDescent(
     stepSize = 0.001,
     function = Polynomial(Vector(2.0)), // The only regressor has exponent = 2.
-    costFunction = OrdinaryLeastSquares,
+    lossFunction = SquaredError,
     regressorCount = 1
 )
 

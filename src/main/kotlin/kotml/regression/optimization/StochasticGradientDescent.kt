@@ -21,12 +21,12 @@ class StochasticGradientDescent(
         function: FunctionModel,
         lossFunction: LossFunction,
         regressorCount: Int,
-        hasBias: Boolean = true
+        hasConstant: Boolean = true
     ) : this(
         stepSize = stepSize,
         function = function,
         lossFunction = lossFunction,
-        weights = Weights(regressorCount, hasBias)
+        weights = Weights(regressorCount, hasConstant)
     )
 
     protected override fun addObservation(regressors: Vector, targets: Vector) {

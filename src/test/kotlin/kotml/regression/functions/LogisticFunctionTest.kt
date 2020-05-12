@@ -7,6 +7,11 @@ import org.junit.jupiter.api.Test
 
 class LogisticFunctionTest {
     @Test
+    fun `estimateNetInput() returns the correct estimate value`() {
+        assertEquals(0.9933071490757153, LogisticFunction.evaluateNetInput(5.0))
+    }
+
+    @Test
     fun `estimate() returns the correct estimate value with bias`() {
         assertEquals(0.9046505351008906, LogisticFunction.evaluate(
             Weights(-4.5, Vector(2.0, 1.5)),

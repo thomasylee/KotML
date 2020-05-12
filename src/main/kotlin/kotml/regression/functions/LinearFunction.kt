@@ -8,8 +8,7 @@ import kotml.regression.Weights
  * to its regressors.
  */
 object LinearFunction : FunctionOfLinearRegressors {
-    override fun evaluate(weights: Weights, regressors: Vector): Double =
-        weights.constant + (weights.coeffs * regressors).sum()[0]
+    override fun evaluateNetInput(netInput: Double): Double = netInput
 
     override fun netInputGradient(netInput: Double): Double = 1.0
 

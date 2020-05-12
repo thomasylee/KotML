@@ -9,10 +9,7 @@ import kotml.regression.Weights
  * ReLU is represented by f(x) = max(0, x).
  */
 object ReLU : FunctionOfLinearRegressors {
-    override fun evaluate(weights: Weights, regressors: Vector): Double =
-        max(0.0, (0 until regressors.shape[0]).fold(weights.constant) { sumAcc, index ->
-            sumAcc + weights.coeffs[index] * regressors[index]
-        })
+    override fun evaluateNetInput(netInput: Double): Double = max(0.0, netInput)
 
     override fun netInputGradient(netInput: Double): Double =
         if (netInput < 0.0)

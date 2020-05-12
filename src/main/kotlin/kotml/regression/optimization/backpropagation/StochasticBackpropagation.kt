@@ -4,7 +4,6 @@ import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.MutableVector
 import kotml.math.Vector
 import kotml.regression.cost.CostFunction
-import kotml.regression.functions.LinearFunction
 import kotml.regression.neural.FeedforwardNeuralNetwork
 import kotml.regression.optimization.IterativeOptimizer
 
@@ -38,7 +37,7 @@ class StochasticBackpropagation(
             val new_dErr_dNetIn = MutableVector.zeros(layer.neurons.size)
 
             layer.neurons.forEachIndexed { neuronIndex, neuron ->
-                val netInput = LinearFunction.evaluate(neuron.weights, inputs[layerIndex])
+                val netInput = neuron.activationFunction.calculateNetInput(neuron.weights, inputs[layerIndex])
                 val dErr_dOut: Double =
                     if (layerIndex == network.layers.size - 1) {
                         costDeriv[neuronIndex]

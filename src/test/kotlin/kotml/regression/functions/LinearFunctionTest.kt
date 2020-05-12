@@ -7,6 +7,11 @@ import org.junit.jupiter.api.Test
 
 class LinearFunctionTest {
     @Test
+    fun `evaluateNetInput() returns the net input`() {
+        assertEquals(-5.0, LinearFunction.evaluateNetInput(-5.0))
+    }
+
+    @Test
     fun `evaluate() returns the correct estimate with bias`() {
         assertEquals(-1.0, LinearFunction.evaluate(
             Weights(-5.0, Vector(2, -1)),

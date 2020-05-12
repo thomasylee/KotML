@@ -7,6 +7,13 @@ import org.junit.jupiter.api.Test
 
 class ReLUTest {
     @Test
+    fun `evaluateNetInput() returns the correct estimate`() {
+        assertEquals(0.0, ReLU.evaluateNetInput(-1.0))
+        assertEquals(0.0, ReLU.evaluateNetInput(0.0))
+        assertEquals(1.0, ReLU.evaluateNetInput(1.0))
+    }
+
+    @Test
     fun `evaluate() returns the correct estimate with bias`() {
         assertEquals(0.0, ReLU.evaluate(
             Weights(-5.0, Vector(2.0, -1.0)),

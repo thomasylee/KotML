@@ -7,12 +7,8 @@ import kotml.math.Vector
 import kotml.regression.Weights
 
 object LogisticFunction : FunctionOfLinearRegressors {
-    override fun evaluate(weights: Weights, regressors: Vector): Double =
-        1.0 / (1.0 + exp(
-            -(0 until regressors.shape[0]).fold(weights.constant) { sumAcc, index ->
-                sumAcc + weights.coeffs[index] * regressors[index]
-            }
-        ))
+    override fun evaluateNetInput(netInput: Double): Double =
+        1.0 / (1.0 + exp(-netInput))
 
     override fun netInputGradient(netInput: Double): Double {
         val expInput = exp(netInput)
@@ -20,9 +16,7 @@ object LogisticFunction : FunctionOfLinearRegressors {
     }
 
     override fun weightsGradient(weights: Weights, regressors: Vector): Weights {
-        val sum = (0 until regressors.shape[0]).fold(weights.constant) { acc, index ->
-            acc + weights.coeffs[index] * regressors[index]
-        }
+        val sum = calculateNetInput(weights, regressors)
         val expSum = exp(-sum)
         val coeffs = MutableVector(weights.coeffs.shape[0]) { index ->
             regressors[index] * expSum / (expSum + 1.0).pow(2.0)

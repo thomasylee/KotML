@@ -9,6 +9,6 @@ class MeanCost(lossFunction: LossFunction) : CostFunction(lossFunction) {
     override fun evaluate(estimates: Vector, targets: Vector): Double =
         sumCost.evaluate(estimates, targets) / estimates.shape[0]
 
-    override fun gradient(estimates: Vector, targets: Vector): Double =
+    override fun gradient(estimates: Vector, targets: Vector): Vector =
         sumCost.gradient(estimates, targets) / estimates.shape[0]
 }

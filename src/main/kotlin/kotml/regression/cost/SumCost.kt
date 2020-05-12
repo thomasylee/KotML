@@ -9,8 +9,8 @@ class SumCost(lossFunction: LossFunction) : CostFunction(lossFunction) {
             acc + lossFunction.evaluate(estimate, targets[index])
         }[0]
 
-    override fun gradient(estimates: Vector, targets: Vector): Double =
-        estimates.foldIndexed(0.0) { index, acc, estimate ->
-            acc + lossFunction.gradient(estimate, targets[index])
-        }[0]
+    override fun gradient(estimates: Vector, targets: Vector): Vector =
+        estimates.mapIndexed { index, estimate ->
+            lossFunction.gradient(estimate, targets[index])
+        }
 }

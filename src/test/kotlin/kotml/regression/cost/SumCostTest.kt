@@ -14,7 +14,7 @@ class SumCostTest {
 
     @Test
     fun `gradient() returns the correct gradient`() {
-        assertEquals(14.0, SumCost(SquaredError).gradient(
+        assertEquals(Vector(6, 8), SumCost(SquaredError).gradient(
             Vector(1, 5), Vector(-2, 1)))
     }
 }

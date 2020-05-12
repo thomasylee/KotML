@@ -13,10 +13,10 @@ abstract class CostFunction(val lossFunction: LossFunction) {
     abstract fun evaluate(estimates: Vector, targets: Vector): Double
 
     /**
-     * Returns the aggregated gradient of the cost.
+     * Returns the gradient of the cost for each estimate.
      * @param estimates row vector of estimates
      * @param targets row vector of target values
-     * @return gradient of the cost
+     * @return gradient of the cost for each estimate
      */
-    abstract fun gradient(estimates: Vector, targets: Vector): Double
+    abstract fun gradient(estimates: Vector, targets: Vector): Vector
 }

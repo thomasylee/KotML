@@ -14,7 +14,7 @@ class MeanCostTest {
 
     @Test
     fun `gradient() returns the correct gradient`() {
-        assertEquals(7.0, MeanCost(SquaredError).gradient(
+        assertEquals(Vector(3, 4), MeanCost(SquaredError).gradient(
             Vector(1, 5), Vector(-2, 1)))
     }
 }

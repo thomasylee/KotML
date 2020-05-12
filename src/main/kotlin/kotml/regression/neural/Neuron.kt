@@ -16,11 +16,11 @@ class Neuron(
     constructor(
         activationFunction: FunctionOfLinearRegressors,
         regressorCount: Int,
-        includeBias: Boolean = true,
+        includeConstant: Boolean = true,
         sampler: DistributionSampler = NormalSampler()
     ) : this(
         activationFunction = activationFunction,
-        weights = Weights(regressorCount, includeBias, sampler)
+        weights = Weights(regressorCount, includeConstant, sampler)
     )
 
     /**

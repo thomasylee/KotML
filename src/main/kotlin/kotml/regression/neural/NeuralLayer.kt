@@ -15,13 +15,13 @@ class NeuralLayer(val neurons: Array<Neuron>) {
         neuronCount: Int,
         activationFunction: FunctionOfLinearRegressors,
         regressorCount: Int,
-        includeBias: Boolean = true,
+        includeConstant: Boolean = true,
         sampler: DistributionSampler = NormalSampler()
     ) : this(Array<Neuron>(neuronCount) {
         Neuron(
             activationFunction,
             regressorCount,
-            includeBias,
+            includeConstant,
             sampler
         )
     })
@@ -37,7 +37,7 @@ class NeuralLayer(val neurons: Array<Neuron>) {
      * @return output values of each neuron
      */
     fun evaluate(regressors: Vector): Vector =
-        Vector(*DoubleArray(neurons.size) { index ->
+        Vector(neurons.size) { index ->
             neurons[index].evaluate(regressors)
-        })
+        }
 }

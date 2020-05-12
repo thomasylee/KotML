@@ -289,6 +289,31 @@ class VectorTest {
     }
 
     @Test
+    fun `forEachIndexed() loops through all elements with indices`() {
+        val vector = Vector(Vector(1, 2), Vector(3, 4))
+        var realIndex = 0
+        vector.forEachIndexed { index, value ->
+            assertEquals(realIndex, index)
+            assertEquals(realIndex + 1.0, value)
+            realIndex++
+        }
+        // Make sure we looped through all the elements
+        assertEquals(vector.shape[0] * vector.shape[1], realIndex)
+    }
+
+    @Test
+    fun `forEach() loops through all elements`() {
+        val vector = Vector(Vector(1, 2), Vector(3, 4))
+        var realIndex = 0
+        vector.forEach { value ->
+            assertEquals(realIndex + 1.0, value)
+            realIndex++
+        }
+        // Make sure we looped through all the elements
+        assertEquals(vector.shape[0] * vector.shape[1], realIndex)
+    }
+
+    @Test
     fun `mapIndexed() maps with index correctly`() {
         assertEquals(
             Vector(Vector(0.0, 2.0), Vector(4.0, 6.0)),

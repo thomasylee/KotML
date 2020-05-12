@@ -82,8 +82,13 @@ Vector(Vector(1, 2, 3), Vector(4, 5, 6), Vector(7, 8, 9)).subMatrix(0, 1) ==
     Vector(Vector(4, 6), Vector(7, 9))
 ```
 
-Vectors also support mapping, as well as folding, adding, and multiplying along an axis, similarly to in numpy.
+Vectors also support iterating and mapping, as well as folding, adding, and multiplying along an axis, similarly to in numpy.
 ```kotlin
+Vector(1, 2).forEach { value -> println(value) }
+Vector(1, 2).forEachIndexed { index, value ->
+    println("At index $index: $value")
+}
+
 Vector(Vector(1, 2), Vector(3, 4)).map { it * 2 } ==
     Vector(Vector(2, 4), Vector(6, 8))
 

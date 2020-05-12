@@ -238,6 +238,20 @@ open class Vector private constructor(
         })
     }
 
+    /**
+     * Iterates over all scalar values in the vector.
+     * @param fn function to invoke on each value
+     */
+    fun forEachIndexed(fn: (Int, Double) -> Unit) = toDoubleArray().forEachIndexed(fn)
+
+    /**
+     * Iterates over all scalar values in the vector.
+     * @param fn function to invoke on each value
+     */
+    fun forEach(fn: (Double) -> Unit) = forEachIndexed { _, value ->
+        fn(value)
+    }
+
     private fun mapIndexed(startIndex: Int, fn: (Int, Double) -> Double): Vector =
         if (dimensions == 1) {
             Vector(*DoubleArray(shape[0]) { fn(startIndex + it, scalarValues[it]) })

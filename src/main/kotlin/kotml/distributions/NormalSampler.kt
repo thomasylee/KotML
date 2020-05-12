@@ -15,7 +15,8 @@ import kotlin.random.Random
  */
 class NormalSampler(
     val mean: Double = 0.0,
-    val stdev: Double = 1.0
+    val stdev: Double = 1.0,
+    val random: Random = Random
 ) : DistributionSampler {
     private var useCosine: Boolean = true
     private lateinit var rand: Pair<Double, Double>
@@ -23,7 +24,7 @@ class NormalSampler(
     override fun sample(): Double =
         if (useCosine) {
             useCosine = false
-            rand = Pair(Random.nextDouble(), Random.nextDouble())
+            rand = Pair(random.nextDouble(), random.nextDouble())
             sqrt(-2.0 * ln(rand.first)) * cos(2.0 * PI * rand.second) * stdev + mean
         } else {
             useCosine = true

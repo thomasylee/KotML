@@ -1,9 +1,10 @@
 package kotml.distributions
 
+import kotlin.random.Random
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class NormalDistributionTest {
+class NormalSamplerTest {
     private fun evaluateSamples(sampler: NormalSampler): Boolean {
         val samples = (1..10).map { sampler.sample() }
         val (inStdev, outStdev) = samples.partition { sample ->
@@ -17,22 +18,19 @@ class NormalDistributionTest {
 
     @Test
     fun `sample() returns normally distributed samples`() {
-        val sampler = NormalSampler()
-        // Try up to 3 times to take 10 samples and evaluate distribution.
-        (1..3).forEach {
-            if (evaluateSamples(sampler)) return
+        // Make 5 runs with different random seeds.
+        (1..5).forEach {
+            val sampler = NormalSampler(random = Random(it))
+            assertTrue(evaluateSamples(sampler))
         }
-        assertTrue(false)
     }
 
     @Test
     fun `sample() uses mean and stdev`() {
-        val sampler = NormalSampler(mean = 100.0, stdev = 20.0)
-        // Try up to 3 times to take 10 samples and evaluate distribution.
-        (1..3).forEach {
-            if (sampler.sample() > 20.0 && evaluateSamples(sampler))
-                return
+        // Make 5 runs with different random seeds.
+        (1..5).forEach {
+            val sampler = NormalSampler(mean = 100.0, stdev = 20.0, random = Random(it))
+            assertTrue(sampler.sample() > 20.0 && evaluateSamples(sampler))
         }
-        assertTrue(false)
     }
 }

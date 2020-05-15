@@ -238,11 +238,26 @@ open class Vector private constructor(
         })
     }
 
+    private fun forEachIndexed(startIndex: Int, fn: (Int, Double) -> Unit) {
+        if (dimensions == 1) {
+            scalarValues.forEachIndexed { index, value ->
+                fn(startIndex + index, value)
+            }
+            return
+        }
+
+        val subShape = removeDimensionFromShape(shape)
+        val valuesPerVector = subShape.fold(1) { acc, value -> acc * value }
+        vectorValues.forEachIndexed { index, vector ->
+            vector.forEachIndexed(startIndex + index * valuesPerVector, fn)
+        }
+    }
+
     /**
      * Iterates over all scalar values in the vector.
      * @param fn function to invoke on each value
      */
-    fun forEachIndexed(fn: (Int, Double) -> Unit) = toDoubleArray().forEachIndexed(fn)
+    fun forEachIndexed(fn: (Int, Double) -> Unit) = forEachIndexed(0, fn)
 
     /**
      * Iterates over all scalar values in the vector.

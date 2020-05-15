@@ -108,6 +108,12 @@ Vector(Vector(1), Vector(2)).sum(axis = 1) == Vector(1, 2)
 
 Vector(1, 2).product() == Vector(2)
 Vector(Vector(1), Vector(2)).product(axis = 1) == Vector(1, 2)
+
+Vector(Vector(1, 2), Vector(3, 4)).max(axis = 0) == Vector(3, 4)
+Vector(Vector(1, 2), Vector(3, 4)).max(axis = 1) == Vector(2, 4)
+
+Vector(Vector(1, 2), Vector(3, 4)).min(axis = 0) == Vector(1, 2)
+Vector(Vector(1, 2), Vector(3, 4)).min(axis = 1) == Vector(1, 3)
 ```
 
 The usual `Vector` class is immutable, but you can use `MutableVector` to create vectors whose values can be updated. Note that the shape of the vector cannot change, but you can reassign subvector and scalar entries.

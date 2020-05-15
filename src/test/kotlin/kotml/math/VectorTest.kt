@@ -405,6 +405,30 @@ class VectorTest {
     }
 
     @Test
+    fun `max(axis) returns the maximum along the correct axis`() {
+        assertEquals(Vector(2.0), Vector(2.0).max(0))
+        assertEquals(Vector(2.0), Vector(-1.0, 2.0).max(0))
+        assertEquals(
+            Vector(1.0, 6.0, 7.0),
+            Vector(Vector(1.0, 2.0, 7.0), Vector(1.0, 6.0, 5.0)).max(0))
+        assertEquals(
+            Vector(7.0, 6.0),
+            Vector(Vector(1.0, 2.0, 7.0), Vector(1.0, 6.0, 5.0)).max(1))
+    }
+
+    @Test
+    fun `min(axis) returns the minimum along the correct axis`() {
+        assertEquals(Vector(2.0), Vector(2.0).min(0))
+        assertEquals(Vector(-1.0), Vector(-1.0, 2.0).min(0))
+        assertEquals(
+            Vector(1.0, 2.0, 5.0),
+            Vector(Vector(1.0, 2.0, 7.0), Vector(1.0, 6.0, 5.0)).min(0))
+        assertEquals(
+            Vector(1.0, 1.0),
+            Vector(Vector(1.0, 2.0, 7.0), Vector(1.0, 6.0, 5.0)).min(1))
+    }
+
+    @Test
     fun `dot() returns the correct dot product`() {
         assertEquals(5.0, Vector(1.0, 2.0, 3.0) dot Vector(-1.0, 0.0, 2.0))
     }

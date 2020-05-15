@@ -373,6 +373,22 @@ open class Vector private constructor(
     }
 
     /**
+     * Returns the maximum values along a particular axis.
+     * @return vector of maximum values
+     */
+    fun max(axis: Int = 0): Vector = fold(Double.MIN_VALUE, axis = axis) { max, value ->
+        if (value > max) value else max
+    }
+
+    /**
+     * Returns the minimum values along a particular axis.
+     * @return vector of minimum values
+     */
+    fun min(axis: Int = 0): Vector = fold(Double.MAX_VALUE, axis = axis) { min, value ->
+        if (value < min) value else min
+    }
+
+    /**
      * Returns the dot product of this vector with `other`.
      * @param other the vector to dot product with this vector
      * @return dot product of this vector and `other`

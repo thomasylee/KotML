@@ -376,7 +376,7 @@ open class Vector private constructor(
      * Returns the maximum values along a particular axis.
      * @return vector of maximum values
      */
-    fun max(axis: Int = 0): Vector = fold(Double.MIN_VALUE, axis = axis) { max, value ->
+    fun max(axis: Int = 0): Vector = fold(-Double.MAX_VALUE, axis = axis) { max, value ->
         if (value > max) value else max
     }
 

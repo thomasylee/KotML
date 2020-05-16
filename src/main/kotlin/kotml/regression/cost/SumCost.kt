@@ -11,6 +11,6 @@ class SumCost(lossFunction: LossFunction) : CostFunction(lossFunction) {
 
     override fun gradient(estimates: Vector, targets: Vector): Vector =
         estimates.mapIndexed { index, estimate ->
-            lossFunction.gradient(estimate, targets[index])
+            lossFunction.derivative(estimate, targets[index])
         }
 }

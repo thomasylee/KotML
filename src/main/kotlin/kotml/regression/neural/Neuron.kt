@@ -4,23 +4,28 @@ import kotml.distributions.DistributionSampler
 import kotml.distributions.NormalSampler
 import kotml.math.Vector
 import kotml.regression.Weights
-import kotml.regression.functions.FunctionOfLinearRegressors
+import kotml.regression.functions.FunctionModel
+import kotml.regression.functions.aggregation.AggregationFunction
+import kotml.regression.functions.aggregation.DotProduct
 
 /**
  * `Neuron` represents a single neuron in a neural network.
  */
 class Neuron(
-    val activationFunction: FunctionOfLinearRegressors,
-    val weights: Weights
+    val activationFunction: FunctionModel,
+    val weights: Weights,
+    val aggregationFunction: AggregationFunction = DotProduct
 ) {
     constructor(
-        activationFunction: FunctionOfLinearRegressors,
+        activationFunction: FunctionModel,
         regressorCount: Int,
         includeConstant: Boolean = true,
-        sampler: DistributionSampler = NormalSampler()
+        sampler: DistributionSampler = NormalSampler(),
+        aggregationFunction: AggregationFunction = DotProduct
     ) : this(
         activationFunction = activationFunction,
-        weights = Weights(regressorCount, includeConstant, sampler)
+        weights = Weights(regressorCount, includeConstant, sampler),
+        aggregationFunction = aggregationFunction
     )
 
     /**
@@ -29,5 +34,7 @@ class Neuron(
      * @return output value
      */
     fun evaluate(regressors: Vector): Double =
-        activationFunction.evaluate(weights, regressors)
+        activationFunction.evaluate(
+            aggregationFunction.aggregate(weights, regressors)
+        )
 }

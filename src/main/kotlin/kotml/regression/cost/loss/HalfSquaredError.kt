@@ -17,11 +17,11 @@ object HalfSquaredError : LossFunction {
         0.5 * (estimate - target) * (estimate - target)
 
     /**
-     * Returns the gradient of half the squared error.
+     * Returns the derivative of half the squared error.
      * @param estimate estimated value
      * @param target dependent variable value
-     * @return gradient of half the squared error
+     * @return derivative of half the squared error
      */
-    override fun gradient(estimate: Double, target: Double): Double =
+    override fun derivative(estimate: Double, target: Double): Double =
         estimate - target
 }

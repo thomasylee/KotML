@@ -22,11 +22,11 @@ object CrossEntropy : LossFunction {
         -target * log2(estimate)
 
     /**
-     * Returns the gradient of the cross entropy error.
+     * Returns the derivative of the cross entropy error.
      * @param estimate estimated value
      * @param target dependent variable value
-     * @return gradient of the cross entropy error
+     * @return derivative of the cross entropy error
      */
-    override fun gradient(estimate: Double, target: Double): Double =
+    override fun derivative(estimate: Double, target: Double): Double =
         -target / (estimate * ln2)
 }

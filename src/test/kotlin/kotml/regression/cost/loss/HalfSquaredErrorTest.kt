@@ -10,7 +10,7 @@ class HalfSquaredErrorTest {
     }
 
     @Test
-    fun `gradient() returns the correct gradient`() {
-        assertEquals(-3.0, HalfSquaredError.gradient(3.0, 6.0))
+    fun `derivative() returns the correct value`() {
+        assertEquals(-3.0, HalfSquaredError.derivative(3.0, 6.0))
     }
 }

@@ -1,30 +1,17 @@
 package kotml.regression.functions
 
-import kotml.math.Vector
-import kotml.regression.Weights
-
 interface FunctionModel {
     /**
-     * Evaluates the function with the given weights and regressors.
-     * @param weights weight values
-     * @param regressors values of independent variables
-     * @return output value of the function
+     * Returns the function evaluated with the provided input.
+     * @param input input value
+     * @return function value for the input
      */
-    abstract fun evaluate(weights: Weights, regressors: Vector): Double
+    abstract fun evaluate(input: Double): Double
 
     /**
-     * Returns the gradient of the function with respect to each weight.
-     * @param weights weight values
-     * @param regressors values of independent variables
-     * @return gradient of the function with respect to each weight
+     * Returns the gradient of the function with respect to the input.
+     * @param input input value
+     * @return derivative with respect to the input
      */
-    abstract fun weightsGradient(weights: Weights, regressors: Vector): Weights
-
-    /**
-     * Returns the gradient of the function with respect to each regressor.
-     * @param weights weight values
-     * @param regressors values of independent variables
-     * @return gradient of the function with respect to each regressor
-     */
-    abstract fun regressorsGradient(weights: Weights, regressors: Vector): Vector
+    abstract fun derivative(input: Double): Double
 }

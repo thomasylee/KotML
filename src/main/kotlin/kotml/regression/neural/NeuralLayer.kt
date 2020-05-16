@@ -4,7 +4,9 @@ import kotml.distributions.DistributionSampler
 import kotml.distributions.NormalSampler
 import kotml.math.Vector
 import kotml.regression.RegressionException
-import kotml.regression.functions.FunctionOfLinearRegressors
+import kotml.regression.functions.FunctionModel
+import kotml.regression.functions.aggregation.AggregationFunction
+import kotml.regression.functions.aggregation.DotProduct
 
 /**
  * `NeuralLayer` contains a collection of neurons to be used in a neural
@@ -13,16 +15,18 @@ import kotml.regression.functions.FunctionOfLinearRegressors
 class NeuralLayer(val neurons: Array<Neuron>) {
     constructor(
         neuronCount: Int,
-        activationFunction: FunctionOfLinearRegressors,
+        activationFunction: FunctionModel,
         regressorCount: Int,
         includeConstant: Boolean = true,
-        sampler: DistributionSampler = NormalSampler()
+        sampler: DistributionSampler = NormalSampler(),
+        aggregationFunction: AggregationFunction = DotProduct
     ) : this(Array<Neuron>(neuronCount) {
         Neuron(
             activationFunction,
             regressorCount,
             includeConstant,
-            sampler
+            sampler,
+            aggregationFunction
         )
     })
 

@@ -10,7 +10,7 @@ class SquaredErrorTest {
     }
 
     @Test
-    fun `gradient() returns the correct gradient`() {
-        assertEquals(-6.0, SquaredError.gradient(3.0, 6.0))
+    fun `derivative() returns the correct value`() {
+        assertEquals(-6.0, SquaredError.derivative(3.0, 6.0))
     }
 }

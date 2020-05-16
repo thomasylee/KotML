@@ -1,4 +1,4 @@
-package kotml.regression.functions
+package kotml.regression.functions.aggregation
 
 import kotlin.math.pow
 import kotml.math.MutableVector
@@ -6,7 +6,7 @@ import kotml.math.Vector
 import kotml.regression.RegressionException
 import kotml.regression.Weights
 
-class Polynomial(val exponents: Vector) : FunctionModel {
+class Polynomial(val exponents: Vector) : AggregationFunction {
     private val regressorCount = exponents.shape[0]
 
     init {
@@ -19,7 +19,7 @@ class Polynomial(val exponents: Vector) : FunctionModel {
 
     constructor(vararg exponents: Int) : this(Vector(*exponents))
 
-    override fun evaluate(weights: Weights, regressors: Vector): Double {
+    override fun aggregate(weights: Weights, regressors: Vector): Double {
         validateRegressorsShape(regressors)
 
         return weights.coeffs.foldIndexed(weights.constant) { index, acc, coeff ->
@@ -37,8 +37,13 @@ class Polynomial(val exponents: Vector) : FunctionModel {
         return Weights(constant, coeffGradient)
     }
 
-    override fun regressorsGradient(weights: Weights, regressors: Vector): Vector =
-        weights.coeffs
+    override fun regressorsGradient(weights: Weights, regressors: Vector): Vector {
+        validateRegressorsShape(regressors)
+
+        return regressors.mapIndexed { index, value ->
+            exponents[index] * weights.coeffs[index] * value.pow(exponents[index] - 1)
+        }
+    }
 
     private fun validateRegressorsShape(regressors: Vector) {
         if (regressors.dimensions != 1 || regressors.shape[0] != regressorCount) {

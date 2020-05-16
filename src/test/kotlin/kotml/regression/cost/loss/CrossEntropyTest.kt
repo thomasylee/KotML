@@ -10,7 +10,7 @@ class CrossEntropyTest {
     }
 
     @Test
-    fun `gradient() returns the correct gradient`() {
-        assertEquals(-3.6067376022224087, CrossEntropy.gradient(2.0, 5.0))
+    fun `derivative() returns the correct value`() {
+        assertEquals(-3.6067376022224087, CrossEntropy.derivative(2.0, 5.0))
     }
 }

@@ -16,11 +16,11 @@ object SquaredError : LossFunction {
         (estimate - target) * (estimate - target)
 
     /**
-     * Returns the gradient of the squared error.
+     * Returns the derivative of the squared error.
      * @param estimate estimated value
      * @param target dependent variable value
-     * @return gradient of the squared error
+     * @return derivative of the squared error
      */
-    override fun gradient(estimate: Double, target: Double): Double =
+    override fun derivative(estimate: Double, target: Double): Double =
         2.0 * (estimate - target)
 }

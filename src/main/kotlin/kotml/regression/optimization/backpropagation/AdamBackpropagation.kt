@@ -57,6 +57,8 @@ class AdamBackpropagation(
 
         val inputs = mutableListOf<Vector>()
         val outputs = mutableListOf<Vector>()
+        val dIn_dOuts = mutableListOf<List<Vector>>()
+        val dIn_dWeights = mutableListOf<List<Weights>>()
         network.layers.forEachIndexed { layerIndex, layer ->
             val input: Vector =
                 if (layerIndex == 0)
@@ -65,6 +67,12 @@ class AdamBackpropagation(
                     outputs[layerIndex - 1]
             inputs.add(input)
             outputs.add(layer.evaluate(input))
+            dIn_dOuts.add(layer.neurons.map { neuron ->
+                neuron.aggregationFunction.regressorsGradient(neuron.weights, input)
+            })
+            dIn_dWeights.add(layer.neurons.map { neuron ->
+                neuron.aggregationFunction.weightsGradient(neuron.weights, input)
+            })
         }
 
         val costDeriv: Vector = costFunction.gradient(outputs.last(), targets)
@@ -76,36 +84,47 @@ class AdamBackpropagation(
             val new_dErr_dNetIn = MutableVector.zeros(layer.neurons.size)
 
             layer.neurons.forEachIndexed { neuronIndex, neuron ->
-                val netInput = neuron.activationFunction.calculateNetInput(neuron.weights, inputs[layerIndex])
                 val dErr_dOut: Double =
                     if (layerIndex == network.layers.size - 1) {
                         costDeriv[neuronIndex]
                     } else {
-                        network.layers[layerIndex + 1].neurons.foldIndexed(0.0) { laterNeuronIndex, acc, laterNeuron ->
-                            acc + dErr_dNetIn[laterNeuronIndex] * laterNeuron.weights.coeffs[neuronIndex]
+                        network.layers[layerIndex + 1].neurons.foldIndexed(0.0) { laterNeuronIndex, acc, _ ->
+                            acc + dErr_dNetIn[laterNeuronIndex] *
+                                dIn_dOuts[layerIndex + 1][laterNeuronIndex][neuronIndex]
                         }
                     }
-                val dOut_dNetIn = neuron.activationFunction.netInputGradient(netInput)
+
+                val netInput = neuron.aggregationFunction.aggregate(neuron.weights, inputs[layerIndex])
+                val dOut_dNetIn = neuron.activationFunction.derivative(netInput)
+
                 new_dErr_dNetIn[neuronIndex] = dErr_dOut * dOut_dNetIn
 
                 if (neuron.weights.hasConstant) {
                     m[layerIndex][neuronIndex].constant =
                         betaM * m[layerIndex][neuronIndex].constant +
-                            (1 - betaM) * new_dErr_dNetIn[neuronIndex]
+                            (1 - betaM) * new_dErr_dNetIn[neuronIndex] *
+                            dIn_dWeights[layerIndex][neuronIndex].constant
                     v[layerIndex][neuronIndex].constant =
                         betaV * v[layerIndex][neuronIndex].constant +
-                            (1 - betaV) * new_dErr_dNetIn[neuronIndex].pow(2)
+                            (1 - betaV) * (
+                                new_dErr_dNetIn[neuronIndex] *
+                                dIn_dWeights[layerIndex][neuronIndex].constant
+                            ).pow(2)
                     val mHat = m[layerIndex][neuronIndex].constant / (1 - betaMProduct)
                     val vHat = v[layerIndex][neuronIndex].constant / (1 - betaVProduct)
                     neuron.weights.constant -= network.stepSize * mHat / (sqrt(vHat) + epsilon)
                 }
-                inputs[layerIndex].forEachIndexed { coeffIndex, input ->
+                inputs[layerIndex].forEachIndexed { coeffIndex, _ ->
                     m[layerIndex][neuronIndex].coeffs[coeffIndex] =
                         betaM * m[layerIndex][neuronIndex].coeffs[coeffIndex] +
-                            (1 - betaM) * new_dErr_dNetIn[neuronIndex] * input
+                            (1 - betaM) * new_dErr_dNetIn[neuronIndex] *
+                            dIn_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]
                     v[layerIndex][neuronIndex].coeffs[coeffIndex] =
                         betaV * v[layerIndex][neuronIndex].coeffs[coeffIndex] +
-                            (1 - betaV) * (new_dErr_dNetIn[neuronIndex] * input).pow(2)
+                            (1 - betaV) * (
+                                new_dErr_dNetIn[neuronIndex] *
+                                dIn_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]
+                            ).pow(2)
                     val mHat = m[layerIndex][neuronIndex].coeffs[coeffIndex] / (1 - betaMProduct)
                     val vHat = v[layerIndex][neuronIndex].coeffs[coeffIndex] / (1 - betaVProduct)
 

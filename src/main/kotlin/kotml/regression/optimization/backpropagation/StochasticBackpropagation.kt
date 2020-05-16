@@ -20,7 +20,7 @@ class StochasticBackpropagation(
         val inputs = mutableListOf<Vector>()
         val outputs = mutableListOf<Vector>()
         val dIn_dOuts = mutableListOf<List<Vector>>()
-        val dOut_dWeights = mutableListOf<List<Weights>>()
+        val dIn_dWeights = mutableListOf<List<Weights>>()
         network.layers.forEachIndexed { layerIndex, layer ->
             val input: Vector =
                 if (layerIndex == 0)
@@ -31,10 +31,10 @@ class StochasticBackpropagation(
             inputs.add(input)
             outputs.add(output)
             dIn_dOuts.add(layer.neurons.map { neuron ->
-                neuron.activationFunction.regressorsGradient(neuron.weights, input)
+                neuron.aggregationFunction.regressorsGradient(neuron.weights, input)
             })
-            dOut_dWeights.add(layer.neurons.map { neuron ->
-                neuron.activationFunction.weightsGradient(neuron.weights, input)
+            dIn_dWeights.add(layer.neurons.map { neuron ->
+                neuron.aggregationFunction.weightsGradient(neuron.weights, input)
             })
         }
 
@@ -47,7 +47,7 @@ class StochasticBackpropagation(
             val new_dErr_dNetIn = MutableVector.zeros(layer.neurons.size)
 
             layer.neurons.forEachIndexed { neuronIndex, neuron ->
-                val netInput = neuron.activationFunction.calculateNetInput(neuron.weights, inputs[layerIndex])
+                val netInput = neuron.aggregationFunction.aggregate(neuron.weights, inputs[layerIndex])
 
                 val dErr_dOut: Double =
                     if (layerIndex == network.layers.size - 1) {
@@ -58,18 +58,20 @@ class StochasticBackpropagation(
                                 dIn_dOuts[layerIndex + 1][laterNeuronIndex][neuronIndex]
                         }
                     }
-                val dOut_dNetIn = neuron.activationFunction.netInputGradient(netInput)
+                val dOut_dNetIn = neuron.activationFunction.derivative(netInput)
                 new_dErr_dNetIn[neuronIndex] = dErr_dOut * dOut_dNetIn
 
                 if (neuron.weights.hasConstant) {
                     neuron.weights.constant -= network.stepSize *
                         dErr_dOut *
-                        dOut_dWeights[layerIndex][neuronIndex].constant
+                        dOut_dNetIn *
+                        dIn_dWeights[layerIndex][neuronIndex].constant
                 }
                 inputs[layerIndex].forEachIndexed { coeffIndex, _ ->
                     neuron.weights.coeffs[coeffIndex] -= network.stepSize *
                         dErr_dOut *
-                        dOut_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]
+                        dOut_dNetIn *
+                        dIn_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]
                 }
             }
 

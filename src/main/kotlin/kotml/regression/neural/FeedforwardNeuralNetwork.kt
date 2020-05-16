@@ -5,7 +5,9 @@ import kotml.distributions.NormalSampler
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionException
-import kotml.regression.functions.FunctionOfLinearRegressors
+import kotml.regression.functions.FunctionModel
+import kotml.regression.functions.aggregation.AggregationFunction
+import kotml.regression.functions.aggregation.DotProduct
 
 /**
  * `FeedforwardNeuralNetwork` contains a sequence of neural layers that
@@ -32,7 +34,8 @@ class FeedforwardNeuralNetwork(
         stepSize: Double,
         inputCount: Int,
         layerSizes: IntArray,
-        activationFunction: FunctionOfLinearRegressors,
+        activationFunction: FunctionModel,
+        aggregationFunction: AggregationFunction = DotProduct,
         includeConstant: Boolean = true,
         sampler: DistributionSampler = NormalSampler()
     ) : this(
@@ -44,7 +47,8 @@ class FeedforwardNeuralNetwork(
                     activationFunction = activationFunction,
                     regressorCount = regressorCount,
                     includeConstant = includeConstant,
-                    sampler = sampler
+                    sampler = sampler,
+                    aggregationFunction = aggregationFunction
                 )
             })
         }

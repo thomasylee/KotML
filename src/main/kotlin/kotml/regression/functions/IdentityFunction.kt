@@ -4,10 +4,10 @@ import kotml.math.Vector
 import kotml.regression.Weights
 
 /**
- * `LinearFunction` represents any function that is linear with respect
- * to its regressors.
+ * `IdentityFunction` returns a dependent variable value that is equal to
+ * the net independent variable value.
  */
-object LinearFunction : FunctionOfLinearRegressors {
+object IdentityFunction : FunctionOfLinearRegressors {
     override fun evaluateNetInput(netInput: Double): Double = netInput
 
     override fun netInputGradient(netInput: Double): Double = 1.0

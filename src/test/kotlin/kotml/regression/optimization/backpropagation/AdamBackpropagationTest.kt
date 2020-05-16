@@ -10,7 +10,7 @@ import kotml.regression.cost.MeanCost
 import kotml.regression.cost.SumCost
 import kotml.regression.cost.loss.HalfSquaredError
 import kotml.regression.cost.loss.SquaredError
-import kotml.regression.functions.LinearFunction
+import kotml.regression.functions.IdentityFunction
 import kotml.regression.functions.LogisticFunction
 import kotml.regression.functions.Tanh
 import kotml.regression.neural.FeedforwardNeuralNetwork
@@ -26,17 +26,17 @@ class AdamBackpropagationTest {
             layers = arrayOf(
                 NeuralLayer(
                     neuronCount = 1,
-                    activationFunction = LinearFunction,
+                    activationFunction = IdentityFunction,
                     regressorCount = 1,
                     sampler = UniformSampler(0.1)),
                 NeuralLayer(
                     neuronCount = 2,
-                    activationFunction = LinearFunction,
+                    activationFunction = IdentityFunction,
                     regressorCount = 1,
                     sampler = UniformSampler(0.1)),
                 NeuralLayer(
                     neuronCount = 1,
-                    activationFunction = LinearFunction,
+                    activationFunction = IdentityFunction,
                     regressorCount = 2,
                     sampler = UniformSampler(0.1))
             )
@@ -77,7 +77,7 @@ class AdamBackpropagationTest {
                     sampler = NormalSampler(stdev = 2.0, random = rand)),
                 NeuralLayer(
                     neuronCount = 2,
-                    activationFunction = LinearFunction,
+                    activationFunction = IdentityFunction,
                     regressorCount = 3,
                     sampler = NormalSampler(stdev = 2.0, random = rand))
             )

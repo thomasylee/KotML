@@ -26,6 +26,9 @@ interface FunctionOfLinearRegressors : FunctionModel {
     override fun evaluate(weights: Weights, regressors: Vector): Double =
         evaluateNetInput(calculateNetInput(weights, regressors))
 
+    override fun regressorsGradient(weights: Weights, regressors: Vector): Vector =
+        weights.coeffs
+
     /**
      * Returns the gradient of the function with respect to the net input
      * For example, if f(x) = x^2, then the inputGradient would return

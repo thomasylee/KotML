@@ -37,6 +37,9 @@ class Polynomial(val exponents: Vector) : FunctionModel {
         return Weights(constant, coeffGradient)
     }
 
+    override fun regressorsGradient(weights: Weights, regressors: Vector): Vector =
+        weights.coeffs
+
     private fun validateRegressorsShape(regressors: Vector) {
         if (regressors.dimensions != 1 || regressors.shape[0] != regressorCount) {
             throw RegressionException(

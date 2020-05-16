@@ -19,4 +19,12 @@ interface FunctionModel {
      * @return gradient of the function with respect to each weight
      */
     abstract fun weightsGradient(weights: Weights, regressors: Vector): Weights
+
+    /**
+     * Returns the gradient of the function with respect to each regressor.
+     * @param weights weight values
+     * @param regressors values of independent variables
+     * @return gradient of the function with respect to each regressor
+     */
+    abstract fun regressorsGradient(weights: Weights, regressors: Vector): Vector
 }

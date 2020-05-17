@@ -2,6 +2,7 @@ package kotml.reinforcement.agents.tabular
 
 import kotml.math.MutableVector
 import kotml.reinforcement.RLException
+import kotml.reinforcement.models.tabular.TabularModel
 import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
 import kotml.reinforcement.policies.tabular.TabularPolicy
 
@@ -10,7 +11,8 @@ class TabularQLearningAgent(
     val numActions: Int,
     val stepSize: Double,
     val discount: Double,
-    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy()
+    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy(),
+    val model: TabularModel? = null
 ) : TabularAgent(behaviorPolicy) {
     val q = MutableVector.zeros(numStates, numActions)
     var prevState: Int = 0
@@ -28,20 +30,26 @@ class TabularQLearningAgent(
     }
 
     override fun processStep(reward: Double, state: Int): Int {
-        val action = behaviorPolicy.chooseAction(q(state))
-
         q[prevState, prevAction] += stepSize * (
             reward + discount * q(state).max()[0] - q[prevState, prevAction]
         )
+        if (model != null) {
+            model.observe(q, prevState, prevAction, reward, state)
+            model.runIterations(q)
+        }
 
         prevState = state
-        prevAction = action
-        return action
+        prevAction = behaviorPolicy.chooseAction(q(state))
+        return prevAction
     }
 
     override fun processTerminalStep(reward: Double) {
         q[prevState, prevAction] += stepSize * (
             reward - q[prevState, prevAction]
         )
+        if (model != null) {
+            model.observe(q, prevState, prevAction, reward, -1)
+            model.runIterations(q)
+        }
     }
 }

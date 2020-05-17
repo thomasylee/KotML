@@ -11,7 +11,7 @@ class TabularEpsilonGreedy(
         if (random.nextDouble() < epsilon)
             random.nextInt(0, qValuesForState.shape[0])
         else
-            qValuesForState.argmax()
+            qValuesForState.argmax(random)
 
     override fun actionProbabilities(qValuesForState: Vector): Vector {
         val numActions = qValuesForState.shape[0]

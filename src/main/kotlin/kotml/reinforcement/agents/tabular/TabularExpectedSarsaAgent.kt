@@ -2,6 +2,7 @@ package kotml.reinforcement.agents.tabular
 
 import kotml.math.MutableVector
 import kotml.reinforcement.RLException
+import kotml.reinforcement.models.tabular.TabularModel
 import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
 import kotml.reinforcement.policies.tabular.TabularPolicy
 
@@ -10,7 +11,11 @@ class TabularExpectedSarsaAgent(
     val numActions: Int,
     val stepSize: Double,
     val discount: Double,
-    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy()
+    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy(),
+    // TODO: Mutating this after initialization is pretty wonky.
+    // Creating and assigning the model only once while still allowing it
+    // to calculated expected Q values would be preferable.
+    var model: TabularModel? = null
 ) : TabularAgent(behaviorPolicy) {
     val q = MutableVector.zeros(numStates, numActions)
     var prevState: Int = 0
@@ -33,20 +38,30 @@ class TabularExpectedSarsaAgent(
     }
 
     override fun processStep(reward: Double, state: Int): Int {
-        val action = behaviorPolicy.chooseAction(q(state))
-
         q[prevState, prevAction] += stepSize * (
             reward + discount * expectedQ(state) - q[prevState, prevAction]
         )
 
+        val constModel = model
+        if (constModel != null) {
+            constModel.observe(q, prevState, prevAction, reward, state)
+            constModel.runIterations(q)
+        }
+
         prevState = state
-        prevAction = action
-        return action
+        prevAction = behaviorPolicy.chooseAction(q(state))
+        return prevAction
     }
 
     override fun processTerminalStep(reward: Double) {
         q[prevState, prevAction] += stepSize * (
             reward - q[prevState, prevAction]
         )
+
+        val constModel = model
+        if (constModel != null) {
+            constModel.observe(q, prevState, prevAction, reward, -1)
+            constModel.runIterations(q)
+        }
     }
 }

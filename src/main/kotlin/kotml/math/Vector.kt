@@ -1,5 +1,7 @@
 package kotml.math
 
+import kotlin.random.Random
+
 /**
  * Vector stores a collection of values in one or more dimensions. Every
  * vector has a `dimensions` variable that indicates how many dimensions
@@ -393,7 +395,7 @@ open class Vector private constructor(
      * indices have the largest value, one index is randomly chosen.
      * @return index of largest value, with ties broken randomly
      */
-    fun argmax(): Int {
+    fun argmax(random: Random = Random): Int {
         var maxValue = -Double.MAX_VALUE
         val maxIndices = mutableListOf<Int>()
         forEachIndexed { index, value ->
@@ -405,7 +407,7 @@ open class Vector private constructor(
                 maxIndices.add(index)
             }
         }
-        return maxIndices.random()
+        return maxIndices.random(random)
     }
 
     /**

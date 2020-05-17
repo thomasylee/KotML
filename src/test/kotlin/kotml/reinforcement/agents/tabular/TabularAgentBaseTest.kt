@@ -10,7 +10,7 @@ abstract class TabularAgentBaseTest {
      * The policy should learn to move right twice and down twice to reach
      * the terminal state in the bottom right (2, 2).
      */
-    fun trainOn3By3Grid(agent: TabularAgent) {
+    fun trainOn3By3Grid(agent: TabularAgent, numTrials: Int) {
         val rewards = Vector(
             Vector(-1, -1, -1),
             Vector(-4, -5, -2),
@@ -20,7 +20,7 @@ abstract class TabularAgentBaseTest {
             fun toState(): Int = row * 3 + col
         }
 
-        (1..100).forEach {
+        (1..numTrials).forEach {
             var agentLoc = Loc(0, 0)
             var action = agent.start(agentLoc.toState())
             val terminalLoc = Loc(2, 2)

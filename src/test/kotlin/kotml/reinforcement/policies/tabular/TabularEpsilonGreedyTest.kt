@@ -15,6 +15,6 @@ class TabularEpsilonGreedyTest {
 
         (1..100).forEach { actionCounts[policy.chooseAction(q)]++ }
 
-        assertEquals(Vector(2, 83, 11, 4), actionCounts)
+        assertEquals(Vector(2, 82, 7, 9), actionCounts)
     }
 }

@@ -429,6 +429,19 @@ class VectorTest {
     }
 
     @Test
+    fun `argmax() returns the index with the largest value`() {
+        assertEquals(3, Vector(-2, 7, 3, 8, 1).argmax())
+
+        // Ensure random selection to break ties.
+        val largeVector = Vector.zeros(10, 10)
+        val try1 = largeVector.argmax()
+        val try2 = largeVector.argmax()
+        val try3 = largeVector.argmax()
+        val try4 = largeVector.argmax()
+        assertFalse(try1 == try2 && try2 == try3 && try3 == try4)
+    }
+
+    @Test
     fun `dot() returns the correct dot product`() {
         assertEquals(5.0, Vector(1.0, 2.0, 3.0) dot Vector(-1.0, 0.0, 2.0))
     }

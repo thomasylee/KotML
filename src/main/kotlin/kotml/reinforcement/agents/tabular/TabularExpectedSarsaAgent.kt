@@ -1,17 +1,17 @@
 package kotml.reinforcement.agents.tabular
 
-import kotlin.random.Random
 import kotml.math.MutableVector
 import kotml.reinforcement.RLException
+import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
+import kotml.reinforcement.policies.tabular.TabularPolicy
 
 class TabularExpectedSarsaAgent(
     val numStates: Int,
     val numActions: Int,
-    val epsilon: Double,
     val stepSize: Double,
     val discount: Double,
-    val random: Random = Random
-) : TabularAgent() {
+    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy()
+) : TabularAgent(behaviorPolicy) {
     val q = MutableVector.zeros(numStates, numActions)
     var prevState: Int = 0
     var prevAction: Int = 0
@@ -23,42 +23,17 @@ class TabularExpectedSarsaAgent(
 
     override fun start(initialState: Int): Int {
         prevState = initialState
-        prevAction = chooseAction(initialState)
+        prevAction = behaviorPolicy.chooseAction(q(initialState))
         return prevAction
     }
 
-    fun chooseAction(state: Int): Int =
-        if (random.nextDouble() < epsilon)
-            random.nextInt(0, numActions)
-        else
-            argmax(q(state))
-
     fun expectedQ(state: Int): Double {
-        val qState = q(state)
-        var actionsWithMaxQ = 0
-        var maxQ = -Double.MAX_VALUE
-        (0 until numActions).forEach { action ->
-            val qValue = qState[action]
-            if (qValue > maxQ) {
-                maxQ = qValue
-                actionsWithMaxQ = 1
-            } else if (qValue == maxQ) {
-                actionsWithMaxQ++
-            }
-        }
-        val nonGreedyProb = epsilon / numActions
-        val greedyProb = epsilon / numActions + (1 - epsilon) / actionsWithMaxQ
-        return (0 until numActions).fold(0.0) { acc, action ->
-            val qValue = qState[action]
-            if (qValue == maxQ)
-                acc + greedyProb * maxQ
-            else
-                acc + nonGreedyProb * qValue
-        }
+        val actionProb = behaviorPolicy.actionProbabilities(q(state))
+        return (actionProb * q(state)).sum()[0]
     }
 
     override fun processStep(reward: Double, state: Int): Int {
-        val action = chooseAction(state)
+        val action = behaviorPolicy.chooseAction(q(state))
 
         q[prevState, prevAction] += stepSize * (
             reward + discount * expectedQ(state) - q[prevState, prevAction]

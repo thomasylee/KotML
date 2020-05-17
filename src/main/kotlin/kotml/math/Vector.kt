@@ -389,6 +389,26 @@ open class Vector private constructor(
     }
 
     /**
+     * Returns the index of the largest value in the Vector. If several
+     * indices have the largest value, one index is randomly chosen.
+     * @return index of largest value, with ties broken randomly
+     */
+    fun argmax(): Int {
+        var maxValue = -Double.MAX_VALUE
+        val maxIndices = mutableListOf<Int>()
+        forEachIndexed { index, value ->
+            if (value > maxValue) {
+                maxIndices.clear()
+                maxIndices.add(index)
+                maxValue = value
+            } else if (value == maxValue) {
+                maxIndices.add(index)
+            }
+        }
+        return maxIndices.random()
+    }
+
+    /**
      * Returns the dot product of this vector with `other`.
      * @param other the vector to dot product with this vector
      * @return dot product of this vector and `other`

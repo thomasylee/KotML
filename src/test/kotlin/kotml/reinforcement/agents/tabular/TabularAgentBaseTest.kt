@@ -2,7 +2,7 @@ package kotml.reinforcement.agents.tabular
 
 import kotml.math.Vector
 
-abstract class TabularAgentTest {
+abstract class TabularAgentBaseTest {
     /**
      * Build a 3x3 grid with the agent starting in the top left (0, 0).
      * Make the reward less negative along the top row and rightmost column.

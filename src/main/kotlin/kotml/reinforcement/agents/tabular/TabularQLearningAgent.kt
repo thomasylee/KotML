@@ -1,17 +1,17 @@
 package kotml.reinforcement.agents.tabular
 
-import kotlin.random.Random
 import kotml.math.MutableVector
 import kotml.reinforcement.RLException
+import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
+import kotml.reinforcement.policies.tabular.TabularPolicy
 
 class TabularQLearningAgent(
     val numStates: Int,
     val numActions: Int,
-    val epsilon: Double,
     val stepSize: Double,
     val discount: Double,
-    val random: Random = Random
-) : TabularAgent() {
+    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy()
+) : TabularAgent(behaviorPolicy) {
     val q = MutableVector.zeros(numStates, numActions)
     var prevState: Int = 0
     var prevAction: Int = 0
@@ -23,18 +23,12 @@ class TabularQLearningAgent(
 
     override fun start(initialState: Int): Int {
         prevState = initialState
-        prevAction = chooseAction(initialState)
+        prevAction = behaviorPolicy.chooseAction(q(initialState))
         return prevAction
     }
 
-    fun chooseAction(state: Int): Int =
-        if (random.nextDouble() < epsilon)
-            random.nextInt(0, numActions)
-        else
-            argmax(q(state))
-
     override fun processStep(reward: Double, state: Int): Int {
-        val action = chooseAction(state)
+        val action = behaviorPolicy.chooseAction(q(state))
 
         q[prevState, prevAction] += stepSize * (
             reward + discount * q(state).max()[0] - q[prevState, prevAction]

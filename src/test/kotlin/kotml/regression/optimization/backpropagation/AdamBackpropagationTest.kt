@@ -117,11 +117,13 @@ class AdamBackpropagationTest {
                 NeuralLayer(
                     neuronCount = 2,
                     activationFunction = Tanh,
-                    regressorCount = 2),
+                    regressorCount = 2,
+                    sampler = NormalSampler(random = rand)),
                 NeuralLayer(
                     neuronCount = 2,
                     activationFunction = Tanh,
-                    regressorCount = 2),
+                    regressorCount = 2,
+                    sampler = NormalSampler(random = rand)),
                 NeuralLayer.softmax(2)
             )
         )

@@ -38,15 +38,22 @@ class Softmax(val regressorIndex: Int) : AggregationFunction {
             Weights(Vector.zeros(regressors.shape[0]))
 
     /**
-     * Returns the gradient of the softmax regressors for the regressorIndex.
-     * Only the value at index regressorIndex should be retrieved. Values at
-     * other indices in the returned Vector could be anything.
+     * Returns the gradient of the softmax regressors.
      * @param weights ignored parameter
      * @param regressors independent variable values
-     * @return vector containing the softmax gradient at index regressorIndex
+     * @return vector containing the softmax gradient for each regressor
      */
     override fun regressorsGradient(weights: Weights, regressors: Vector): Vector {
-        val softmax = aggregate(weights, regressors)
-        return Vector(regressors.shape[0]) { softmax * (1 - softmax) }
+        val max = regressors.max()[0]
+        val sum = regressors.foldIndexed(0.0) { index, acc, _ ->
+            acc + exp(regressors[index] - max)
+        }[0]
+        return Vector(regressors.shape[0]) { index ->
+            val softmax = exp(regressors[index] - max) / sum
+            if (index == regressorIndex)
+                softmax * (1.0 - softmax)
+            else
+                -softmax * softmax
+        }
     }
 }

@@ -17,11 +17,17 @@ import kotml.regression.functions.aggregation.Softmax
  */
 class NeuralLayer(val neurons: Array<Neuron>) {
     companion object {
-        fun softmax(neuronCount: Int, regressorCount: Int): NeuralLayer =
+        /**
+         * Returns a `NeuralLayer` with softmax neurons. The number of
+         * neurons must equals the number of regressors.
+         * @param neuronCount number of neurons to include in the layer
+         * @return neural layer containing softmax neurons
+         */
+        fun softmax(neuronCount: Int): NeuralLayer =
             NeuralLayer(Array<Neuron>(neuronCount) { index ->
                 Neuron(
                     activationFunction = IdentityFunction,
-                    regressorCount = regressorCount,
+                    regressorCount = neuronCount,
                     includeConstant = false,
                     sampler = UniformSampler(0.0),
                     aggregationFunction = Softmax(index)

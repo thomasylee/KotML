@@ -77,11 +77,11 @@ class AdamBackpropagation(
 
         val costDeriv: Vector = costFunction.gradient(outputs.last(), targets)
 
-        var dErr_dNetIn: Vector = Vector(0)
+        var dErr_dIn: Vector = Vector(0)
 
         ((network.layers.size - 1) downTo 0).forEach { layerIndex ->
             val layer = network.layers[layerIndex]
-            val new_dErr_dNetIn = MutableVector.zeros(layer.neurons.size)
+            val new_dErr_dIn = MutableVector.zeros(layer.neurons.size)
 
             layer.neurons.forEachIndexed { neuronIndex, neuron ->
                 val dErr_dOut: Double =
@@ -89,25 +89,25 @@ class AdamBackpropagation(
                         costDeriv[neuronIndex]
                     } else {
                         network.layers[layerIndex + 1].neurons.foldIndexed(0.0) { laterNeuronIndex, acc, _ ->
-                            acc + dErr_dNetIn[laterNeuronIndex] *
+                            acc + dErr_dIn[laterNeuronIndex] *
                                 dIn_dOuts[layerIndex + 1][laterNeuronIndex][neuronIndex]
                         }
                     }
 
                 val netInput = neuron.aggregationFunction.aggregate(neuron.weights, inputs[layerIndex])
-                val dOut_dNetIn = neuron.activationFunction.derivative(netInput)
+                val dOut_dIn = neuron.activationFunction.derivative(netInput)
 
-                new_dErr_dNetIn[neuronIndex] = dErr_dOut * dOut_dNetIn
+                new_dErr_dIn[neuronIndex] = dErr_dOut * dOut_dIn
 
                 if (neuron.weights.hasConstant) {
                     m[layerIndex][neuronIndex].constant =
                         betaM * m[layerIndex][neuronIndex].constant +
-                            (1 - betaM) * new_dErr_dNetIn[neuronIndex] *
+                            (1 - betaM) * new_dErr_dIn[neuronIndex] *
                             dIn_dWeights[layerIndex][neuronIndex].constant
                     v[layerIndex][neuronIndex].constant =
                         betaV * v[layerIndex][neuronIndex].constant +
                             (1 - betaV) * (
-                                new_dErr_dNetIn[neuronIndex] *
+                                new_dErr_dIn[neuronIndex] *
                                 dIn_dWeights[layerIndex][neuronIndex].constant
                             ).pow(2)
                     val mHat = m[layerIndex][neuronIndex].constant / (1 - betaMProduct)
@@ -117,12 +117,12 @@ class AdamBackpropagation(
                 inputs[layerIndex].forEachIndexed { coeffIndex, _ ->
                     m[layerIndex][neuronIndex].coeffs[coeffIndex] =
                         betaM * m[layerIndex][neuronIndex].coeffs[coeffIndex] +
-                            (1 - betaM) * new_dErr_dNetIn[neuronIndex] *
+                            (1 - betaM) * new_dErr_dIn[neuronIndex] *
                             dIn_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]
                     v[layerIndex][neuronIndex].coeffs[coeffIndex] =
                         betaV * v[layerIndex][neuronIndex].coeffs[coeffIndex] +
                             (1 - betaV) * (
-                                new_dErr_dNetIn[neuronIndex] *
+                                new_dErr_dIn[neuronIndex] *
                                 dIn_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]
                             ).pow(2)
                     val mHat = m[layerIndex][neuronIndex].coeffs[coeffIndex] / (1 - betaMProduct)
@@ -132,7 +132,7 @@ class AdamBackpropagation(
                 }
             }
 
-            dErr_dNetIn = new_dErr_dNetIn
+            dErr_dIn = new_dErr_dIn
         }
     }
 }

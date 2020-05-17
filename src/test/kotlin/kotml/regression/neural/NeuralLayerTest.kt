@@ -24,12 +24,13 @@ class NeuralLayerTest {
 
     @Test
     fun `softmax() returns a softmax neural layer`() {
-        val neuralLayer = NeuralLayer.softmax(5, 3)
+        val neuralLayer = NeuralLayer.softmax(5)
 
         assertEquals(5, neuralLayer.neurons.size)
         neuralLayer.neurons.forEachIndexed { index, neuron ->
             assertTrue(neuron.aggregationFunction is Softmax)
             assertEquals(index, (neuron.aggregationFunction as Softmax).regressorIndex)
+            assertEquals(5, neuron.weights.coeffs.shape[0])
             assertFalse(neuron.weights.hasConstant)
             assertTrue(neuron.activationFunction is IdentityFunction)
         }

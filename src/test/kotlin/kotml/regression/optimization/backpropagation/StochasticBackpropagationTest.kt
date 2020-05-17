@@ -13,6 +13,7 @@ import kotml.regression.cost.loss.SquaredError
 import kotml.regression.functions.IdentityFunction
 import kotml.regression.functions.LogisticFunction
 import kotml.regression.functions.ReLU
+import kotml.regression.functions.Tanh
 import kotml.regression.neural.FeedforwardNeuralNetwork
 import kotml.regression.neural.NeuralLayer
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -108,5 +109,50 @@ class StochasticBackpropagationTest {
         val estimate = network.evaluate(Vector(0.5, 1.5, 1.0))
         assertTrue(abs(5.5 - estimate[0]) < 0.6)
         assertTrue(abs(0.75 - estimate[1]) < 0.05)
+    }
+
+    @Test
+    fun `backpropagates with softmax correctly`() {
+        val rand = Random(0)
+        val network = FeedforwardNeuralNetwork(
+            stepSize = 0.01,
+            layers = arrayOf(
+                NeuralLayer(
+                    neuronCount = 2,
+                    activationFunction = Tanh,
+                    regressorCount = 2),
+                NeuralLayer(
+                    neuronCount = 2,
+                    activationFunction = Tanh,
+                    regressorCount = 2),
+                NeuralLayer.softmax(2)
+            )
+        )
+
+        val estimator = StochasticBackpropagation(
+            network = network,
+            costFunction = SumCost(HalfSquaredError)
+        )
+
+        (0..100).shuffled(rand).forEach { intX1 ->
+            (0..100).shuffled(rand).forEach { intX2 ->
+                val x1 = intX1.toDouble() / 100.0
+                val x2 = intX2.toDouble() / 100.0
+                val target =
+                    if (x1 < x2)
+                        Vector(1, 0)
+                    else
+                        Vector(0, 1)
+                estimator.observe(Vector(x1, x2), target)
+            }
+        }
+
+        val evaluateLessThan = network.evaluate(Vector(0.2, 0.8))
+        assertTrue(evaluateLessThan[0] > 0.85)
+        assertTrue(evaluateLessThan[0] + evaluateLessThan[1] == 1.0)
+
+        val evaluateGreaterThan = network.evaluate(Vector(0.8, 0.2))
+        assertTrue(evaluateGreaterThan[1] > 0.85)
+        assertTrue(evaluateGreaterThan[0] + evaluateGreaterThan[1] == 1.0)
     }
 }

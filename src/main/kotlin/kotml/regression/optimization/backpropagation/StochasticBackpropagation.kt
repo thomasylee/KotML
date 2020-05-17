@@ -40,42 +40,42 @@ class StochasticBackpropagation(
 
         val costDeriv: Vector = costFunction.gradient(outputs.last(), targets)
 
-        var dErr_dNetIn: Vector = Vector(0)
+        var dErr_dIn: Vector = Vector(0)
 
         ((network.layers.size - 1) downTo 0).forEach { layerIndex ->
             val layer = network.layers[layerIndex]
-            val new_dErr_dNetIn = MutableVector.zeros(layer.neurons.size)
+            val new_dErr_dIn = MutableVector.zeros(layer.neurons.size)
 
             layer.neurons.forEachIndexed { neuronIndex, neuron ->
-                val netInput = neuron.aggregationFunction.aggregate(neuron.weights, inputs[layerIndex])
-
                 val dErr_dOut: Double =
                     if (layerIndex == network.layers.size - 1) {
                         costDeriv[neuronIndex]
                     } else {
                         network.layers[layerIndex + 1].neurons.foldIndexed(0.0) { laterNeuronIndex, acc, _ ->
-                            acc + dErr_dNetIn[laterNeuronIndex] *
+                            acc + dErr_dIn[laterNeuronIndex] *
                                 dIn_dOuts[layerIndex + 1][laterNeuronIndex][neuronIndex]
                         }
                     }
-                val dOut_dNetIn = neuron.activationFunction.derivative(netInput)
-                new_dErr_dNetIn[neuronIndex] = dErr_dOut * dOut_dNetIn
+
+                val netInput = neuron.aggregationFunction.aggregate(neuron.weights, inputs[layerIndex])
+                val dOut_dIn = neuron.activationFunction.derivative(netInput)
+                new_dErr_dIn[neuronIndex] = dErr_dOut * dOut_dIn
 
                 if (neuron.weights.hasConstant) {
                     neuron.weights.constant -= network.stepSize *
                         dErr_dOut *
-                        dOut_dNetIn *
+                        dOut_dIn *
                         dIn_dWeights[layerIndex][neuronIndex].constant
                 }
                 inputs[layerIndex].forEachIndexed { coeffIndex, _ ->
                     neuron.weights.coeffs[coeffIndex] -= network.stepSize *
                         dErr_dOut *
-                        dOut_dNetIn *
+                        dOut_dIn *
                         dIn_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]
                 }
             }
 
-            dErr_dNetIn = new_dErr_dNetIn
+            dErr_dIn = new_dErr_dIn
         }
     }
 }

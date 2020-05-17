@@ -71,5 +71,81 @@ class MutableVector : Vector {
         vector.vectorValues[indices.last()] = value
     }
 
+    /**
+     * Adds the value to all elements in the vector.
+     * @param value value to add
+     */
+    operator fun plusAssign(value: Double) {
+        if (dimensions == 1)
+            (0 until scalarValues.size).forEach { scalarValues[it] += value }
+        else
+            vectorValues.forEach { vector ->
+                vector.toMutableVector().plusAssign(value)
+            }
+    }
+
+    /**
+     * Adds the value to all elements in the vector.
+     * @param value value to add
+     */
+    operator fun plusAssign(value: Int) = plusAssign(value.toDouble())
+
+    /**
+     * Subtracts the value from all elements in the vector.
+     * @param value value to subtract
+     */
+    operator fun minusAssign(value: Double) {
+        if (dimensions == 1)
+            (0 until scalarValues.size).forEach { scalarValues[it] -= value }
+        else
+            vectorValues.forEach { vector ->
+                vector.toMutableVector().minusAssign(value)
+            }
+    }
+
+    /**
+     * Subtracts the value from all elements in the vector.
+     * @param value value to subtract
+     */
+    operator fun minusAssign(value: Int) = minusAssign(value.toDouble())
+
+    /**
+     * Multiplies the value to all elements in the vector.
+     * @param value value to multiply
+     */
+    operator fun timesAssign(value: Double) {
+        if (dimensions == 1)
+            (0 until scalarValues.size).forEach { scalarValues[it] *= value }
+        else
+            vectorValues.forEach { vector ->
+                vector.toMutableVector().timesAssign(value)
+            }
+    }
+
+    /**
+     * Multiplies the value to all elements in the vector.
+     * @param value value to multiply
+     */
+    operator fun timesAssign(value: Int) = timesAssign(value.toDouble())
+
+    /**
+     * Divides the value from all elements in the vector.
+     * @param value value to divide
+     */
+    operator fun divAssign(value: Double) {
+        if (dimensions == 1)
+            (0 until scalarValues.size).forEach { scalarValues[it] /= value }
+        else
+            vectorValues.forEach { vector ->
+                vector.toMutableVector().divAssign(value)
+            }
+    }
+
+    /**
+     * Divides the value from all elements in the vector.
+     * @param value value to divide
+     */
+    operator fun divAssign(value: Int) = divAssign(value.toDouble())
+
     override fun toMutableVector(): MutableVector = this
 }

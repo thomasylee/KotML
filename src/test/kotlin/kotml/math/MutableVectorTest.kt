@@ -112,6 +112,42 @@ class MutableVectorTest {
     }
 
     @Test
+    fun `plusAssign() adds to all elements`() {
+        val vector = MutableVector(Vector(1, 2), Vector(3, 4))
+        vector += 1
+        assertEquals(Vector(Vector(2, 3), Vector(4, 5)), vector)
+        vector += 2.0
+        assertEquals(Vector(Vector(4, 5), Vector(6, 7)), vector)
+    }
+
+    @Test
+    fun `minusAssign() subtracts from all elements`() {
+        val vector = MutableVector(Vector(4, 5), Vector(6, 7))
+        vector -= 1
+        assertEquals(Vector(Vector(3, 4), Vector(5, 6)), vector)
+        vector -= 2.0
+        assertEquals(Vector(Vector(1, 2), Vector(3, 4)), vector)
+    }
+
+    @Test
+    fun `timesAssign() multiples to all elements`() {
+        val vector = MutableVector(Vector(4, 5), Vector(6, 7))
+        vector *= 2
+        assertEquals(Vector(Vector(8, 10), Vector(12, 14)), vector)
+        vector *= 3.0
+        assertEquals(Vector(Vector(24, 30), Vector(36, 42)), vector)
+    }
+
+    @Test
+    fun `divAssign() divides from all elements`() {
+        val vector = MutableVector(Vector(24, 30), Vector(36, 42))
+        vector /= 2
+        assertEquals(Vector(Vector(12, 15), Vector(18, 21)), vector)
+        vector /= 3.0
+        assertEquals(Vector(Vector(4, 5), Vector(6, 7)), vector)
+    }
+
+    @Test
     fun `toMutableVector() returns this instead of creating a new vector`() {
         val vector = Vector(1, 2, 3)
         val mutable = vector.toMutableVector()

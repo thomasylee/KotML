@@ -9,29 +9,31 @@ import org.junit.jupiter.api.Test
 class TabularExpectedSarsaAgentTest : TabularAgentBaseTest() {
     @Test
     fun `finds optimal path in 3x3 grid`() {
+        val random = Random(0)
         val agent = TabularExpectedSarsaAgent(
             numStates = 9,
             numActions = 4,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = Random(0))
+            behaviorPolicy = TabularEpsilonGreedy(random = random)
         )
         trainOn3By3Grid(agent, 100)
 
-        assertEquals(3, agent.q(0).argmax())
-        assertEquals(3, agent.q(1).argmax())
-        assertEquals(1, agent.q(2).argmax())
-        assertEquals(1, agent.q(5).argmax())
+        assertEquals(3, agent.q(0).argmax(random))
+        assertEquals(3, agent.q(1).argmax(random))
+        assertEquals(1, agent.q(2).argmax(random))
+        assertEquals(1, agent.q(5).argmax(random))
     }
 
     @Test
     fun `finds optimal path in 3x3 grid with DynaQPlus`() {
+        val random = Random(0)
         val agent = TabularExpectedSarsaAgent(
             numStates = 9,
             numActions = 4,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = Random(0))
+            behaviorPolicy = TabularEpsilonGreedy(random = random)
         )
         agent.model = DynaQPlus(
             numIterations = 5,
@@ -44,13 +46,13 @@ class TabularExpectedSarsaAgentTest : TabularAgentBaseTest() {
                 else
                     0.1 * (reward + 0.9 * agent.expectedQ(state) - q[prevState, prevAction])
             },
-            random = Random(0)
+            random = random
         )
         trainOn3By3Grid(agent, 20)
 
-        assertEquals(3, agent.q(0).argmax())
-        assertEquals(3, agent.q(1).argmax())
-        assertEquals(1, agent.q(2).argmax())
-        assertEquals(1, agent.q(5).argmax())
+        assertEquals(3, agent.q(0).argmax(random))
+        assertEquals(3, agent.q(1).argmax(random))
+        assertEquals(1, agent.q(2).argmax(random))
+        assertEquals(1, agent.q(5).argmax(random))
     }
 }

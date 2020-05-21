@@ -31,6 +31,20 @@ class MutableVector : Vector {
         )
     }
 
+    /**
+     * Returns a new MutableVector whose values are equal to this vector's
+     * values. Changes made to the copy do not affect values in the original,
+     * and vice versa.
+     * @return a copy of this vector
+     */
+    fun copy(): MutableVector {
+        val values = toDoubleArray()
+        val vector = MutableVector(*shape) { index ->
+            values[index]
+        }
+        return vector
+    }
+
     operator fun set(vararg indices: Int, value: Int) = set(
         indices = *indices,
         value = value.toDouble()

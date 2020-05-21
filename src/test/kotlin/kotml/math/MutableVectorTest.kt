@@ -73,6 +73,15 @@ class MutableVectorTest {
     }
 
     @Test
+    fun `copy() returns a new MutableVector`() {
+        val original = MutableVector(Vector(1, 2), Vector(3, 4))
+        val copy = original.copy()
+        original[0, 0] = 5
+        assertEquals(Vector(Vector(5, 2), Vector(3, 4)), original)
+        assertEquals(Vector(Vector(1, 2), Vector(3, 4)), copy)
+    }
+
+    @Test
     fun `set() sets scalar values correctly`() {
         val rowVector = MutableVector(1, 2, 3)
         rowVector[1] = 5.0

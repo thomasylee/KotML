@@ -7,6 +7,7 @@ import kotml.regression.functions.IdentityFunction
 import kotml.regression.functions.aggregation.Polynomial
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -28,6 +29,13 @@ class StochasticGradientDescentTest {
                 estimator.weights, Vector(5.0)
             )
         ))
+
+        val prevWeights = Weights(
+            estimator.weights.constant,
+            estimator.weights.coeffs.copy()
+        )
+        assertEquals(3.525972048, estimator.observeAndEvaluate(Vector(5), Vector(5)))
+        assertNotEquals(prevWeights, estimator.weights)
     }
 
     @Test
@@ -49,6 +57,10 @@ class StochasticGradientDescentTest {
                 estimator.weights, Vector(6.0)
             )
         ))
+
+        val prevWeights = Weights(estimator.weights.coeffs.copy())
+        assertEquals(12.0, estimator.observeAndEvaluate(Vector(6), Vector(15)))
+        assertNotEquals(prevWeights, estimator.weights)
     }
 
     @Test

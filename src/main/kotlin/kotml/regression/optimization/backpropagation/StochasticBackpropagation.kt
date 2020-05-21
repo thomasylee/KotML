@@ -11,12 +11,16 @@ import kotml.regression.optimization.IterativeOptimizer
 class StochasticBackpropagation(
     val network: FeedforwardNeuralNetwork,
     val costFunction: CostFunction
-) : IterativeOptimizer<FeedforwardNeuralNetwork>(
+) : IterativeOptimizer<FeedforwardNeuralNetwork, Vector>(
     regressorCount = network.layers.first().neurons.first().weights.coeffs.shape[0],
     outputCount = network.layers.last().neurons.size,
     model = network
 ) {
     protected override fun addObservation(regressors: Vector, targets: Vector) {
+        observeAndEvaluate(regressors, targets)
+    }
+
+    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Vector {
         val inputs = mutableListOf<Vector>()
         val outputs = mutableListOf<Vector>()
         val dIn_dOuts = mutableListOf<List<Vector>>()
@@ -77,5 +81,7 @@ class StochasticBackpropagation(
 
             dErr_dIn = new_dErr_dIn
         }
+
+        return outputs.last()
     }
 }

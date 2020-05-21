@@ -18,7 +18,7 @@ class StochasticGradientDescent(
     val lossFunction: LossFunction,
     val weights: Weights,
     val aggregationFunction: AggregationFunction = DotProduct
-) : IterativeOptimizer<Weights>(weights.coeffs.shape[0], 1, weights) {
+) : IterativeOptimizer<Weights, Double>(weights.coeffs.shape[0], 1, weights) {
     constructor(
         stepSize: Double,
         function: FunctionModel,
@@ -35,6 +35,10 @@ class StochasticGradientDescent(
     )
 
     protected override fun addObservation(regressors: Vector, targets: Vector) {
+        observeAndEvaluate(regressors, targets)
+    }
+
+    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Double {
         val estimate = function.evaluate(
             aggregationFunction.aggregate(weights, regressors)
         )
@@ -47,5 +51,7 @@ class StochasticGradientDescent(
         (0 until regressors.shape[0]).forEach { index ->
             weights.coeffs[index] -= stepSize * dF_dIn * dIn_dWeight.coeffs[index]
         }
+
+        return estimate
     }
 }

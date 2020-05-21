@@ -16,6 +16,7 @@ import kotml.regression.functions.ReLU
 import kotml.regression.functions.Tanh
 import kotml.regression.neural.FeedforwardNeuralNetwork
 import kotml.regression.neural.NeuralLayer
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -156,5 +157,12 @@ class StochasticBackpropagationTest {
         val evaluateGreaterThan = network.evaluate(Vector(0.8, 0.2))
         assertTrue(evaluateGreaterThan[1] > 0.85)
         assertTrue(evaluateGreaterThan[0] + evaluateGreaterThan[1] == 1.0)
+
+        // Test observeAndEvalute().
+        val prevWeights = network.layers.first().neurons.first().weights.coeffs.copy()
+        val observeAndEvaluate = estimator.observeAndEvaluate(Vector(0.8, 0.2), Vector(0.9, 0.1))
+        assertTrue(observeAndEvaluate[1] > 0.85)
+        assertTrue(observeAndEvaluate[0] + observeAndEvaluate[1] == 1.0)
+        assertNotEquals(prevWeights, network.layers.first().neurons.first().weights.coeffs)
     }
 }

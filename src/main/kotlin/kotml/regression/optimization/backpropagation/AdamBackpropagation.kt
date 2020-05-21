@@ -16,7 +16,7 @@ class AdamBackpropagation(
     val betaM: Double = 0.99,
     val betaV: Double = 0.999,
     val epsilon: Double = 0.0001
-) : IterativeOptimizer<FeedforwardNeuralNetwork>(
+) : IterativeOptimizer<FeedforwardNeuralNetwork, Vector>(
     regressorCount = network.layers.first().neurons.first().weights.coeffs.shape[0],
     outputCount = network.layers.last().neurons.size,
     model = network
@@ -52,6 +52,10 @@ class AdamBackpropagation(
     private var betaVProduct: Double = 1.0
 
     protected override fun addObservation(regressors: Vector, targets: Vector) {
+        observeAndEvaluate(regressors, targets)
+    }
+
+    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Vector {
         betaMProduct *= betaM
         betaVProduct *= betaV
 
@@ -134,5 +138,7 @@ class AdamBackpropagation(
 
             dErr_dIn = new_dErr_dIn
         }
+
+        return outputs.last()
     }
 }

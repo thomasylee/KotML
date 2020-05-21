@@ -6,10 +6,10 @@ import kotml.regression.RegressionException
 /**
  * Optimizer optimizes weights for a function to minimize a loss or cost.
  */
-sealed class Optimizer<T>(
+sealed class Optimizer<M>(
     val regressorCount: Int,
     val outputCount: Int,
-    val model: T
+    val model: M
 ) {
     /**
      * Adds an observation to the training model.
@@ -37,20 +37,29 @@ sealed class Optimizer<T>(
  * IterativeOptimizer develops a model of any kind of linear function by
  * iteratively reducing a loss function.
  */
-abstract class IterativeOptimizer<T>(
+abstract class IterativeOptimizer<M, V>(
     regressorCount: Int,
     outputCount: Int,
-    model: T
-) : Optimizer<T>(regressorCount, outputCount, model)
+    model: M
+) : Optimizer<M>(regressorCount, outputCount, model) {
+    /**
+     * Returns the evaluated output of the optimizer while also optimizing
+     * the output and targets.
+     * @param regressors independent variable values
+     * @param targets target dependent variable values
+     * @return evaluated dependent variable values
+     */
+    abstract fun observeAndEvaluate(regressors: Vector, targets: Vector): V
+}
 
 /**
  * BatchOptimizer develops a model of any kind of linear function by
  * updating weights in batches.
  */
-abstract class BatchOptimizer<T>(
+abstract class BatchOptimizer<M>(
     regressorCount: Int,
     outputCount: Int,
-    model: T
-) : Optimizer<T>(regressorCount, outputCount, model) {
+    model: M
+) : Optimizer<M>(regressorCount, outputCount, model) {
     abstract fun processBatch()
 }

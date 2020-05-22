@@ -66,4 +66,20 @@ class NeuralLayer(val neurons: Array<Neuron>) {
         Vector(neurons.size) { index ->
             neurons[index].evaluate(regressors)
         }
+
+    /**
+     * Returns a copy of the neural layer.
+     * @return copy of the neural layer
+     */
+    fun copy(): NeuralLayer = NeuralLayer(Array<Neuron>(neurons.size) { index ->
+        neurons[index].copy()
+    })
+
+    /**
+     * Returns true if `other` is an equivalent `NeuralLayer`.
+     * @param other nullable object to compare to this one
+     * @return true if other is an equivalent NeuralLayer, false otherwise
+     */
+    override fun equals(other: Any?): Boolean =
+        other is NeuralLayer && neurons.contentEquals(other.neurons)
 }

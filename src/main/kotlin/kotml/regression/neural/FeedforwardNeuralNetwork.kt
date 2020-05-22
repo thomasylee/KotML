@@ -72,4 +72,22 @@ class FeedforwardNeuralNetwork(
         layers.fold(regressors) { input, layer ->
             layer.evaluate(input)
         }
+
+    /**
+     * Returns a copy of the neural network.
+     * @return copy of the neural network
+     */
+    fun copy(): FeedforwardNeuralNetwork = FeedforwardNeuralNetwork(
+        stepSize = stepSize,
+        layers = Array<NeuralLayer>(layers.size) { layers[it].copy() }
+    )
+
+    /**
+     * Returns true if `other` is an equivalent `FeedforwardNeuralNetwork`.
+     * @param other nullable object to compare to this one
+     * @return true if other is an equivalent FeedforwardNeuralNetwork, or
+     *   false otherwise
+     */
+    override fun equals(other: Any?): Boolean =
+        other is FeedforwardNeuralNetwork && layers.contentEquals(other.layers)
 }

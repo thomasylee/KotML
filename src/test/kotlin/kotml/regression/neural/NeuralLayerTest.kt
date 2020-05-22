@@ -7,6 +7,7 @@ import kotml.regression.functions.ReLU
 import kotml.regression.functions.aggregation.Softmax
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -34,5 +35,15 @@ class NeuralLayerTest {
             assertFalse(neuron.weights.hasConstant)
             assertTrue(neuron.activationFunction is IdentityFunction)
         }
+    }
+
+    @Test
+    fun `copy() returns a copy of the neural layer`() {
+        val original = NeuralLayer.softmax(3)
+        val copy = original.copy()
+
+        assertEquals(original, copy)
+        original.neurons.first().weights.coeffs[0] += 1.0
+        assertNotEquals(original, copy)
     }
 }

@@ -37,4 +37,24 @@ class Neuron(
         activationFunction.evaluate(
             aggregationFunction.aggregate(weights, regressors)
         )
+
+    /**
+     * Returns a copy of the neuron.
+     * @return copy of the neuron
+     */
+    fun copy(): Neuron = Neuron(
+        activationFunction = activationFunction,
+        weights = weights.copy(),
+        aggregationFunction = aggregationFunction
+    )
+
+    /**
+     * Returns true if `other` is an equivalent `Neuron`.
+     * @param other nullable object to compare to this one
+     * @return true if other is an equivalent Neuron, or false otherwise
+     */
+    override fun equals(other: Any?): Boolean =
+        other is Neuron && activationFunction == other.activationFunction &&
+            weights == other.weights &&
+            aggregationFunction == other.aggregationFunction
 }

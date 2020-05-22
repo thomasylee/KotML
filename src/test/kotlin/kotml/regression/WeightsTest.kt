@@ -36,4 +36,20 @@ class WeightsTest {
         assertFalse(withoutConstant.hasConstant)
         assertEquals(Vector(1, 2, 0), withoutConstant.toVector())
     }
+
+    @Test
+    fun `copy() returns a copy of the weights`() {
+        val originalWithBias = Weights(2.0, Vector(3, 4))
+        val copyWithBias = originalWithBias.copy()
+        originalWithBias.constant = 3.0
+        originalWithBias.coeffs[0] = 5.0
+        assertEquals(Weights(3.0, Vector(5, 4)), originalWithBias)
+        assertEquals(Weights(2.0, Vector(3, 4)), copyWithBias)
+
+        val originalWithoutBias = Weights(Vector(3, 4))
+        val copyWithoutBias = originalWithoutBias.copy()
+        originalWithoutBias.coeffs[0] = 5.0
+        assertEquals(Weights(Vector(5, 4)), originalWithoutBias)
+        assertEquals(Weights(Vector(3, 4)), copyWithoutBias)
+    }
 }

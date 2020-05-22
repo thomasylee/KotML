@@ -47,6 +47,16 @@ class Weights(
 
     fun toVector(): Vector = coeffs.append(constant)
 
+    /**
+     * Returns a copy of the weights.
+     * @return copy of the weights
+     */
+    fun copy(): Weights =
+        if (hasConstant)
+            Weights(constant, coeffs.copy())
+        else
+            Weights(coeffs.copy())
+
     override fun equals(other: Any?): Boolean =
         other is Weights && other.hasConstant == hasConstant &&
             (!hasConstant || other.constant == constant) && other.coeffs == coeffs

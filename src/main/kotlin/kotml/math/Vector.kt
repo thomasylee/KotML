@@ -37,6 +37,12 @@ open class Vector private constructor(
         fun zeros(vararg shape: Int): Vector = Vector(*shape) { 0.0 }
 
         @JvmStatic
+        fun ofVectors(numVectors: Int, mapVectors: (Int) -> Vector): Vector =
+            Vector(*Array<Vector>(numVectors) { index ->
+                mapVectors(index)
+            })
+
+        @JvmStatic
         protected fun addDimensionToShape(dimension: Int, shape: IntArray): IntArray =
             IntArray(shape.size + 1) { index ->
                 if (index == 0)

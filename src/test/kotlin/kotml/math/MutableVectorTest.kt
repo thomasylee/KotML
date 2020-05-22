@@ -73,6 +73,13 @@ class MutableVectorTest {
     }
 
     @Test
+    fun `ofVectors() initializes a MutableVector of MutableVectors`() {
+        val vector = MutableVector.ofVectors(2) { MutableVector(it, it) }
+        assertTrue(vector(0) is MutableVector, "Subvector should be a MutableVector")
+        assertEquals(Vector(Vector(0, 0), Vector(1, 1)), vector)
+    }
+
+    @Test
     fun `copy() returns a new MutableVector`() {
         val original = MutableVector(Vector(1, 2), Vector(3, 4))
         val copy = original.copy()

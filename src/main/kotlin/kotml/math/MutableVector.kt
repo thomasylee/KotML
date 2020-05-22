@@ -29,6 +29,10 @@ class MutableVector : Vector {
             shape = *shape,
             mapValues = { 0.0 }
         )
+
+        @JvmStatic
+        fun ofVectors(numVectors: Int, mapVectors: (Int) -> MutableVector): MutableVector =
+            MutableVector(*Array<MutableVector>(numVectors) { mapVectors(it) })
     }
 
     /**

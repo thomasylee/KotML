@@ -76,6 +76,13 @@ class VectorTest {
     }
 
     @Test
+    fun `ofVectors() initializes a vector of vectors`() {
+        assertEquals(Vector(Vector(0, 0), Vector(1, 1)), Vector.ofVectors(2) {
+            Vector(it, it)
+        })
+    }
+
+    @Test
     fun `det() returns the determinant for square matrices`() {
         assertEquals(-2.0, Vector(Vector(1.0, 2.0), Vector(3.0, 4.0)).det())
         assertEquals(12.0, Vector(

@@ -14,7 +14,7 @@ class ReLUTest {
     @Test
     fun `derivative() returns the correct value`() {
         assertEquals(0.0, ReLU.derivative(-5.0))
-        assertEquals(0.0, ReLU.derivative(0.0))
+        assertEquals(1.0, ReLU.derivative(0.0))
         assertEquals(1.0, ReLU.derivative(5.0))
     }
 }

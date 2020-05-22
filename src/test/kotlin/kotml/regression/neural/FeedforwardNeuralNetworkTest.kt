@@ -1,11 +1,7 @@
 package kotml.regression.neural
 
-// import kotlin.math.pow
-// import kotml.distributions.UniformSampler
 import kotml.math.Vector
 import kotml.regression.Weights
-// import kotml.regression.cost.OrdinaryLeastSquares
-// import kotml.regression.functions.LogisticFunction
 import kotml.regression.functions.ReLU
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

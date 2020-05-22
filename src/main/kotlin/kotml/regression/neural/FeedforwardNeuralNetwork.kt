@@ -1,13 +1,16 @@
 package kotml.regression.neural
 
-import kotml.distributions.DistributionSampler
-import kotml.distributions.NormalSampler
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionException
 import kotml.regression.functions.FunctionModel
+import kotml.regression.functions.PReLU
+import kotml.regression.functions.ReLU
 import kotml.regression.functions.aggregation.AggregationFunction
 import kotml.regression.functions.aggregation.DotProduct
+import kotml.regression.neural.initialization.HeInitializer
+import kotml.regression.neural.initialization.NeuralNetworkInitializer
+import kotml.regression.neural.initialization.XavierInitializer
 
 /**
  * `FeedforwardNeuralNetwork` contains a sequence of neural layers that
@@ -37,7 +40,11 @@ class FeedforwardNeuralNetwork(
         activationFunction: FunctionModel,
         aggregationFunction: AggregationFunction = DotProduct,
         includeConstant: Boolean = true,
-        sampler: DistributionSampler = NormalSampler()
+        initializer: NeuralNetworkInitializer =
+            if (activationFunction is ReLU || activationFunction is PReLU)
+                HeInitializer
+            else
+                XavierInitializer
     ) : this(
         stepSize,
         Array<NeuralLayer>(layerSizes.size) { index ->
@@ -47,7 +54,7 @@ class FeedforwardNeuralNetwork(
                     activationFunction = activationFunction,
                     regressorCount = regressorCount,
                     includeConstant = includeConstant,
-                    sampler = sampler,
+                    sampler = initializer.sampler(regressorCount, layerSizes[index]),
                     aggregationFunction = aggregationFunction
                 )
             })

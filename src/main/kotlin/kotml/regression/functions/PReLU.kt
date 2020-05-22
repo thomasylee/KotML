@@ -4,18 +4,18 @@ package kotml.regression.functions
  * PReLU (Parameterized ReLU) is parameter * x when x is < 0 and x when x
  * is >= 0.
  */
-open class PReLU(val parameter: Double) : FunctionModel {
+open class PReLU(val alpha: Double) : FunctionModel {
     override fun evaluate(input: Double): Double =
-        if (input < 0 && parameter == 0.0)
+        if (input < 0 && alpha == 0.0)
             0.0
         else if (input < 0)
-            parameter * input
+            alpha * input
         else
             input
 
     override fun derivative(input: Double): Double =
         if (input < 0.0)
-            parameter
+            alpha
         else
             1.0
 }

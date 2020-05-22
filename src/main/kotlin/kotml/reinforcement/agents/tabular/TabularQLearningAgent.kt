@@ -3,15 +3,15 @@ package kotml.reinforcement.agents.tabular
 import kotml.math.MutableVector
 import kotml.reinforcement.RLException
 import kotml.reinforcement.models.tabular.TabularModel
-import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
-import kotml.reinforcement.policies.tabular.TabularPolicy
+import kotml.reinforcement.policies.discrete.DiscreteBehaviorPolicy
+import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 
 class TabularQLearningAgent(
     val numStates: Int,
     val numActions: Int,
     val stepSize: Double,
     val discount: Double,
-    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy(),
+    behaviorPolicy: DiscreteBehaviorPolicy = EpsilonGreedyPolicy(),
     val model: TabularModel? = null
 ) : TabularAgent(behaviorPolicy) {
     val q = MutableVector.zeros(numStates, numActions)

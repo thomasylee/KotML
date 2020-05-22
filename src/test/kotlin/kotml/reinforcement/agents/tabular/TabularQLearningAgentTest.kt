@@ -3,7 +3,7 @@ package kotml.reinforcement.agents.tabular
 import kotlin.random.Random
 import kotml.reinforcement.models.tabular.DynaQPlus
 import kotml.reinforcement.models.tabular.PrioritizedDynaQPlus
-import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
+import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -16,7 +16,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
             numActions = 4,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = random)
+            behaviorPolicy = EpsilonGreedyPolicy(random = random)
         )
         trainOn3By3Grid(agent, 100)
 
@@ -34,7 +34,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
             numActions = 4,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = random),
+            behaviorPolicy = EpsilonGreedyPolicy(random = random),
             model = DynaQPlus(
                 numIterations = 5,
                 numStates = 9,
@@ -65,7 +65,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
             numActions = 2,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = random),
+            behaviorPolicy = EpsilonGreedyPolicy(random = random),
             model = DynaQPlus(
                 numIterations = 10,
                 numStates = 10,
@@ -95,7 +95,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
             numActions = 2,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = random),
+            behaviorPolicy = EpsilonGreedyPolicy(random = random),
             model = PrioritizedDynaQPlus(
                 numIterations = 5,
                 numStates = 10,

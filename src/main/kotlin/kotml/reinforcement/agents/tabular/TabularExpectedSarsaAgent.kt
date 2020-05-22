@@ -3,37 +3,40 @@ package kotml.reinforcement.agents.tabular
 import kotml.math.MutableVector
 import kotml.reinforcement.RLException
 import kotml.reinforcement.models.tabular.TabularModel
-import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
-import kotml.reinforcement.policies.tabular.TabularPolicy
+import kotml.reinforcement.policies.discrete.DiscreteBehaviorPolicy
+import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 
 class TabularExpectedSarsaAgent(
     val numStates: Int,
     val numActions: Int,
     val stepSize: Double,
     val discount: Double,
-    behaviorPolicy: TabularPolicy = TabularEpsilonGreedy(),
+    behaviorPolicy: DiscreteBehaviorPolicy = EpsilonGreedyPolicy(),
     // TODO: Mutating this after initialization is pretty wonky.
     // Creating and assigning the model only once while still allowing it
     // to calculated expected Q values would be preferable.
     var model: TabularModel? = null
 ) : TabularAgent(behaviorPolicy) {
     val q = MutableVector.zeros(numStates, numActions)
+    val discreteBehaviorPolicy: DiscreteBehaviorPolicy
     var prevState: Int = 0
     var prevAction: Int = 0
 
     init {
         if (numStates <= 0 || numActions <= 0)
             throw RLException("Number of states and actions must be positive")
+
+        discreteBehaviorPolicy = behaviorPolicy
     }
 
     override fun start(initialState: Int): Int {
         prevState = initialState
-        prevAction = behaviorPolicy.chooseAction(q(initialState))
+        prevAction = discreteBehaviorPolicy.chooseAction(q(initialState))
         return prevAction
     }
 
     fun expectedQ(state: Int): Double {
-        val actionProb = behaviorPolicy.actionProbabilities(q(state))
+        val actionProb = discreteBehaviorPolicy.actionProbabilities(q(state))
         return (actionProb * q(state)).sum()[0]
     }
 
@@ -49,7 +52,7 @@ class TabularExpectedSarsaAgent(
         }
 
         prevState = state
-        prevAction = behaviorPolicy.chooseAction(q(state))
+        prevAction = discreteBehaviorPolicy.chooseAction(q(state))
         return prevAction
     }
 

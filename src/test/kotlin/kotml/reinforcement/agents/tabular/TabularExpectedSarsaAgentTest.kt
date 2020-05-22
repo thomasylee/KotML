@@ -2,7 +2,7 @@ package kotml.reinforcement.agents.tabular
 
 import kotlin.random.Random
 import kotml.reinforcement.models.tabular.DynaQPlus
-import kotml.reinforcement.policies.tabular.TabularEpsilonGreedy
+import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -15,7 +15,7 @@ class TabularExpectedSarsaAgentTest : TabularAgentBaseTest() {
             numActions = 4,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = random)
+            behaviorPolicy = EpsilonGreedyPolicy(random = random)
         )
         trainOn3By3Grid(agent, 100)
 
@@ -33,7 +33,7 @@ class TabularExpectedSarsaAgentTest : TabularAgentBaseTest() {
             numActions = 4,
             stepSize = 0.1,
             discount = 0.9,
-            behaviorPolicy = TabularEpsilonGreedy(random = random)
+            behaviorPolicy = EpsilonGreedyPolicy(random = random)
         )
         agent.model = DynaQPlus(
             numIterations = 5,

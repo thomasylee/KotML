@@ -15,7 +15,7 @@ abstract class TabularAgentBaseTest {
         (1..numTrials).forEach {
             var agentLoc = 0
             var action = agent.start(0)
-            var movesLeft = 100
+            var movesLeft = 200
             while (agentLoc != terminalLoc && movesLeft > 0) {
                 movesLeft--
 

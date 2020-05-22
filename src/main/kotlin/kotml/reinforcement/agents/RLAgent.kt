@@ -1,6 +1,8 @@
 package kotml.reinforcement.agents
 
-abstract class RLAgent<S, A> {
+import kotml.reinforcement.policies.BehaviorPolicy
+
+abstract class RLAgent<S, A>(val behaviorPolicy: BehaviorPolicy<A>) {
     abstract fun start(initialState: S): A
 
     abstract fun processStep(reward: Double, state: S): A

@@ -1,4 +1,4 @@
-package kotml.reinforcement.policies.tabular
+package kotml.reinforcement.policies.discrete
 
 import kotlin.random.Random
 import kotml.math.MutableVector
@@ -6,10 +6,10 @@ import kotml.math.Vector
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class TabularSoftmaxTest {
+class SoftmaxPolicyTest {
     @Test
     fun `chooseAction() selects actions correctly`() {
-        val policy = TabularSoftmax(tau = 0.5, random = Random(0))
+        val policy = SoftmaxPolicy(tau = 0.5, random = Random(0))
         val q = Vector(1, 2, 0, 0)
         var actionCounts = MutableVector(0, 0, 0, 0)
 
@@ -20,7 +20,7 @@ class TabularSoftmaxTest {
 
     @Test
     fun `actionProbabilities() returns the correct probabilities`() {
-        val policy = TabularSoftmax(tau = 0.5, random = Random(0))
+        val policy = SoftmaxPolicy(tau = 0.5, random = Random(0))
 
         assertEquals(
             Vector(

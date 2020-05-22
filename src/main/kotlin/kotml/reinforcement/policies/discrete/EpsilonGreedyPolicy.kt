@@ -1,18 +1,12 @@
-package kotml.reinforcement.policies.tabular
+package kotml.reinforcement.policies.discrete
 
 import kotlin.random.Random
 import kotml.math.Vector
 
-class TabularEpsilonGreedy(
+class EpsilonGreedyPolicy(
     val epsilon: Double = 0.1,
-    val random: Random = Random
-) : TabularPolicy {
-    override fun chooseAction(qValuesForState: Vector): Int =
-        if (random.nextDouble() < epsilon)
-            random.nextInt(0, qValuesForState.shape[0])
-        else
-            qValuesForState.argmax(random)
-
+    random: Random = Random
+) : DiscreteBehaviorPolicy(random) {
     override fun actionProbabilities(qValuesForState: Vector): Vector {
         val numActions = qValuesForState.shape[0]
         val actionsWithMaxQ = mutableListOf<Int>()

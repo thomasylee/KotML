@@ -1,29 +1,15 @@
-package kotml.reinforcement.policies.tabular
+package kotml.reinforcement.policies.discrete
 
 import kotlin.math.exp
 import kotlin.random.Random
 import kotml.math.Vector
 
-class TabularSoftmax(
+class SoftmaxPolicy(
     var tau: Double = 1.0,
-    val random: Random = Random
-) : TabularPolicy {
+    random: Random = Random
+) : DiscreteBehaviorPolicy(random) {
     var lastQValues: Vector = Vector.zeros(1)
     var distribution: Vector = Vector(1) { 1.0 }
-
-    override fun chooseAction(qValuesForState: Vector): Int {
-        val probabilities = actionProbabilities(qValuesForState)
-        val randomValue = random.nextDouble()
-        var chosenAction = 0
-        var runningSum = 0.0
-        for (index in 0 until probabilities.shape[0]) {
-            runningSum += probabilities[index]
-            chosenAction = index
-            if (randomValue < runningSum)
-                break
-        }
-        return chosenAction
-    }
 
     override fun actionProbabilities(qValuesForState: Vector): Vector {
         if (qValuesForState != lastQValues) {

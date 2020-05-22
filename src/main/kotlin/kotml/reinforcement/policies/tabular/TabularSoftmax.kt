@@ -5,7 +5,7 @@ import kotlin.random.Random
 import kotml.math.Vector
 
 class TabularSoftmax(
-    var tau: Double = 0.5,
+    var tau: Double = 1.0,
     val random: Random = Random
 ) : TabularPolicy {
     var lastQValues: Vector = Vector.zeros(1)

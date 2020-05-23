@@ -74,10 +74,7 @@ class AdamBackpropagation(
         }
     }
 
-    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Vector =
-        observeAndEvaluate(network, regressors, targets)
-
-    private fun observeAndEvaluate(evaluatingNetwork: FeedforwardNeuralNetwork, regressors: Vector, targets: Vector): Vector {
+    override fun observeAndEvaluate(evaluatingModel: FeedforwardNeuralNetwork, regressors: Vector, targets: Vector): Vector {
         betaMProduct *= betaM
         betaVProduct *= betaV
 
@@ -85,7 +82,7 @@ class AdamBackpropagation(
         val outputs = mutableListOf<Vector>()
         val dIn_dOuts = mutableListOf<List<Vector>>()
         val dIn_dWeights = mutableListOf<List<Weights>>()
-        evaluatingNetwork.layers.forEachIndexed { layerIndex, layer ->
+        evaluatingModel.layers.forEachIndexed { layerIndex, layer ->
             val input: Vector =
                 if (layerIndex == 0)
                     regressors

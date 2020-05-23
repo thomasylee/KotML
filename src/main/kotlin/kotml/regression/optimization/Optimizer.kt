@@ -49,7 +49,19 @@ abstract class IterativeOptimizer<M, V>(
      * @param targets target dependent variable values
      * @return evaluated dependent variable values
      */
-    abstract fun observeAndEvaluate(regressors: Vector, targets: Vector): V
+    fun observeAndEvaluate(regressors: Vector, targets: Vector): V =
+        observeAndEvaluate(model, regressors, targets)
+
+    /**
+     * Returns the evaluated output of the evaluatingModel while also
+     * optimizing the output and targets.
+     * @param evaluatingModel model used for evaluation, which may be
+     *   different from the model being optimized
+     * @param regressors independent variable values
+     * @param targets target dependent variable values
+     * @return evaluated dependent variable values
+     */
+    abstract fun observeAndEvaluate(evaluatingModel: M, regressors: Vector, targets: Vector): V
 
     /**
      * Returns the evaluated output of the optimizer while also optimizing

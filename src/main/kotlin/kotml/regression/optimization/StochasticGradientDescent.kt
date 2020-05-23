@@ -60,12 +60,9 @@ class StochasticGradientDescent(
         }
     }
 
-    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Double =
-        observeAndEvaluate(weights, regressors, targets)
-
-    private fun observeAndEvaluate(evaluatingWeights: Weights, regressors: Vector, targets: Vector): Double {
+    override fun observeAndEvaluate(evaluatingModel: Weights, regressors: Vector, targets: Vector): Double {
         val estimate = function.evaluate(
-            aggregationFunction.aggregate(evaluatingWeights, regressors)
+            aggregationFunction.aggregate(evaluatingModel, regressors)
         )
         val dF_dIn = lossFunction.derivative(estimate, targets[0])
         val dIn_dWeight = aggregationFunction.weightsGradient(weights, regressors)

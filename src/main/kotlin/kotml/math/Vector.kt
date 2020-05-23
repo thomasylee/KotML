@@ -1,5 +1,6 @@
 package kotml.math
 
+import kotlin.math.abs
 import kotlin.random.Random
 
 /**
@@ -645,6 +646,23 @@ open class Vector private constructor(
         } else {
             false
         }
+
+    /**
+     * Returns true if the other vector has the same shape and approximately
+     * the same values as this vector. Approximate equality can be useful in
+     * cases where floating point arithmetic makes calculated values
+     * slightly inaccurate.
+     * @param other vector to check equality against
+     * @return true if the vectors have approximately equivalent values, false otherwise
+     */
+    fun approxEquals(other: Vector, tolerance: Double = 0.00000001): Boolean =
+        shapeEquals(other.shape) &&
+            (0 until scalarValues.size).all {
+                abs(scalarValues[it] - other.scalarValues[it]) < tolerance
+            } &&
+            (0 until vectorValues.size).all {
+                vectorValues[it].approxEquals(other.vectorValues[it], tolerance)
+            }
 
     /**
      * Returns true if this vector's shape equals the given shape.

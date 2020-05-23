@@ -507,4 +507,16 @@ class VectorTest {
         val mutable = vector.toMutableVector()
         assertEquals(vector, mutable)
     }
+
+    @Test
+    fun `approxEquals() compares vector values with approximate equality`() {
+        assertTrue(Vector(Vector(0.001, 1.001), Vector(1.999, 2.999))
+            .approxEquals(Vector(Vector(0, 1), Vector(2, 3)), 0.01))
+
+        assertFalse(Vector(Vector(0.1, 1.001), Vector(1.999, 2.999))
+            .approxEquals(Vector(Vector(0, 1), Vector(2, 3)), 0.01))
+
+        assertFalse(Vector(Vector(0.001, 1.001), Vector(1.95, 2.999))
+            .approxEquals(Vector(Vector(0, 1), Vector(2, 3)), 0.01))
+    }
 }

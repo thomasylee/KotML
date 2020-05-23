@@ -28,7 +28,7 @@ class ExperienceReplayBuffer(val maxSize: Int = 10_000) {
      * @param isTerminal true if the nextState is a terminal state, false otherwise
      */
     fun append(state: Vector, action: Int, reward: Double, nextState: Vector, isTerminal: Boolean) {
-        if (experiences.size == maxSize)
+        if (size == maxSize)
             experiences.removeAt(0)
         else
             size++
@@ -46,10 +46,10 @@ class ExperienceReplayBuffer(val maxSize: Int = 10_000) {
      * @return list of random experiences
      */
     fun sample(count: Int = 1, random: Random = Random): List<Experience> =
-        if (count >= experiences.size) {
+        if (count >= size) {
             experiences.shuffled(random)
         } else {
-            val indices = (0 until experiences.size).map { it }.toMutableList()
+            val indices = (0 until size).map { it }.toMutableList()
             (1..count).map {
                 val indicesIndex = random.nextInt(0, indices.size)
                 val experienceIndex = indices[indicesIndex]

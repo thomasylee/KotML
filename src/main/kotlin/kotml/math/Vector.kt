@@ -30,8 +30,8 @@ open class Vector private constructor(
     val dimensions: Int
 
     // Unfortunately, these need to be internal for MutableVector to access them.
-    internal val scalarValues: MutableList<Double>
-    internal val vectorValues: MutableList<Vector>
+    internal val scalarValues: DoubleArray
+    internal val vectorValues: Array<Vector>
 
     companion object {
         @JvmStatic
@@ -68,15 +68,15 @@ open class Vector private constructor(
         }
 
         if (dimensions == 1) {
-            scalarValues = MutableList(shape[0]) { mapValues(initIndex + it) }
-            vectorValues = mutableListOf()
+            scalarValues = DoubleArray(shape[0]) { mapValues(initIndex + it) }
+            vectorValues = arrayOf()
         } else {
-            scalarValues = mutableListOf()
+            scalarValues = doubleArrayOf()
             val subVectorShape = removeDimensionFromShape(shape)
             val scalarsPerVector = subVectorShape.fold(1) { acc, dim ->
                 acc * dim
             }
-            vectorValues = MutableList<Vector>(shape[0]) { index ->
+            vectorValues = Array<Vector>(shape[0]) { index ->
                 Vector(
                     initIndex = (initIndex + index * scalarsPerVector).toByte(),
                     shape = subVectorShape,

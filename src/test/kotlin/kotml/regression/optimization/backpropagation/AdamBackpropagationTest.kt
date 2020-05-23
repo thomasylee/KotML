@@ -1,8 +1,8 @@
 package kotml.regression.optimization.backpropagation
 
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.random.Random
+import kotml.TestUtils.assertApproxEquals
 import kotml.distributions.NormalSampler
 import kotml.distributions.UniformSampler
 import kotml.math.Vector
@@ -15,6 +15,7 @@ import kotml.regression.functions.LogisticFunction
 import kotml.regression.functions.Tanh
 import kotml.regression.neural.FeedforwardNeuralNetwork
 import kotml.regression.neural.NeuralLayer
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -43,7 +44,7 @@ class AdamBackpropagationTest {
             )
         )
 
-        val estimator = AdamBackpropagation(
+        val optimizer = AdamBackpropagation(
             network = network,
             costFunction = SumCost(SquaredError)
         )
@@ -52,12 +53,12 @@ class AdamBackpropagationTest {
         (-700..700).shuffled(rand).forEach { intX ->
             val x = intX.toDouble() / 70.0
             val target = -1.0 + 2.0 * x
-            estimator.observe(Vector(x), Vector(target))
+            optimizer.observe(Vector(x), Vector(target))
         }
 
-        assertTrue(abs(-1.0 - network.evaluate(Vector(0))[0]) < 0.01)
-        assertTrue(abs(3.0 - network.evaluate(Vector(2))[0]) < 0.01)
-        assertTrue(abs(9.0 - network.evaluate(Vector(5))[0]) < 0.01)
+        assertApproxEquals(-1.0, network.evaluate(Vector(0))[0], 0.01)
+        assertApproxEquals(3.0, network.evaluate(Vector(2))[0], 0.01)
+        assertApproxEquals(9.0, network.evaluate(Vector(5))[0], 0.01)
     }
 
     @Test
@@ -84,7 +85,7 @@ class AdamBackpropagationTest {
             )
         )
 
-        val estimator = AdamBackpropagation(
+        val optimizer = AdamBackpropagation(
             network = network,
             costFunction = MeanCost(HalfSquaredError)
         )
@@ -99,14 +100,14 @@ class AdamBackpropagationTest {
                     val x3 = intX3.toDouble() / 12.0
                     val target1 = 1.5 + x1 + 2.0 * x2 + 0.5 * x3.pow(2)
                     val target2 = x1.pow(2) + x2 - x3
-                    estimator.observe(Vector(x1, x2, x3), Vector(target1, target2))
+                    optimizer.observe(Vector(x1, x2, x3), Vector(target1, target2))
                 }
             }
         }
 
         val estimate = network.evaluate(Vector(0.5, 1.5, 1.0))
-        assertTrue(abs(5.5 - estimate[0]) < 0.6)
-        assertTrue(abs(0.75 - estimate[1]) < 0.1)
+        assertApproxEquals(5.5, estimate[0], 0.6)
+        assertApproxEquals(0.75, estimate[1], 0.1)
     }
 
     @Test
@@ -129,7 +130,7 @@ class AdamBackpropagationTest {
             )
         )
 
-        val estimator = AdamBackpropagation(
+        val optimizer = AdamBackpropagation(
             network = network,
             costFunction = SumCost(HalfSquaredError)
         )
@@ -143,7 +144,7 @@ class AdamBackpropagationTest {
                         Vector(1, 0)
                     else
                         Vector(0, 1)
-                estimator.observe(Vector(x1, x2), target)
+                optimizer.observe(Vector(x1, x2), target)
             }
         }
 
@@ -157,9 +158,43 @@ class AdamBackpropagationTest {
 
         // Test observeAndEvalute().
         val prevWeights = network.layers.first().neurons.first().weights.coeffs.copy()
-        val observeAndEvaluate = estimator.observeAndEvaluate(Vector(0.8, 0.2), Vector(0.9, 0.1))
+        val observeAndEvaluate = optimizer.observeAndEvaluate(Vector(0.8, 0.2), Vector(0.9, 0.1))
         assertTrue(observeAndEvaluate[1] > 0.85)
         assertTrue(observeAndEvaluate[0] + observeAndEvaluate[1] == 1.0)
         assertNotEquals(prevWeights, network.layers.first().neurons.first().weights.coeffs)
+    }
+
+    @Test
+    fun `batchObserveAndEvaluate() updates weights after batch`() {
+        val network = FeedforwardNeuralNetwork(
+            stepSize = 0.1,
+            layers = arrayOf(
+                NeuralLayer(
+                    neuronCount = 1,
+                    activationFunction = IdentityFunction,
+                    regressorCount = 1,
+                    includeConstant = false,
+                    sampler = UniformSampler(1.0))
+            )
+        )
+        val optimizer = AdamBackpropagation(
+            network = network,
+            costFunction = SumCost(HalfSquaredError)
+        )
+
+        assertApproxEquals(
+            Vector(Vector(1), Vector(2), Vector(3)),
+            optimizer.batchObserveAndEvaluate(
+                Vector(Vector(1), Vector(2), Vector(3)),
+                Vector(Vector(2), Vector(4), Vector(6))
+            )
+        )
+        assertEquals(
+            Vector(Vector(1.2680597213646203), Vector(2.5361194427292406), Vector(3.8041791640938607)),
+            optimizer.batchObserveAndEvaluate(
+                Vector(Vector(1), Vector(2), Vector(3)),
+                Vector(Vector(2), Vector(4), Vector(6))
+            )
+        )
     }
 }

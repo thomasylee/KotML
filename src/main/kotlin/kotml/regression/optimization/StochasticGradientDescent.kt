@@ -1,5 +1,7 @@
 package kotml.regression.optimization
 
+import kotml.distributions.DistributionSampler
+import kotml.distributions.UniformSampler
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.Weights
@@ -25,12 +27,13 @@ class StochasticGradientDescent(
         lossFunction: LossFunction,
         regressorCount: Int,
         hasConstant: Boolean = true,
-        aggregationFunction: AggregationFunction = DotProduct
+        aggregationFunction: AggregationFunction = DotProduct,
+        sampler: DistributionSampler = UniformSampler(0.0)
     ) : this(
         stepSize = stepSize,
         function = function,
         lossFunction = lossFunction,
-        weights = Weights(regressorCount, hasConstant),
+        weights = Weights(regressorCount, hasConstant, sampler),
         aggregationFunction = aggregationFunction
     )
 
@@ -38,9 +41,31 @@ class StochasticGradientDescent(
         observeAndEvaluate(regressors, targets)
     }
 
-    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Double {
+    /**
+     * Adjusts weights in batches, where each row of regressorsBatch and
+     * targetsBatch is an observation of regressors and targets. The
+     * weights are updated as if they were updated at the completion of the
+     * batch rather than at the completion of each observation.
+     * @param regressorsBatch batch of regressors, shape = (batchSize, numRegressors)
+     * @param targetsBatch batch of targets, shape = (batchSize, numTargets)
+     */
+    override fun batchObserveAndEvaluate(regressorsBatch: Vector, targetsBatch: Vector): Vector {
+        val currentWeights = weights.copy()
+        return Vector(regressorsBatch.shape[0]) { batchIndex ->
+            observeAndEvaluate(
+                currentWeights,
+                regressorsBatch(batchIndex),
+                targetsBatch(batchIndex)
+            )
+        }
+    }
+
+    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Double =
+        observeAndEvaluate(weights, regressors, targets)
+
+    private fun observeAndEvaluate(evaluatingWeights: Weights, regressors: Vector, targets: Vector): Double {
         val estimate = function.evaluate(
-            aggregationFunction.aggregate(weights, regressors)
+            aggregationFunction.aggregate(evaluatingWeights, regressors)
         )
         val dF_dIn = lossFunction.derivative(estimate, targets[0])
         val dIn_dWeight = aggregationFunction.weightsGradient(weights, regressors)

@@ -55,7 +55,29 @@ class AdamBackpropagation(
         observeAndEvaluate(regressors, targets)
     }
 
-    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Vector {
+    /**
+     * Adjusts weights in batches, where each row of regressorsBatch and
+     * targetsBatch is an observation of regressors and targets. The
+     * network is updated as if the batch weights update at the completion
+     * of the batch rather than at the completion of each observation.
+     * @param regressorsBatch batch of regressors, shape = (batchSize, numRegressors)
+     * @param targetsBatch batch of targets, shape = (batchSize, numTargets)
+     */
+    override fun batchObserveAndEvaluate(regressorsBatch: Vector, targetsBatch: Vector): Vector {
+        val currentNetwork = network.copy()
+        return Vector.ofVectors(regressorsBatch.shape[0]) { batchIndex ->
+            observeAndEvaluate(
+                currentNetwork,
+                regressorsBatch(batchIndex),
+                targetsBatch(batchIndex)
+            )
+        }
+    }
+
+    override fun observeAndEvaluate(regressors: Vector, targets: Vector): Vector =
+        observeAndEvaluate(network, regressors, targets)
+
+    private fun observeAndEvaluate(evaluatingNetwork: FeedforwardNeuralNetwork, regressors: Vector, targets: Vector): Vector {
         betaMProduct *= betaM
         betaVProduct *= betaV
 
@@ -63,7 +85,7 @@ class AdamBackpropagation(
         val outputs = mutableListOf<Vector>()
         val dIn_dOuts = mutableListOf<List<Vector>>()
         val dIn_dWeights = mutableListOf<List<Weights>>()
-        network.layers.forEachIndexed { layerIndex, layer ->
+        evaluatingNetwork.layers.forEachIndexed { layerIndex, layer ->
             val input: Vector =
                 if (layerIndex == 0)
                     regressors

@@ -1,9 +1,13 @@
 package kotml.regression.optimization
 
+import kotml.TestUtils.assertApproxEquals
+import kotml.distributions.UniformSampler
 import kotml.math.Vector
 import kotml.regression.Weights
+import kotml.regression.cost.loss.HalfSquaredError
 import kotml.regression.cost.loss.SquaredError
 import kotml.regression.functions.IdentityFunction
+import kotml.regression.functions.aggregation.DotProduct
 import kotml.regression.functions.aggregation.Polynomial
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -80,6 +84,21 @@ class StochasticGradientDescentTest {
             estimator.aggregationFunction.aggregate(
                 estimator.weights, Vector(5.0)
             )
+        ))
+    }
+
+    @Test
+    fun `batchObserveAndEvaluate() updates weights after batch`() {
+        val estimator = StochasticGradientDescent(
+            0.1, IdentityFunction, HalfSquaredError, 1, false, DotProduct, UniformSampler(1.0)
+        )
+        assertEquals(Vector(1, 2, 3), estimator.batchObserveAndEvaluate(
+            Vector(Vector(1), Vector(2), Vector(3)),
+            Vector(Vector(2), Vector(4), Vector(6))
+        ))
+        assertApproxEquals(Vector(2.4, 4.8, 7.2), estimator.batchObserveAndEvaluate(
+            Vector(Vector(1), Vector(2), Vector(3)),
+            Vector(Vector(2), Vector(4), Vector(6))
         ))
     }
 }

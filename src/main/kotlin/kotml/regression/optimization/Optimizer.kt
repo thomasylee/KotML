@@ -50,6 +50,15 @@ abstract class IterativeOptimizer<M, V>(
      * @return evaluated dependent variable values
      */
     abstract fun observeAndEvaluate(regressors: Vector, targets: Vector): V
+
+    /**
+     * Returns the evaluated output of the optimizer while also optimizing
+     * the output and targets as a single batch.
+     * @param regressorsBatch batch of regressors
+     * @param targetsBatch batch of targets
+     * @return evaluated batches
+     */
+    abstract fun batchObserveAndEvaluate(regressorsBatch: Vector, targetsBatch: Vector): Vector
 }
 
 /**

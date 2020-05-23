@@ -1,8 +1,8 @@
 package kotml.regression.optimization.backpropagation
 
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.random.Random
+import kotml.TestUtils.assertApproxEquals
 import kotml.distributions.NormalSampler
 import kotml.distributions.UniformSampler
 import kotml.math.Vector
@@ -46,7 +46,7 @@ class StochasticBackpropagationTest {
             )
         )
 
-        val estimator = StochasticBackpropagation(
+        val optimizer = StochasticBackpropagation(
             network = network,
             costFunction = SumCost(SquaredError)
         )
@@ -55,12 +55,12 @@ class StochasticBackpropagationTest {
         (-1000..1000).shuffled(rand).forEach { intX ->
             val x = intX.toDouble() / 100.0
             val target = -1.0 + 2.0 * x
-            estimator.observe(Vector(x), Vector(target))
+            optimizer.observe(Vector(x), Vector(target))
         }
 
-        assertTrue(abs(-1.0 - network.evaluate(Vector(0))[0]) < 0.001)
-        assertTrue(abs(3.0 - network.evaluate(Vector(2))[0]) < 0.001)
-        assertTrue(abs(9.0 - network.evaluate(Vector(5))[0]) < 0.001)
+        assertApproxEquals(-1.0, network.evaluate(Vector(0))[0], 0.001)
+        assertApproxEquals(3.0, network.evaluate(Vector(2))[0], 0.001)
+        assertApproxEquals(9.0, network.evaluate(Vector(5))[0], 0.001)
     }
 
     @Test
@@ -87,7 +87,7 @@ class StochasticBackpropagationTest {
             )
         )
 
-        val estimator = StochasticBackpropagation(
+        val optimizer = StochasticBackpropagation(
             network = network,
             costFunction = MeanCost(HalfSquaredError)
         )
@@ -102,14 +102,14 @@ class StochasticBackpropagationTest {
                     val x3 = intX3.toDouble() / 10.0
                     val target1 = 1.5 + x1 + 2.0 * x2 + 0.5 * x3.pow(2)
                     val target2 = x1.pow(2) + x2 - x3
-                    estimator.observe(Vector(x1, x2, x3), Vector(target1, target2))
+                    optimizer.observe(Vector(x1, x2, x3), Vector(target1, target2))
                 }
             }
         }
 
         val estimate = network.evaluate(Vector(0.5, 1.5, 1.0))
-        assertTrue(abs(5.5 - estimate[0]) < 0.6)
-        assertTrue(abs(0.75 - estimate[1]) < 0.05)
+        assertApproxEquals(5.5, estimate[0], 0.6)
+        assertApproxEquals(0.75, estimate[1], 0.05)
     }
 
     @Test
@@ -132,7 +132,7 @@ class StochasticBackpropagationTest {
             )
         )
 
-        val estimator = StochasticBackpropagation(
+        val optimizer = StochasticBackpropagation(
             network = network,
             costFunction = SumCost(HalfSquaredError)
         )
@@ -146,7 +146,7 @@ class StochasticBackpropagationTest {
                         Vector(1, 0)
                     else
                         Vector(0, 1)
-                estimator.observe(Vector(x1, x2), target)
+                optimizer.observe(Vector(x1, x2), target)
             }
         }
 
@@ -160,9 +160,43 @@ class StochasticBackpropagationTest {
 
         // Test observeAndEvalute().
         val prevWeights = network.layers.first().neurons.first().weights.coeffs.copy()
-        val observeAndEvaluate = estimator.observeAndEvaluate(Vector(0.8, 0.2), Vector(0.9, 0.1))
+        val observeAndEvaluate = optimizer.observeAndEvaluate(Vector(0.8, 0.2), Vector(0.9, 0.1))
         assertTrue(observeAndEvaluate[1] > 0.85)
         assertTrue(observeAndEvaluate[0] + observeAndEvaluate[1] == 1.0)
         assertNotEquals(prevWeights, network.layers.first().neurons.first().weights.coeffs)
+    }
+
+    @Test
+    fun `batchObserveAndEvaluate() updates weights after batch`() {
+        val network = FeedforwardNeuralNetwork(
+            stepSize = 0.1,
+            layers = arrayOf(
+                NeuralLayer(
+                    neuronCount = 1,
+                    activationFunction = IdentityFunction,
+                    regressorCount = 1,
+                    includeConstant = false,
+                    sampler = UniformSampler(1.0))
+            )
+        )
+        val optimizer = StochasticBackpropagation(
+            network = network,
+            costFunction = SumCost(HalfSquaredError)
+        )
+
+        assertApproxEquals(
+            Vector(Vector(1), Vector(2), Vector(3)),
+            optimizer.batchObserveAndEvaluate(
+                Vector(Vector(1), Vector(2), Vector(3)),
+                Vector(Vector(2), Vector(4), Vector(6))
+            )
+        )
+        assertApproxEquals(
+            Vector(Vector(2.4), Vector(4.8), Vector(7.2)),
+            optimizer.batchObserveAndEvaluate(
+                Vector(Vector(1), Vector(2), Vector(3)),
+                Vector(Vector(2), Vector(4), Vector(6))
+            )
+        )
     }
 }

@@ -4,12 +4,12 @@ import kotml.math.Vector
 
 abstract class TabularAgentBaseTest {
     /**
-     * Build a 20-step random walk starting at the left end and receiving a
+     * Build a 10-step corridor starting at the left end and receiving a
      * reward of 1 at the right end.
      * Actions are (left, right), in order.
      * The policy should learn to move right in every state.
      */
-    fun trainOn10StepRandomWalk(agent: TabularAgent, numTrials: Int) {
+    fun trainOn10StepCorridor(agent: TabularAgent, numTrials: Int) {
         val terminalLoc = 9
         val terminalReward = 1.0
         (1..numTrials).forEach {

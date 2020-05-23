@@ -80,7 +80,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
                 random = random
             )
         )
-        trainOn10StepRandomWalk(agent, 10)
+        trainOn10StepCorridor(agent, 10)
 
         (0 until 10).forEach { state ->
             assertEquals(1, agent.q(state).argmax(random))
@@ -110,7 +110,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
                 random = random
             )
         )
-        trainOn10StepRandomWalk(agent, 5)
+        trainOn10StepCorridor(agent, 5)
 
         (0 until 10).forEach { state ->
             assertEquals(1, agent.q(state).argmax(random))

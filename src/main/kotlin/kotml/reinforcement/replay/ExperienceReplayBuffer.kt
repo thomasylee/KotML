@@ -7,7 +7,7 @@ import kotml.math.Vector
  * `ExperienceReplayBuffer` stores experiences and allows for random
  * sampling of the experiences in batches.
  */
-class ExperienceReplayBuffer(val maxSize: Int = 10_000) {
+class ExperienceReplayBuffer(val maxSize: Int = 1_000_000) {
     val experiences = mutableListOf<Experience>()
     var size: Int = 0
 

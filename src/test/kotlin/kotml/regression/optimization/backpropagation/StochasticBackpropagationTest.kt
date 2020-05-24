@@ -21,34 +21,30 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class StochasticBackpropagationTest {
-    // It's completely unnecessary to use multiple layers of linear
-    // functions, but it's straightforward to debug.
     @Test
     fun `calculates weights correctly with linear functions`() {
-        val network = FeedforwardNeuralNetwork(
-            stepSize = 0.001,
-            layers = arrayOf(
-                NeuralLayer(
-                    neuronCount = 1,
-                    activationFunction = IdentityFunction,
-                    regressorCount = 1,
-                    sampler = UniformSampler(0.1)),
-                NeuralLayer(
-                    neuronCount = 2,
-                    activationFunction = IdentityFunction,
-                    regressorCount = 1,
-                    sampler = UniformSampler(0.1)),
-                NeuralLayer(
-                    neuronCount = 1,
-                    activationFunction = IdentityFunction,
-                    regressorCount = 2,
-                    sampler = UniformSampler(0.1))
-            )
-        )
+        val network = FeedforwardNeuralNetwork(arrayOf(
+            NeuralLayer(
+                neuronCount = 1,
+                activationFunction = IdentityFunction,
+                regressorCount = 1,
+                sampler = UniformSampler(0.1)),
+            NeuralLayer(
+                neuronCount = 2,
+                activationFunction = IdentityFunction,
+                regressorCount = 1,
+                sampler = UniformSampler(0.1)),
+            NeuralLayer(
+                neuronCount = 1,
+                activationFunction = IdentityFunction,
+                regressorCount = 2,
+                sampler = UniformSampler(0.1))
+        ))
 
         val optimizer = StochasticBackpropagation(
             network = network,
-            costFunction = SumCost(SquaredError)
+            costFunction = SumCost(SquaredError),
+            stepSize = 0.001
         )
 
         val rand = Random(0)
@@ -66,30 +62,28 @@ class StochasticBackpropagationTest {
     @Test
     fun `calculates weights correctly with layers of different functions`() {
         val rand = Random(0)
-        val network = FeedforwardNeuralNetwork(
-            stepSize = 0.01,
-            layers = arrayOf(
-                NeuralLayer(
-                    neuronCount = 3,
-                    activationFunction = LogisticFunction,
-                    regressorCount = 3,
-                    sampler = NormalSampler(stdev = 2.0, random = rand)),
-                NeuralLayer(
-                    neuronCount = 3,
-                    activationFunction = ReLU,
-                    regressorCount = 3,
-                    sampler = NormalSampler(stdev = 2.0, random = rand)),
-                NeuralLayer(
-                    neuronCount = 2,
-                    activationFunction = IdentityFunction,
-                    regressorCount = 3,
-                    sampler = NormalSampler(stdev = 2.0, random = rand))
-            )
-        )
+        val network = FeedforwardNeuralNetwork(arrayOf(
+            NeuralLayer(
+                neuronCount = 3,
+                activationFunction = LogisticFunction,
+                regressorCount = 3,
+                sampler = NormalSampler(stdev = 2.0, random = rand)),
+            NeuralLayer(
+                neuronCount = 3,
+                activationFunction = ReLU,
+                regressorCount = 3,
+                sampler = NormalSampler(stdev = 2.0, random = rand)),
+            NeuralLayer(
+                neuronCount = 2,
+                activationFunction = IdentityFunction,
+                regressorCount = 3,
+                sampler = NormalSampler(stdev = 2.0, random = rand))
+        ))
 
         val optimizer = StochasticBackpropagation(
             network = network,
-            costFunction = MeanCost(HalfSquaredError)
+            costFunction = MeanCost(HalfSquaredError),
+            stepSize = 0.01
         )
 
         // out1(x1, x2, x3) = 1.5 + x1 + 2 * x2 + 0.5 * x3^2
@@ -115,26 +109,24 @@ class StochasticBackpropagationTest {
     @Test
     fun `backpropagates with softmax correctly`() {
         val rand = Random(0)
-        val network = FeedforwardNeuralNetwork(
-            stepSize = 0.01,
-            layers = arrayOf(
-                NeuralLayer(
-                    neuronCount = 2,
-                    activationFunction = Tanh,
-                    regressorCount = 2,
-                    sampler = NormalSampler(random = rand)),
-                NeuralLayer(
-                    neuronCount = 2,
-                    activationFunction = Tanh,
-                    regressorCount = 2,
-                    sampler = NormalSampler(random = rand)),
-                NeuralLayer.softmax(2)
-            )
-        )
+        val network = FeedforwardNeuralNetwork(arrayOf(
+            NeuralLayer(
+                neuronCount = 2,
+                activationFunction = Tanh,
+                regressorCount = 2,
+                sampler = NormalSampler(random = rand)),
+            NeuralLayer(
+                neuronCount = 2,
+                activationFunction = Tanh,
+                regressorCount = 2,
+                sampler = NormalSampler(random = rand)),
+            NeuralLayer.softmax(2)
+        ))
 
         val optimizer = StochasticBackpropagation(
             network = network,
-            costFunction = SumCost(HalfSquaredError)
+            costFunction = SumCost(HalfSquaredError),
+            stepSize = 0.01
         )
 
         (0..100).shuffled(rand).forEach { intX1 ->
@@ -168,20 +160,18 @@ class StochasticBackpropagationTest {
 
     @Test
     fun `batchObserveAndEvaluate() updates weights after batch`() {
-        val network = FeedforwardNeuralNetwork(
-            stepSize = 0.1,
-            layers = arrayOf(
-                NeuralLayer(
-                    neuronCount = 1,
-                    activationFunction = IdentityFunction,
-                    regressorCount = 1,
-                    includeConstant = false,
-                    sampler = UniformSampler(1.0))
-            )
-        )
+        val network = FeedforwardNeuralNetwork(arrayOf(
+            NeuralLayer(
+                neuronCount = 1,
+                activationFunction = IdentityFunction,
+                regressorCount = 1,
+                includeConstant = false,
+                sampler = UniformSampler(1.0))
+        ))
         val optimizer = StochasticBackpropagation(
             network = network,
-            costFunction = SumCost(HalfSquaredError)
+            costFunction = SumCost(HalfSquaredError),
+            stepSize = 0.1
         )
 
         assertApproxEquals(

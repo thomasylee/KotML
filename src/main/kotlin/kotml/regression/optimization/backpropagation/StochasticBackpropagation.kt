@@ -10,7 +10,8 @@ import kotml.regression.optimization.IterativeOptimizer
 
 class StochasticBackpropagation(
     val network: FeedforwardNeuralNetwork,
-    val costFunction: CostFunction
+    val costFunction: CostFunction,
+    val stepSize: Double
 ) : IterativeOptimizer<FeedforwardNeuralNetwork, Vector>(
     regressorCount = network.layers.first().neurons.first().weights.coeffs.shape[0],
     outputCount = network.layers.last().neurons.size,
@@ -85,13 +86,13 @@ class StochasticBackpropagation(
                 new_dErr_dIn[neuronIndex] = dErr_dOut * dOut_dIn
 
                 if (neuron.weights.hasConstant) {
-                    neuron.weights.constant -= network.stepSize *
+                    neuron.weights.constant -= stepSize *
                         dErr_dOut *
                         dOut_dIn *
                         dIn_dWeights[layerIndex][neuronIndex].constant
                 }
                 inputs[layerIndex].forEachIndexed { coeffIndex, _ ->
-                    neuron.weights.coeffs[coeffIndex] -= network.stepSize *
+                    neuron.weights.coeffs[coeffIndex] -= stepSize *
                         dErr_dOut *
                         dOut_dIn *
                         dIn_dWeights[layerIndex][neuronIndex].coeffs[coeffIndex]

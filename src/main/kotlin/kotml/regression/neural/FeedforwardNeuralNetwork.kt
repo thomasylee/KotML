@@ -18,7 +18,6 @@ import kotml.regression.neural.initialization.XavierInitializer
  * output layer).
  */
 class FeedforwardNeuralNetwork(
-    val stepSize: Double,
     val layers: Array<NeuralLayer>
 ) {
     init {
@@ -34,7 +33,6 @@ class FeedforwardNeuralNetwork(
      * @param sampler distribution sampler to generate initial weights
      */
     constructor(
-        stepSize: Double,
         inputCount: Int,
         layerSizes: IntArray,
         activationFunction: FunctionModel,
@@ -46,7 +44,6 @@ class FeedforwardNeuralNetwork(
             else
                 XavierInitializer
     ) : this(
-        stepSize,
         Array<NeuralLayer>(layerSizes.size) { index ->
             val regressorCount = layerSizes.getOrElse(index - 1) { inputCount }
             NeuralLayer(Array<Neuron>(layerSizes[index]) {
@@ -78,8 +75,7 @@ class FeedforwardNeuralNetwork(
      * @return copy of the neural network
      */
     fun copy(): FeedforwardNeuralNetwork = FeedforwardNeuralNetwork(
-        stepSize = stepSize,
-        layers = Array<NeuralLayer>(layers.size) { layers[it].copy() }
+        Array<NeuralLayer>(layers.size) { layers[it].copy() }
     )
 
     /**

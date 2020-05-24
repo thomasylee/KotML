@@ -23,8 +23,7 @@ class FeedforwardNeuralNetworkTest {
             )
         })
         val network = FeedforwardNeuralNetwork(
-            stepSize = 0.1,
-            layers = arrayOf(hiddenLayer, outputLayer)
+            arrayOf(hiddenLayer, outputLayer)
         )
         // Input: [2]
         // Hidden layer: [0 - 0.25 * 2 => 0, 1 - 0.25 * 2 => 0.5]
@@ -34,7 +33,7 @@ class FeedforwardNeuralNetworkTest {
 
     @Test
     fun `copy() returns a copy of the neural network`() {
-        val original = FeedforwardNeuralNetwork(0.1, 1, intArrayOf(1), ReLU)
+        val original = FeedforwardNeuralNetwork(1, intArrayOf(1), ReLU)
         var copy = original.copy()
         assertEquals(original, copy)
         original.layers.first().neurons.first().weights.coeffs[0] += 1.0
@@ -54,8 +53,7 @@ class FeedforwardNeuralNetworkTest {
     @Test
     fun `updateWeights() updates the weights to the network's weights`() {
         val network = FeedforwardNeuralNetwork(
-            stepSize = 0.1,
-            layers = arrayOf(
+            arrayOf(
                 NeuralLayer(arrayOf(
                     Neuron(
                         activationFunction = ReLU,
@@ -66,8 +64,7 @@ class FeedforwardNeuralNetworkTest {
         )
         val newWeights = Weights(5.0, Vector(6, 7))
         network.updateWeights(FeedforwardNeuralNetwork(
-            stepSize = 0.1,
-            layers = arrayOf(
+            arrayOf(
                 NeuralLayer(arrayOf(
                     Neuron(
                         activationFunction = ReLU,

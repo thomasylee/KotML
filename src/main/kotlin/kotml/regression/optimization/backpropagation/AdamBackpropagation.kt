@@ -13,6 +13,7 @@ import kotml.regression.optimization.IterativeOptimizer
 class AdamBackpropagation(
     val network: FeedforwardNeuralNetwork,
     val costFunction: CostFunction,
+    val stepSize: Double,
     val betaM: Double = 0.99,
     val betaV: Double = 0.999,
     val epsilon: Double = 0.0001
@@ -135,7 +136,7 @@ class AdamBackpropagation(
                             ).pow(2)
                     val mHat = m[layerIndex][neuronIndex].constant / (1 - betaMProduct)
                     val vHat = v[layerIndex][neuronIndex].constant / (1 - betaVProduct)
-                    neuron.weights.constant -= network.stepSize * mHat / (sqrt(vHat) + epsilon)
+                    neuron.weights.constant -= stepSize * mHat / (sqrt(vHat) + epsilon)
                 }
                 inputs[layerIndex].forEachIndexed { coeffIndex, _ ->
                     m[layerIndex][neuronIndex].coeffs[coeffIndex] =
@@ -151,7 +152,7 @@ class AdamBackpropagation(
                     val mHat = m[layerIndex][neuronIndex].coeffs[coeffIndex] / (1 - betaMProduct)
                     val vHat = v[layerIndex][neuronIndex].coeffs[coeffIndex] / (1 - betaVProduct)
 
-                    neuron.weights.coeffs[coeffIndex] -= network.stepSize * mHat / (sqrt(vHat) + epsilon)
+                    neuron.weights.coeffs[coeffIndex] -= stepSize * mHat / (sqrt(vHat) + epsilon)
                 }
             }
 

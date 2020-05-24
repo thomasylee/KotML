@@ -46,4 +46,22 @@ class NeuralLayerTest {
         original.neurons.first().weights.coeffs[0] += 1.0
         assertNotEquals(original, copy)
     }
+
+    @Test
+    fun `updateWeights() copies the layer's weights`() {
+        val layer = NeuralLayer(arrayOf(
+            Neuron(
+                activationFunction = ReLU,
+                weights = Weights(1.0, Vector(2))
+            )
+        ))
+        val newLayer = NeuralLayer(arrayOf(
+            Neuron(
+                activationFunction = ReLU,
+                weights = Weights(3.0, Vector(4))
+            )
+        ))
+        layer.updateWeights(newLayer)
+        assertEquals(Weights(3.0, Vector(4)), layer.neurons.first().weights)
+    }
 }

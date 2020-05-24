@@ -50,4 +50,32 @@ class FeedforwardNeuralNetworkTest {
         original.layers[0] = NeuralLayer(arrayOf(Neuron(ReLU, Weights(Vector(10)))))
         assertNotEquals(original, copy)
     }
+
+    @Test
+    fun `updateWeights() updates the weights to the network's weights`() {
+        val network = FeedforwardNeuralNetwork(
+            stepSize = 0.1,
+            layers = arrayOf(
+                NeuralLayer(arrayOf(
+                    Neuron(
+                        activationFunction = ReLU,
+                        weights = Weights(1.0, Vector(2, 3))
+                    )
+                ))
+            )
+        )
+        val newWeights = Weights(5.0, Vector(6, 7))
+        network.updateWeights(FeedforwardNeuralNetwork(
+            stepSize = 0.1,
+            layers = arrayOf(
+                NeuralLayer(arrayOf(
+                    Neuron(
+                        activationFunction = ReLU,
+                        weights = newWeights
+                    )
+                ))
+            )
+        ))
+        assertEquals(newWeights, network.layers.first().neurons.first().weights)
+    }
 }

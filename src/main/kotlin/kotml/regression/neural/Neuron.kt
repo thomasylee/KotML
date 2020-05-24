@@ -49,6 +49,18 @@ class Neuron(
     )
 
     /**
+     * Sets this neuron's weights to the provided weights.
+     * @param newWeights weights to which this neuron's weights should be set
+     */
+    fun updateWeights(newWeights: Weights) {
+        if (weights.hasConstant && newWeights.hasConstant)
+            weights.constant = newWeights.constant
+        (0 until weights.coeffs.shape[0]).forEach { index ->
+            weights.coeffs[index] = newWeights.coeffs[index]
+        }
+    }
+
+    /**
      * Returns true if `other` is an equivalent `Neuron`.
      * @param other nullable object to compare to this one
      * @return true if other is an equivalent Neuron, or false otherwise

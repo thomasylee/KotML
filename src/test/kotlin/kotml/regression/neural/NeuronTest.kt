@@ -26,4 +26,18 @@ class NeuronTest {
         original.weights.coeffs[0] += 1.0
         assertNotEquals(original, copy)
     }
+
+    @Test
+    fun `updateWeights() copies the weights`() {
+        val neuron = Neuron(ReLU, Weights(2.0, Vector(3)))
+        val newWeights = Weights(5.0, Vector(4))
+
+        neuron.updateWeights(newWeights)
+        assertEquals(newWeights, neuron.weights)
+
+        newWeights.constant = 10.0
+        newWeights.coeffs[0] = 20.0
+        assertEquals(Weights(10.0, Vector(20)), newWeights)
+        assertEquals(Weights(5.0, Vector(4)), neuron.weights)
+    }
 }

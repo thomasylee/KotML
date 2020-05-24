@@ -76,6 +76,16 @@ class NeuralLayer(val neurons: Array<Neuron>) {
     })
 
     /**
+     * Copies the weights in `layer` to the weights of this layer's neurons.
+     * @param layer layer whose weights should be copied
+     */
+    fun updateWeights(layer: NeuralLayer) {
+        neurons.forEachIndexed { index, neuron ->
+            neuron.updateWeights(layer.neurons[index].weights)
+        }
+    }
+
+    /**
      * Returns true if `other` is an equivalent `NeuralLayer`.
      * @param other nullable object to compare to this one
      * @return true if other is an equivalent NeuralLayer, false otherwise

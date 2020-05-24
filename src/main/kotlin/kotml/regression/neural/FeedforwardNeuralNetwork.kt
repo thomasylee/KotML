@@ -83,6 +83,16 @@ class FeedforwardNeuralNetwork(
     )
 
     /**
+     * Copies the weights of `network` into this network's neurons.
+     * @param network network whose weights should be copied
+     */
+    fun updateWeights(network: FeedforwardNeuralNetwork) {
+        layers.forEachIndexed { index, layer ->
+            layer.updateWeights(network.layers[index])
+        }
+    }
+
+    /**
      * Returns true if `other` is an equivalent `FeedforwardNeuralNetwork`.
      * @param other nullable object to compare to this one
      * @return true if other is an equivalent FeedforwardNeuralNetwork, or

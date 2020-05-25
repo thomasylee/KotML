@@ -15,8 +15,7 @@ class ExperienceReplayBuffer(val maxSize: Int = 1_000_000) {
         val state: Vector,
         val action: Int,
         val reward: Double,
-        val nextState: Vector,
-        val isTerminal: Boolean
+        val nextState: Vector?
     )
 
     /**
@@ -24,15 +23,15 @@ class ExperienceReplayBuffer(val maxSize: Int = 1_000_000) {
      * @param state previous state
      * @param action action taken in the previous state
      * @param reward reward from taking the action in the previous state
-     * @param nextState next state after having take the action
-     * @param isTerminal true if the nextState is a terminal state, false otherwise
+     * @param nextState next state after having take the action, or null if
+     *   nextState is a terminal state
      */
-    fun append(state: Vector, action: Int, reward: Double, nextState: Vector, isTerminal: Boolean) {
+    fun append(state: Vector, action: Int, reward: Double, nextState: Vector?) {
         if (size == maxSize)
             experiences.removeAt(0)
         else
             size++
-        experiences.add(Experience(state, action, reward, nextState, isTerminal))
+        experiences.add(Experience(state, action, reward, nextState))
     }
 
     /**

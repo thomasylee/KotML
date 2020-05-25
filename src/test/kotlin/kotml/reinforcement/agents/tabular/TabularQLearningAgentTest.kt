@@ -58,7 +58,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
     }
 
     @Test
-    fun `finds optimal path in 10-step random walk with DynaQPlus`() {
+    fun `finds optimal path in 10-step corridor with DynaQPlus`() {
         val random = Random(0)
         val agent = TabularQLearningAgent(
             numStates = 10,
@@ -88,7 +88,7 @@ class TabularQLearningAgentTest : TabularAgentBaseTest() {
     }
 
     @Test
-    fun `finds optimal path in 10-step random walk with PrioritizedDynaQPlus`() {
+    fun `finds optimal path in 10-step corridor with PrioritizedDynaQPlus`() {
         val random = Random(0)
         val agent = TabularQLearningAgent(
             numStates = 10,

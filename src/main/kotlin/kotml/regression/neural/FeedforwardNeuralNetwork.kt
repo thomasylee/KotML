@@ -1,5 +1,6 @@
 package kotml.regression.neural
 
+import kotlin.random.Random
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionException
@@ -42,7 +43,8 @@ class FeedforwardNeuralNetwork(
             if (activationFunction is ReLU || activationFunction is PReLU)
                 HeInitializer
             else
-                XavierInitializer
+                XavierInitializer,
+        random: Random = Random
     ) : this(
         Array<NeuralLayer>(layerSizes.size) { index ->
             val regressorCount = layerSizes.getOrElse(index - 1) { inputCount }
@@ -51,7 +53,7 @@ class FeedforwardNeuralNetwork(
                     activationFunction = activationFunction,
                     regressorCount = regressorCount,
                     includeConstant = includeConstant,
-                    sampler = initializer.sampler(regressorCount, layerSizes[index]),
+                    sampler = initializer.sampler(regressorCount, layerSizes[index], random),
                     aggregationFunction = aggregationFunction
                 )
             })

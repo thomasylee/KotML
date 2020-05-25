@@ -29,17 +29,18 @@ class DeepQNetworkTest {
             discount = 1.0,
             stepSize = 0.1,
             targetNetworkUpdateFrequency = 3,
-            minibatchSize = 2
+            minibatchSize = 2,
+            random = random
         )
-        dqn.learn(Vector(1), 0, 1.0, Vector(0), false, random)
+        dqn.learn(Vector(1), 0, 1.0, null)
 
         assertEquals(Vector(0), dqn.targetNetwork.evaluate(Vector(1)))
         assertApproxEquals(Vector(0.1), dqn.network.evaluate(Vector(1)), 0.0001)
         assertApproxEquals(Vector(0.1), dqn.evaluate(Vector(1)), 0.0001)
 
-        dqn.learn(Vector(1), 0, 2.0, Vector(0), false, random)
-        assertApproxEquals(Vector(0.2888502494508579), dqn.targetNetwork.evaluate(Vector(1)), 0.001)
-        assertApproxEquals(Vector(0.2888502494508579), dqn.network.evaluate(Vector(1)), 0.001)
-        assertApproxEquals(Vector(0.2888502494508579), dqn.evaluate(Vector(1)), 0.001)
+        dqn.learn(Vector(1), 0, 2.0, null)
+        assertApproxEquals(Vector(0.29505415218356185), dqn.targetNetwork.evaluate(Vector(1)), 0.001)
+        assertApproxEquals(Vector(0.29505415218356185), dqn.network.evaluate(Vector(1)), 0.001)
+        assertApproxEquals(Vector(0.29505415218356185), dqn.evaluate(Vector(1)), 0.001)
     }
 }

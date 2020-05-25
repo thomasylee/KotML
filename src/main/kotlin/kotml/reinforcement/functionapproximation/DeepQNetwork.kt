@@ -22,7 +22,8 @@ class DeepQNetwork(
     val optimizer: IterativeOptimizer<FeedforwardNeuralNetwork, Vector>,
     val targetNetworkUpdateFrequency: Int = 10_000,
     val minibatchSize: Int = 32,
-    val replayBuffer: ExperienceReplayBuffer = ExperienceReplayBuffer()
+    val replayBuffer: ExperienceReplayBuffer = ExperienceReplayBuffer(),
+    val random: Random = Random
 ) {
     val numActions = network.layers.last().neurons.size
     val targetNetwork = network.copy()
@@ -34,7 +35,8 @@ class DeepQNetwork(
         stepSize: Double,
         targetNetworkUpdateFrequency: Int = 10_000,
         minibatchSize: Int = 32,
-        replayBuffer: ExperienceReplayBuffer = ExperienceReplayBuffer()
+        replayBuffer: ExperienceReplayBuffer = ExperienceReplayBuffer(),
+        random: Random = Random
     ) : this(
         network = network,
         discount = discount,
@@ -45,7 +47,8 @@ class DeepQNetwork(
         ),
         targetNetworkUpdateFrequency = targetNetworkUpdateFrequency,
         minibatchSize = minibatchSize,
-        replayBuffer = replayBuffer
+        replayBuffer = replayBuffer,
+        random = random
     )
 
     /**
@@ -64,18 +67,16 @@ class DeepQNetwork(
         state: Vector,
         action: Int,
         reward: Double,
-        nextState: Vector,
-        isTerminal: Boolean,
-        random: Random = Random
+        nextState: Vector?
     ) {
-        replayBuffer.append(state, action, reward, nextState, isTerminal)
+        replayBuffer.append(state, action, reward, nextState)
 
         replayBuffer.sample(minibatchSize, random).forEach { experience ->
             val target =
-                if (experience.isTerminal) {
+                if (experience.nextState == null) {
                     Vector(numActions) { experience.reward }
                 } else {
-                    val evaluatedTarget = targetNetwork.evaluate(nextState)
+                    val evaluatedTarget = targetNetwork.evaluate(experience.nextState)
                     val nextAction = evaluatedTarget.argmax(random)
                     val nextQ = Vector(numActions) { action ->
                         if (action == nextAction)
@@ -86,7 +87,7 @@ class DeepQNetwork(
                     experience.reward + discount * nextQ
                 }
 
-            optimizer.observeAndEvaluate(state, target)
+            optimizer.observe(experience.state, target)
 
             iterationCounter++
             if (iterationCounter >= targetNetworkUpdateFrequency) {

@@ -15,6 +15,11 @@ import kotml.reinforcement.replay.ExperienceReplayBuffer
  * isTerminal) in a replay buffer and samples them to update a feedforward
  * neural network that outputs action values for each action, given a
  * particular state.
+ *
+ * References:
+ * * Human-level control through deep reinforcement learning (2015) -
+ *   Volodymyr Mnih, Koray Kavukcuoglu, David Silver, et al. -
+ *   https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
  */
 class DeepQNetwork(
     val network: FeedforwardNeuralNetwork,

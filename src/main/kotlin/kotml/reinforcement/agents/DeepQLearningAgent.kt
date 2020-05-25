@@ -12,6 +12,16 @@ import kotml.reinforcement.policies.discrete.DiscreteBehaviorPolicy
 import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 import kotml.reinforcement.replay.ExperienceReplayBuffer
 
+/**
+ * `DeepQLearningAgent` uses a deep Q-network as an action value function
+ * approximator, following traditional Q learning action selection using
+ * the Q-network's estimated action values.
+ *
+ * References:
+ * * Human-level control through deep reinforcement learning (2015) -
+ *   Volodymyr Mnih, Koray Kavukcuoglu, David Silver, et al. -
+ *   https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
+ */
 class DeepQLearningAgent(
     val stateDimensions: Int,
     val dqn: DeepQNetwork,

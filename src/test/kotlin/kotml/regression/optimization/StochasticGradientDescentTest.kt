@@ -1,5 +1,6 @@
 package kotml.regression.optimization
 
+import kotlin.random.Random
 import kotml.TestUtils.assertApproxEquals
 import kotml.distributions.UniformSampler
 import kotml.math.Vector
@@ -100,5 +101,32 @@ class StochasticGradientDescentTest {
             Vector(Vector(1), Vector(2), Vector(3)),
             Vector(Vector(2), Vector(4), Vector(6))
         ))
+    }
+
+    @Test
+    fun `using weight decay converges`() {
+        val random = Random(0)
+        val estimator = StochasticGradientDescent(
+            stepSize = 0.02,
+            function = IdentityFunction,
+            lossFunction = SquaredError,
+            regressorCount = 1,
+            hasConstant = true,
+            weightDecayRate = 0.0001,
+            weightDecayScalingFactor = 1.0
+        )
+        (0..200).shuffled(random).forEach { intX ->
+            val x = intX.toDouble() / 200.0
+            estimator.observe(Vector(x), Vector(2 * x + 1))
+        }
+        assertApproxEquals(
+            2.0,
+            estimator.function.evaluate(
+                estimator.aggregationFunction.aggregate(
+                    estimator.weights, Vector(0.5)
+                )
+            ),
+            0.01
+        )
     }
 }

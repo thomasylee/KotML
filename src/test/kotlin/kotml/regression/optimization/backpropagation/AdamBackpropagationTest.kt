@@ -44,7 +44,8 @@ class AdamBackpropagationTest {
         val optimizer = AdamBackpropagation(
             network = network,
             costFunction = SumCost(SquaredError),
-            stepSize = 0.01
+            stepSize = 0.01,
+            weightDecayRate = 0.0001
         )
 
         val rand = Random(0)

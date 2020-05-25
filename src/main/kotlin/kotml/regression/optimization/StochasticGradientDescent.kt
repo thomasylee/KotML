@@ -19,7 +19,9 @@ class StochasticGradientDescent(
     val function: FunctionModel,
     val lossFunction: LossFunction,
     val weights: Weights,
-    val aggregationFunction: AggregationFunction = DotProduct
+    val aggregationFunction: AggregationFunction = DotProduct,
+    val weightDecayRate: Double = 0.0,
+    val weightDecayScalingFactor: Double = 1.0
 ) : IterativeOptimizer<Weights, Double>(weights.coeffs.shape[0], 1, weights) {
     constructor(
         stepSize: Double,
@@ -28,13 +30,17 @@ class StochasticGradientDescent(
         regressorCount: Int,
         hasConstant: Boolean = true,
         aggregationFunction: AggregationFunction = DotProduct,
-        sampler: DistributionSampler = UniformSampler(0.0)
+        sampler: DistributionSampler = UniformSampler(0.0),
+        weightDecayRate: Double = 0.0,
+        weightDecayScalingFactor: Double = 1.0
     ) : this(
         stepSize = stepSize,
         function = function,
         lossFunction = lossFunction,
         weights = Weights(regressorCount, hasConstant, sampler),
-        aggregationFunction = aggregationFunction
+        aggregationFunction = aggregationFunction,
+        weightDecayRate = weightDecayRate,
+        weightDecayScalingFactor = weightDecayScalingFactor
     )
 
     protected override fun addObservation(regressors: Vector, targets: Vector) {
@@ -68,10 +74,12 @@ class StochasticGradientDescent(
         val dIn_dWeight = aggregationFunction.weightsGradient(weights, regressors)
 
         if (weights.hasConstant)
-            weights.constant -= stepSize * dF_dIn * dIn_dWeight.constant
+            weights.constant -= stepSize * dF_dIn * dIn_dWeight.constant +
+                weightDecayScalingFactor * weightDecayRate * weights.constant
 
         (0 until regressors.shape[0]).forEach { index ->
-            weights.coeffs[index] -= stepSize * dF_dIn * dIn_dWeight.coeffs[index]
+            weights.coeffs[index] -= stepSize * dF_dIn * dIn_dWeight.coeffs[index] +
+                weightDecayScalingFactor * weightDecayRate * weights.coeffs[index]
         }
 
         return estimate

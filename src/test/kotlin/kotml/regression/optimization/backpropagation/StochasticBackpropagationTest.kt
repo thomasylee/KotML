@@ -44,7 +44,8 @@ class StochasticBackpropagationTest {
         val optimizer = StochasticBackpropagation(
             network = network,
             costFunction = SumCost(SquaredError),
-            stepSize = 0.001
+            stepSize = 0.001,
+            weightDecayRate = 0.00001
         )
 
         val rand = Random(0)

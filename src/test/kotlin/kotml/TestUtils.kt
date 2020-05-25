@@ -9,11 +9,11 @@ object TestUtils {
 
     fun assertApproxEquals(expected: Vector, actual: Vector, tolerance: Double = defaultTolerance) {
         if (!actual.approxEquals(expected, tolerance))
-            throw AssertionFailedError("Expected $actual to approxEqual $expected")
+            throw AssertionFailedError("Expected $actual to approxEqual $expected (tolerance = $tolerance)")
     }
 
     fun assertApproxEquals(expected: Double, actual: Double, tolerance: Double = defaultTolerance) {
         if (abs(actual - expected) >= tolerance)
-            throw AssertionFailedError("Expected $actual to approxEqual $expected")
+            throw AssertionFailedError("Expected $actual to approxEqual $expected (tolerance = $tolerance)")
     }
 }

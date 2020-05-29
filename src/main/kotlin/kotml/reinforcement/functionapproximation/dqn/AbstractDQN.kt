@@ -1,27 +1,22 @@
-package kotml.reinforcement.functionapproximation
+package kotml.reinforcement.functionapproximation.dqn
 
 import kotlin.random.Random
 import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
-import kotml.regression.cost.SumCost
-import kotml.regression.cost.loss.HalfSquaredError
 import kotml.regression.neural.FeedforwardNeuralNetwork
 import kotml.regression.optimization.IterativeOptimizer
-import kotml.regression.optimization.backpropagation.AdamBackpropagation
 import kotml.reinforcement.replay.ExperienceReplayBuffer
 
 /**
- * `DeepQNetwork` stores experiences (state, action, reward, nextState,
- * isTerminal) in a replay buffer and samples them to update a feedforward
- * neural network that outputs action values for each action, given a
- * particular state.
+ * `AbstractDQN` is the superclass of all variants of the Deep Q-Network (DQN)
+ * function approximator.
  *
  * References:
  * * Human-level control through deep reinforcement learning (2015) -
  *   Volodymyr Mnih, Koray Kavukcuoglu, David Silver, et al. -
  *   https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
  */
-class DeepQNetwork(
+abstract class AbstractDQN(
     val network: FeedforwardNeuralNetwork,
     val discount: Double,
     val optimizer: IterativeOptimizer<FeedforwardNeuralNetwork, Vector>,
@@ -34,27 +29,14 @@ class DeepQNetwork(
     val targetNetwork = network.copy()
     var iterationCounter = 0
 
-    constructor(
-        network: FeedforwardNeuralNetwork,
-        discount: Double,
-        stepSize: Double,
-        targetNetworkUpdateFrequency: Int = 10_000,
-        minibatchSize: Int = 32,
-        replayBuffer: ExperienceReplayBuffer = ExperienceReplayBuffer(),
-        random: Random = Random
-    ) : this(
-        network = network,
-        discount = discount,
-        optimizer = AdamBackpropagation(
-            network = network,
-            costFunction = SumCost(HalfSquaredError),
-            stepSize = stepSize
-        ),
-        targetNetworkUpdateFrequency = targetNetworkUpdateFrequency,
-        minibatchSize = minibatchSize,
-        replayBuffer = replayBuffer,
-        random = random
-    )
+    /**
+     * Returns the Q target for a non-terminal state based on its reward
+     * and next state.
+     * @param reward reward from taking the action
+     * @param nextState state after having taken the action
+     * @return target Q value
+     */
+    abstract fun calculateQTarget(reward: Double, nextState: Vector): Vector
 
     /**
      * Adds the experience to the experience replay buffer and performs
@@ -78,19 +60,10 @@ class DeepQNetwork(
 
         replayBuffer.sample(minibatchSize, random).forEach { experience ->
             val target =
-                if (experience.nextState == null) {
+                if (experience.nextState == null)
                     Vector(numActions) { experience.reward }
-                } else {
-                    val evaluatedTarget = targetNetwork.evaluate(experience.nextState)
-                    val nextAction = evaluatedTarget.argmax(random)
-                    val nextQ = Vector(numActions) { action ->
-                        if (action == nextAction)
-                            evaluatedTarget[nextAction]
-                        else
-                            0.0
-                    }
-                    experience.reward + discount * nextQ
-                }
+                else
+                    calculateQTarget(experience.reward, experience.nextState)
 
             optimizer.observe(experience.state, target)
 

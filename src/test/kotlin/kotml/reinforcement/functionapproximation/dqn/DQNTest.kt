@@ -1,4 +1,4 @@
-package kotml.reinforcement.functionapproximation
+package kotml.reinforcement.functionapproximation.dqn
 
 import kotlin.random.Random
 import kotml.TestUtils.assertApproxEquals
@@ -11,11 +11,11 @@ import kotml.regression.neural.Neuron
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class DeepQNetworkTest {
+class DQNTest {
     @Test
     fun `learns and evaluates using the correct networks`() {
         val random = Random(0)
-        val dqn = DeepQNetwork(
+        val dqn = DQN(
             network = FeedforwardNeuralNetwork(arrayOf(
                 NeuralLayer(arrayOf(
                     Neuron(

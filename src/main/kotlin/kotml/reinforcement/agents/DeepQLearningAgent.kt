@@ -7,7 +7,8 @@ import kotml.regression.functions.ReLU
 import kotml.regression.neural.FeedforwardNeuralNetwork
 import kotml.regression.neural.NeuralLayer
 import kotml.regression.neural.initialization.HeInitializer
-import kotml.reinforcement.functionapproximation.DeepQNetwork
+import kotml.reinforcement.functionapproximation.dqn.AbstractDQN
+import kotml.reinforcement.functionapproximation.dqn.DQN
 import kotml.reinforcement.policies.discrete.DiscreteBehaviorPolicy
 import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 import kotml.reinforcement.replay.ExperienceReplayBuffer
@@ -24,7 +25,7 @@ import kotml.reinforcement.replay.ExperienceReplayBuffer
  */
 class DeepQLearningAgent(
     val stateDimensions: Int,
-    val dqn: DeepQNetwork,
+    val dqn: AbstractDQN,
     behaviorPolicy: DiscreteBehaviorPolicy = EpsilonGreedyPolicy(),
     val random: Random = Random
 ) : RLAgent<Vector, Int>(behaviorPolicy) {
@@ -44,7 +45,7 @@ class DeepQLearningAgent(
     ) : this(
         behaviorPolicy = behaviorPolicy,
         stateDimensions = stateDimensions,
-        dqn = DeepQNetwork(
+        dqn = DQN(
             network = FeedforwardNeuralNetwork(Array<NeuralLayer>(layerSizes.size) { layerIndex ->
                 val numNeurons = layerSizes[layerIndex]
                 val numInputs = layerSizes.getOrNull(layerIndex - 1) ?: stateDimensions

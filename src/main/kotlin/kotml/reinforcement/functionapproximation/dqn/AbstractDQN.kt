@@ -34,7 +34,7 @@ abstract class AbstractDQN(
      * and next state.
      * @param reward reward from taking the action
      * @param nextState state after having taken the action
-     * @return target Q value
+     * @return target Q value at the next action's index, zeros at other indices
      */
     abstract fun calculateQTarget(reward: Double, nextState: Vector): Vector
 

@@ -11,16 +11,16 @@ import kotml.regression.optimization.backpropagation.AdamBackpropagation
 import kotml.reinforcement.replay.ExperienceReplayBuffer
 
 /**
- * `DQN` stores experiences (state, action, reward, nextState) in a replay
- * buffer and samples them to update a feedforward neural network that
- * outputs action values for each action, given a particular state.
+ * `DDQN` implements the Double Deep Q-Network (DDQN) function approximator
+ * that addresses DQN's tendency to sometimes overestimate action values,
+ * particularly as the number of actions increases.
  *
  * References:
- * * Human-level control through deep reinforcement learning (2015) -
- *   Volodymyr Mnih, Koray Kavukcuoglu, David Silver, et al. -
- *   https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
+ * * Deep reinforcement learning with double Q-learning (2015) -
+ *   Hado van Hasselt, Arthur Guez, David Silver
+ *   https://arxiv.org/pdf/1509.06461.pdf
  */
-class DQN(
+class DDQN(
     network: FeedforwardNeuralNetwork,
     discount: Double,
     optimizer: IterativeOptimizer<FeedforwardNeuralNetwork, Vector>,
@@ -67,11 +67,13 @@ class DQN(
      * @return target Q value at the next action's index, zeros at other indices
      */
     override fun calculateQTarget(reward: Double, nextState: Vector): Vector {
-        val evaluatedTarget = targetNetwork.evaluate(nextState)
+        // Y_t = R_t+1 + discnt * Q(S_t+1, argmax Q(S_t+1, a, theta), theta-)
+        // where theta is online network and theta- is target network.
+        val evaluatedTarget = network.evaluate(nextState)
         val nextAction = evaluatedTarget.argmax(random)
-        val nextQ = Vector(numActions) { action ->
+        val nextQ = targetNetwork.evaluate(nextState).mapIndexed { action, q ->
             if (action == nextAction)
-                evaluatedTarget[nextAction]
+                q
             else
                 0.0
         }

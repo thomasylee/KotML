@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class NeuralLayerTest {
+class DenseNeuralLayerTest {
     @Test
     fun `evaluate() returns the correct value`() {
-        val neuralLayer = NeuralLayer(Array<Neuron>(3) { index ->
+        val neuralLayer = DenseNeuralLayer((0..2).map { index ->
             Neuron(
                 activationFunction = ReLU,
                 weights = Weights(index.toDouble(), Vector(2.0))
@@ -25,7 +25,7 @@ class NeuralLayerTest {
 
     @Test
     fun `softmax() returns a softmax neural layer`() {
-        val neuralLayer = NeuralLayer.softmax(5)
+        val neuralLayer = DenseNeuralLayer.softmax(5)
 
         assertEquals(5, neuralLayer.neurons.size)
         neuralLayer.neurons.forEachIndexed { index, neuron ->
@@ -39,7 +39,7 @@ class NeuralLayerTest {
 
     @Test
     fun `copy() returns a copy of the neural layer`() {
-        val original = NeuralLayer.softmax(3)
+        val original = DenseNeuralLayer.softmax(3)
         val copy = original.copy()
 
         assertEquals(original, copy)
@@ -49,13 +49,13 @@ class NeuralLayerTest {
 
     @Test
     fun `updateWeights() copies the layer's weights`() {
-        val layer = NeuralLayer(arrayOf(
+        val layer = DenseNeuralLayer(listOf(
             Neuron(
                 activationFunction = ReLU,
                 weights = Weights(1.0, Vector(2))
             )
         ))
-        val newLayer = NeuralLayer(arrayOf(
+        val newLayer = DenseNeuralLayer(listOf(
             Neuron(
                 activationFunction = ReLU,
                 weights = Weights(3.0, Vector(4))

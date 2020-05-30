@@ -4,8 +4,8 @@ import kotlin.random.Random
 import kotml.math.Vector
 import kotml.regression.functions.IdentityFunction
 import kotml.regression.functions.ReLU
+import kotml.regression.neural.DenseNeuralLayer
 import kotml.regression.neural.FeedforwardNeuralNetwork
-import kotml.regression.neural.NeuralLayer
 import kotml.regression.neural.initialization.HeInitializer
 import kotml.reinforcement.functionapproximation.dqn.AbstractDQN
 import kotml.reinforcement.functionapproximation.dqn.DQN
@@ -46,18 +46,17 @@ class DeepQLearningAgent(
         behaviorPolicy = behaviorPolicy,
         stateDimensions = stateDimensions,
         dqn = DQN(
-            network = FeedforwardNeuralNetwork(Array<NeuralLayer>(layerSizes.size) { layerIndex ->
-                val numNeurons = layerSizes[layerIndex]
+            network = FeedforwardNeuralNetwork(layerSizes.mapIndexed { layerIndex, numNeurons ->
                 val numInputs = layerSizes.getOrNull(layerIndex - 1) ?: stateDimensions
                 val activationFunction =
                     if (layerIndex == layerSizes.size - 1)
                         IdentityFunction
                     else
                         ReLU
-                NeuralLayer(
+                DenseNeuralLayer(
+                    numInputs = numInputs,
                     neuronCount = numNeurons,
                     activationFunction = activationFunction,
-                    regressorCount = numInputs,
                     sampler = HeInitializer.sampler(numInputs, numNeurons, random)
                 )
             }),

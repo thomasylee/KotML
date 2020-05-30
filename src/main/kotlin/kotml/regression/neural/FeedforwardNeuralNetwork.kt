@@ -19,11 +19,66 @@ import kotml.regression.neural.initialization.XavierInitializer
  * output layer).
  */
 class FeedforwardNeuralNetwork(
-    val layers: Array<NeuralLayer>
+    val layers: List<NeuralLayer>
 ) {
+    val prevDenseLayers: Map<DenseNeuralLayer, List<DenseNeuralLayer>>
+    val nextDenseLayers: Map<DenseNeuralLayer, List<DenseNeuralLayer>>
+    val denseLayers: List<DenseNeuralLayer>
+    val lastDenseLayers: List<DenseNeuralLayer>
+
     init {
         if (layers.isEmpty())
             throw RegressionException("Neural networks must have at least one neural layer")
+
+        val prevDenseLayers = mutableMapOf<DenseNeuralLayer, List<DenseNeuralLayer>>()
+        val nextDenseLayers = mutableMapOf<DenseNeuralLayer, List<DenseNeuralLayer>>()
+        val denseLayers = mutableListOf<DenseNeuralLayer>()
+
+        var prevLayers = listOf<DenseNeuralLayer>()
+        layers.forEach { layer ->
+            prevLayers = extractDenseLayers(
+                layer, prevLayers, denseLayers, prevDenseLayers, nextDenseLayers
+            )
+        }
+
+        this.lastDenseLayers = prevLayers
+        this.denseLayers = denseLayers
+        this.prevDenseLayers = prevDenseLayers
+        this.nextDenseLayers = nextDenseLayers
+    }
+
+    private fun extractDenseLayers(
+        layer: NeuralLayer,
+        prevLayers: List<DenseNeuralLayer>,
+        denseLayers: MutableList<DenseNeuralLayer>,
+        prevDenseLayers: MutableMap<DenseNeuralLayer, List<DenseNeuralLayer>>,
+        nextDenseLayers: MutableMap<DenseNeuralLayer, List<DenseNeuralLayer>>
+    ): List<DenseNeuralLayer> {
+        if (layer is SplitNeuralLayer) {
+            val lastSubLayers = mutableListOf<DenseNeuralLayer>()
+            layer.subLayers.forEach { subLayerList ->
+                var prevSubLayers = prevLayers
+                subLayerList.forEach { subLayer ->
+                    prevSubLayers = extractDenseLayers(
+                        subLayer, prevSubLayers, denseLayers,
+                        prevDenseLayers, nextDenseLayers
+                    )
+                }
+                lastSubLayers.addAll(prevSubLayers)
+            }
+            return lastSubLayers
+        } else if (layer !is DenseNeuralLayer) {
+            throw RegressionException("Cannot backpropagate over unknown layer type: ${layer::class}")
+        }
+
+        denseLayers.add(layer)
+
+        prevDenseLayers.put(layer, prevLayers)
+        prevLayers.forEach { prevLayer ->
+            nextDenseLayers.put(prevLayer, listOf(layer))
+        }
+
+        return listOf(layer)
     }
 
     /**
@@ -46,9 +101,9 @@ class FeedforwardNeuralNetwork(
                 XavierInitializer,
         random: Random = Random
     ) : this(
-        Array<NeuralLayer>(layerSizes.size) { index ->
+        layerSizes.mapIndexed { index, layerSize ->
             val regressorCount = layerSizes.getOrElse(index - 1) { inputCount }
-            NeuralLayer(Array<Neuron>(layerSizes[index]) {
+            DenseNeuralLayer((0 until layerSize).map {
                 Neuron(
                     activationFunction = activationFunction,
                     regressorCount = regressorCount,
@@ -77,7 +132,7 @@ class FeedforwardNeuralNetwork(
      * @return copy of the neural network
      */
     fun copy(): FeedforwardNeuralNetwork = FeedforwardNeuralNetwork(
-        Array<NeuralLayer>(layers.size) { layers[it].copy() }
+        layers.map { it.copy() }
     )
 
     /**
@@ -97,5 +152,5 @@ class FeedforwardNeuralNetwork(
      *   false otherwise
      */
     override fun equals(other: Any?): Boolean =
-        other is FeedforwardNeuralNetwork && layers.contentEquals(other.layers)
+        other is FeedforwardNeuralNetwork && layers == other.layers
 }

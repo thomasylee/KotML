@@ -16,6 +16,8 @@ class Neuron(
     val weights: Weights,
     val aggregationFunction: AggregationFunction = DotProduct
 ) {
+    val regressorCount = weights.coeffs.shape[0]
+
     constructor(
         activationFunction: FunctionModel,
         regressorCount: Int,

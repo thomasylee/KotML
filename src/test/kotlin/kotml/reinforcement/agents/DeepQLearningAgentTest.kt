@@ -4,6 +4,7 @@ import kotlin.random.Random
 import kotml.math.Vector
 import kotml.regression.functions.IdentityFunction
 import kotml.regression.functions.ReLU
+import kotml.regression.neural.DenseNeuralLayer
 import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -30,11 +31,13 @@ class DeepQLearningAgentTest {
         )
         val numTrials = 20
         assertTrue(
-            agent.dqn.network.layers.first().neurons.first().activationFunction is ReLU,
+            (agent.dqn.network.layers.first() as DenseNeuralLayer)
+                .neurons.first().activationFunction is ReLU,
             "First DQN layer should use ReLU"
         )
         assertTrue(
-            agent.dqn.network.layers.last().neurons.first().activationFunction is IdentityFunction,
+            (agent.dqn.network.layers.last() as DenseNeuralLayer)
+                .neurons.first().activationFunction is IdentityFunction,
             "Second DQN layer should use IdentityFunction"
         )
 

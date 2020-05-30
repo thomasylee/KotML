@@ -5,8 +5,8 @@ import kotml.TestUtils.assertApproxEquals
 import kotml.distributions.UniformSampler
 import kotml.math.Vector
 import kotml.regression.functions.IdentityFunction
+import kotml.regression.neural.DenseNeuralLayer
 import kotml.regression.neural.FeedforwardNeuralNetwork
-import kotml.regression.neural.NeuralLayer
 import kotml.regression.neural.Neuron
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -16,8 +16,8 @@ class DDQNTest {
     fun `learns and evaluates using the correct networks`() {
         val random = Random(0)
         val dqn = DDQN(
-            network = FeedforwardNeuralNetwork(arrayOf(
-                NeuralLayer(arrayOf(
+            network = FeedforwardNeuralNetwork(listOf(
+                DenseNeuralLayer(listOf(
                     Neuron(
                         activationFunction = IdentityFunction,
                         regressorCount = 1,

@@ -13,8 +13,8 @@ import kotml.regression.cost.loss.SquaredError
 import kotml.regression.functions.IdentityFunction
 import kotml.regression.functions.LogisticFunction
 import kotml.regression.functions.Tanh
+import kotml.regression.neural.DenseNeuralLayer
 import kotml.regression.neural.FeedforwardNeuralNetwork
-import kotml.regression.neural.NeuralLayer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -23,21 +23,21 @@ import org.junit.jupiter.api.Test
 class AdamBackpropagationTest {
     @Test
     fun `calculates weights correctly with linear functions`() {
-        val network = FeedforwardNeuralNetwork(arrayOf(
-            NeuralLayer(
+        val network = FeedforwardNeuralNetwork(listOf(
+            DenseNeuralLayer(
+                numInputs = 1,
                 neuronCount = 1,
                 activationFunction = IdentityFunction,
-                regressorCount = 1,
                 sampler = UniformSampler(0.1)),
-            NeuralLayer(
+            DenseNeuralLayer(
+                numInputs = 1,
                 neuronCount = 2,
                 activationFunction = IdentityFunction,
-                regressorCount = 1,
                 sampler = UniformSampler(0.1)),
-            NeuralLayer(
+            DenseNeuralLayer(
+                numInputs = 2,
                 neuronCount = 1,
                 activationFunction = IdentityFunction,
-                regressorCount = 2,
                 sampler = UniformSampler(0.1))
         ))
 
@@ -63,21 +63,21 @@ class AdamBackpropagationTest {
     @Test
     fun `calculates weights correctly with a constant`() {
         val rand = Random(0)
-        val network = FeedforwardNeuralNetwork(arrayOf(
-            NeuralLayer(
+        val network = FeedforwardNeuralNetwork(listOf(
+            DenseNeuralLayer(
+                numInputs = 3,
                 neuronCount = 3,
                 activationFunction = LogisticFunction,
-                regressorCount = 3,
                 sampler = NormalSampler(stdev = 2.0, random = rand)),
-            NeuralLayer(
+            DenseNeuralLayer(
+                numInputs = 3,
                 neuronCount = 3,
                 activationFunction = Tanh,
-                regressorCount = 3,
                 sampler = NormalSampler(stdev = 2.0, random = rand)),
-            NeuralLayer(
+            DenseNeuralLayer(
+                numInputs = 3,
                 neuronCount = 2,
                 activationFunction = IdentityFunction,
-                regressorCount = 3,
                 sampler = NormalSampler(stdev = 2.0, random = rand))
         ))
 
@@ -110,18 +110,18 @@ class AdamBackpropagationTest {
     @Test
     fun `backpropagates with softmax correctly`() {
         val rand = Random(0)
-        val network = FeedforwardNeuralNetwork(arrayOf(
-            NeuralLayer(
+        val network = FeedforwardNeuralNetwork(listOf(
+            DenseNeuralLayer(
+                numInputs = 2,
                 neuronCount = 2,
                 activationFunction = Tanh,
-                regressorCount = 2,
                 sampler = NormalSampler(random = rand)),
-            NeuralLayer(
+            DenseNeuralLayer(
+                numInputs = 2,
                 neuronCount = 2,
                 activationFunction = Tanh,
-                regressorCount = 2,
                 sampler = NormalSampler(random = rand)),
-            NeuralLayer.softmax(2)
+            DenseNeuralLayer.softmax(2)
         ))
 
         val optimizer = AdamBackpropagation(
@@ -152,20 +152,24 @@ class AdamBackpropagationTest {
         assertTrue(evaluateGreaterThan[0] + evaluateGreaterThan[1] == 1.0)
 
         // Test observeAndEvalute().
-        val prevWeights = network.layers.first().neurons.first().weights.coeffs.copy()
+        val prevWeights = (network.layers.first() as DenseNeuralLayer)
+            .neurons.first().weights.coeffs.copy()
         val observeAndEvaluate = optimizer.observeAndEvaluate(Vector(0.8, 0.2), Vector(0.9, 0.1))
         assertTrue(observeAndEvaluate[1] > 0.85)
         assertTrue(observeAndEvaluate[0] + observeAndEvaluate[1] == 1.0)
-        assertNotEquals(prevWeights, network.layers.first().neurons.first().weights.coeffs)
+        assertNotEquals(
+            prevWeights,
+            (network.layers.first() as DenseNeuralLayer).neurons.first().weights.coeffs
+        )
     }
 
     @Test
     fun `batchObserveAndEvaluate() updates weights after batch`() {
-        val network = FeedforwardNeuralNetwork(arrayOf(
-            NeuralLayer(
+        val network = FeedforwardNeuralNetwork(listOf(
+            DenseNeuralLayer(
+                numInputs = 1,
                 neuronCount = 1,
                 activationFunction = IdentityFunction,
-                regressorCount = 1,
                 includeConstant = false,
                 sampler = UniformSampler(1.0))
         ))

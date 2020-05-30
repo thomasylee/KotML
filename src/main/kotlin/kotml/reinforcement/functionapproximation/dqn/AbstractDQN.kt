@@ -25,7 +25,7 @@ abstract class AbstractDQN(
     val replayBuffer: ExperienceReplayBuffer = ExperienceReplayBuffer(),
     val random: Random = Random
 ) {
-    val numActions = network.layers.last().neurons.size
+    val numActions = network.layers.last().numOutputs
     val targetNetwork = network.copy()
     var iterationCounter = 0
 

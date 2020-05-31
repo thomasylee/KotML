@@ -1,7 +1,6 @@
 package kotml.regression.neural
 
 import kotlin.random.Random
-import kotml.extensions.* // ktlint-disable no-wildcard-imports
 import kotml.math.Vector
 import kotml.regression.RegressionException
 import kotml.regression.functions.FunctionModel
@@ -30,8 +29,8 @@ class FeedforwardNeuralNetwork(
         if (layers.isEmpty())
             throw RegressionException("Neural networks must have at least one neural layer")
 
-        val prevDenseLayers = mutableMapOf<DenseNeuralLayer, List<DenseNeuralLayer>>()
-        val nextDenseLayers = mutableMapOf<DenseNeuralLayer, List<DenseNeuralLayer>>()
+        val prevDenseLayers = mutableMapOf<DenseNeuralLayer, MutableList<DenseNeuralLayer>>()
+        val nextDenseLayers = mutableMapOf<DenseNeuralLayer, MutableList<DenseNeuralLayer>>()
         val denseLayers = mutableListOf<DenseNeuralLayer>()
 
         var prevLayers = listOf<DenseNeuralLayer>()
@@ -51,8 +50,8 @@ class FeedforwardNeuralNetwork(
         layer: NeuralLayer,
         prevLayers: List<DenseNeuralLayer>,
         denseLayers: MutableList<DenseNeuralLayer>,
-        prevDenseLayers: MutableMap<DenseNeuralLayer, List<DenseNeuralLayer>>,
-        nextDenseLayers: MutableMap<DenseNeuralLayer, List<DenseNeuralLayer>>
+        prevDenseLayers: MutableMap<DenseNeuralLayer, MutableList<DenseNeuralLayer>>,
+        nextDenseLayers: MutableMap<DenseNeuralLayer, MutableList<DenseNeuralLayer>>
     ): List<DenseNeuralLayer> {
         if (layer is SplitNeuralLayer) {
             val lastSubLayers = mutableListOf<DenseNeuralLayer>()
@@ -73,9 +72,11 @@ class FeedforwardNeuralNetwork(
 
         denseLayers.add(layer)
 
-        prevDenseLayers.put(layer, prevLayers)
+        prevDenseLayers.put(layer, prevLayers.toMutableList())
         prevLayers.forEach { prevLayer ->
-            nextDenseLayers.put(prevLayer, listOf(layer))
+            nextDenseLayers.getOrPut(prevLayer) {
+                mutableListOf()
+            }.add(layer)
         }
 
         return listOf(layer)

@@ -15,6 +15,7 @@ import kotml.regression.functions.LogisticFunction
 import kotml.regression.functions.Tanh
 import kotml.regression.neural.DenseNeuralLayer
 import kotml.regression.neural.FeedforwardNeuralNetwork
+import kotml.regression.neural.SplitNeuralLayer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -105,6 +106,50 @@ class AdamBackpropagationTest {
         val estimate = network.evaluate(Vector(0.5, 1.5, 1.0))
         assertApproxEquals(5.5, estimate[0], 0.6)
         assertApproxEquals(0.75, estimate[1], 0.1)
+    }
+
+    @Test
+    fun `calculates weights correctly with split layers`() {
+        val rand = Random(0)
+        val network = FeedforwardNeuralNetwork(listOf(
+            DenseNeuralLayer(
+                numInputs = 1,
+                neuronCount = 1,
+                activationFunction = IdentityFunction,
+                sampler = NormalSampler(random = rand)),
+            SplitNeuralLayer(listOf(
+                listOf(DenseNeuralLayer(
+                    numInputs = 1,
+                    neuronCount = 1,
+                    activationFunction = IdentityFunction,
+                    sampler = NormalSampler(random = rand))),
+                listOf(DenseNeuralLayer(
+                    numInputs = 1,
+                    neuronCount = 1,
+                    activationFunction = IdentityFunction,
+                    sampler = NormalSampler(random = rand)))
+            )),
+            DenseNeuralLayer(
+                numInputs = 2,
+                neuronCount = 1,
+                activationFunction = IdentityFunction,
+                sampler = NormalSampler(random = rand))
+        ))
+
+        val optimizer = StochasticBackpropagation(
+            network = network,
+            costFunction = SumCost(HalfSquaredError),
+            stepSize = 0.04
+        )
+
+        (0..150).shuffled(rand).forEach { intX ->
+            val x = intX.toDouble() / 75.0
+            val target = 0.5 - 1.5 * x
+            optimizer.observe(Vector(x), Vector(target))
+        }
+
+        val estimate = network.evaluate(Vector(1))
+        assertApproxEquals(Vector(-1), estimate, 0.001)
     }
 
     @Test

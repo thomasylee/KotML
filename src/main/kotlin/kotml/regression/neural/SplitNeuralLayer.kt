@@ -14,10 +14,9 @@ import kotml.regression.RegressionException
  * Layer B is a split layer with a list of (C, D) and a list of (E).
  */
 class SplitNeuralLayer(
-    numInputs: Int,
     val subLayers: List<List<NeuralLayer>>
 ) : NeuralLayer(
-    numInputs = numInputs,
+    numInputs = subLayers.firstOrNull()?.firstOrNull()?.numInputs ?: 0,
     numOutputs = subLayers.fold(0) { acc, layers ->
         acc + layers.last().numOutputs
     }
@@ -41,7 +40,7 @@ class SplitNeuralLayer(
      * Returns a copy of the neural layer.
      * @return copy of the neural layer
      */
-    override fun copy(): NeuralLayer = SplitNeuralLayer(numInputs, subLayers.map { layer ->
+    override fun copy(): NeuralLayer = SplitNeuralLayer(subLayers.map { layer ->
         layer.map { subLayer -> subLayer.copy() }
     })
 

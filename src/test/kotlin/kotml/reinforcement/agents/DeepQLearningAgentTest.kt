@@ -5,6 +5,8 @@ import kotml.math.Vector
 import kotml.regression.functions.IdentityFunction
 import kotml.regression.functions.ReLU
 import kotml.regression.neural.DenseNeuralLayer
+import kotml.regression.neural.SplitNeuralLayer
+import kotml.reinforcement.functionapproximation.dqn.DuelingAggregationFunction
 import kotml.reinforcement.policies.discrete.EpsilonGreedyPolicy
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -17,19 +19,7 @@ class DeepQLearningAgentTest {
      * Actions are (left, right), in order.
      * The policy should learn to move right in every state.
      */
-    @Test
-    fun `finds optimal solution for 10-step corridor`() {
-        val random = Random(0)
-        val agent = DeepQLearningAgent(
-            stateDimensions = 10,
-            discount = 0.9,
-            stepSize = 0.0005,
-            layerSizes = intArrayOf(10, 2),
-            behaviorPolicy = EpsilonGreedyPolicy(random = random),
-            targetNetworkUpdateFrequency = 1000,
-            random = random
-        )
-        val numTrials = 20
+    fun trainOn10StepCorridor(agent: DeepQLearningAgent, numTrials: Int) {
         assertTrue(
             (agent.dqn.network.layers.first() as DenseNeuralLayer)
                 .neurons.first().activationFunction is ReLU,
@@ -66,10 +56,62 @@ class DeepQLearningAgentTest {
                 }
             }
             if (movesLeft == 0)
-                throw RuntimeException("$it More moves were used than were necessary")
+                throw RuntimeException("More moves were used than were necessary")
         }
+    }
 
-        (0..terminalLoc).forEach { stateIndex ->
+    @Test
+    fun `finds optimal solution for 10-step corridor with default network`() {
+        val random = Random(0)
+        val agent = DeepQLearningAgent(
+            stateDimensions = 10,
+            discount = 0.9,
+            stepSize = 0.0005,
+            layerSizes = intArrayOf(10, 2),
+            behaviorPolicy = EpsilonGreedyPolicy(random = random),
+            targetNetworkUpdateFrequency = 1000,
+            random = random
+        )
+
+        trainOn10StepCorridor(agent, 20)
+
+        (0..9).forEach { stateIndex ->
+            val state = Vector(10) { if (it == stateIndex) 1.0 else 0.0 }
+            assertEquals(1, agent.dqn.evaluate(state).argmax(random))
+        }
+    }
+
+    @Test
+    fun `finds optimal solution for 10-step corridor with dueling network`() {
+        val random = Random(0)
+        val agent = DeepQLearningAgent(
+            stateDimensions = 10,
+            discount = 0.9,
+            stepSize = 0.0005,
+            layerSizes = intArrayOf(10, 2),
+            behaviorPolicy = EpsilonGreedyPolicy(random = random),
+            targetNetworkUpdateFrequency = 1000,
+            duelingNetwork = true,
+            random = random
+        )
+
+        // Make sure it's a dueling network.
+        assertEquals(
+            SplitNeuralLayer::class,
+            agent.dqn.network.layers[1]::class
+        )
+        assertEquals(
+            DenseNeuralLayer::class,
+            agent.dqn.network.layers.last()::class
+        )
+        assertEquals(
+            DuelingAggregationFunction::class,
+            (agent.dqn.network.layers.last() as DenseNeuralLayer).neurons.last().aggregationFunction::class
+        )
+
+        trainOn10StepCorridor(agent, 20)
+
+        (0..9).forEach { stateIndex ->
             val state = Vector(10) { if (it == stateIndex) 1.0 else 0.0 }
             assertEquals(1, agent.dqn.evaluate(state).argmax(random))
         }

@@ -2,11 +2,6 @@ package kotml.reinforcement.agents
 
 import kotlin.random.Random
 import kotml.math.Vector
-import kotml.regression.functions.IdentityFunction
-import kotml.regression.functions.ReLU
-import kotml.regression.neural.DenseNeuralLayer
-import kotml.regression.neural.FeedforwardNeuralNetwork
-import kotml.regression.neural.initialization.HeInitializer
 import kotml.reinforcement.functionapproximation.dqn.AbstractDQN
 import kotml.reinforcement.functionapproximation.dqn.DQN
 import kotml.reinforcement.policies.discrete.DiscreteBehaviorPolicy
@@ -41,25 +36,21 @@ class DeepQLearningAgent(
         targetNetworkUpdateFrequency: Int = 10_000,
         minibatchSize: Int = 32,
         replayBuffer: ExperienceReplayBuffer = ExperienceReplayBuffer(),
+        duelingNetwork: Boolean = false,
         random: Random = Random
     ) : this(
         behaviorPolicy = behaviorPolicy,
         stateDimensions = stateDimensions,
         dqn = DQN(
-            network = FeedforwardNeuralNetwork(layerSizes.mapIndexed { layerIndex, numNeurons ->
-                val numInputs = layerSizes.getOrNull(layerIndex - 1) ?: stateDimensions
-                val activationFunction =
-                    if (layerIndex == layerSizes.size - 1)
-                        IdentityFunction
-                    else
-                        ReLU
-                DenseNeuralLayer(
-                    numInputs = numInputs,
-                    neuronCount = numNeurons,
-                    activationFunction = activationFunction,
-                    sampler = HeInitializer.sampler(numInputs, numNeurons, random)
-                )
-            }),
+            network =
+                if (duelingNetwork)
+                    AbstractDQN.createDuelingNeuralNetwork(
+                        stateDimensions = stateDimensions,
+                        numActions = layerSizes.last(),
+                        random = random
+                    )
+                else
+                    AbstractDQN.createNeuralNetwork(stateDimensions, layerSizes, random),
             discount = discount,
             stepSize = stepSize,
             targetNetworkUpdateFrequency = targetNetworkUpdateFrequency,

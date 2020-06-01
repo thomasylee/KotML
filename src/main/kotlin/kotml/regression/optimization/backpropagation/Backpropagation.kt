@@ -54,12 +54,17 @@ abstract class Backpropagation(
     ): List<DenseNeuralLayer> {
         val prevLayers = evaluatingModel.prevDenseLayers[layer]
         val input =
-            if (prevLayers.isNullOrEmpty())
+            if (prevLayers.isNullOrEmpty()) {
                 regressors
-            else
-                Vector.ofVectors(prevLayers.size) { index ->
-                    outputs.getValue(prevLayers[index])
-                }.flatten()
+            } else {
+                val inputList = mutableListOf<Double>()
+                (0 until prevLayers.size).forEach { index ->
+                    outputs.getValue(prevLayers[index]).forEach { value ->
+                        inputList.add(value)
+                    }
+                }
+                Vector(inputList.size) { inputList[it] }
+            }
 
         inputs.put(layer, input)
         outputs.put(layer, layer.evaluate(input))

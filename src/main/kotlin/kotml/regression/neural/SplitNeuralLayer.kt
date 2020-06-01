@@ -28,13 +28,17 @@ class SplitNeuralLayer(
      * @param regressors input values
      * @return output values
      */
-    override fun evaluate(regressors: Vector): Vector = Vector.ofVectors(subLayers.size) { index ->
-        var output = regressors
-        subLayers[index].forEach { subLayer ->
-            output = subLayer.evaluate(output)
+    override fun evaluate(regressors: Vector): Vector {
+        val values = mutableListOf<Double>()
+        (0 until subLayers.size).forEach { index ->
+            var output = regressors
+            subLayers[index].forEach { subLayer ->
+                output = subLayer.evaluate(output)
+            }
+            output.forEach { values.add(it) }
         }
-        output
-    }.flatten()
+        return Vector(values.size) { values[it] }
+    }
 
     /**
      * Returns a copy of the neural layer.

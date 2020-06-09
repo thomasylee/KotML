@@ -15,18 +15,20 @@ import kotml.regression.neural.FeedforwardNeuralNetwork
  * AdamW instead of classic Adam.
  *
  * References:
+ * * Adam: A Method for Stochastic Optimization (2014) - Diederik P. Kingma,
+ *   Jimmy Ba - https://arxiv.org/abs/1412.6980
  * * Decoupled Weight Decay Regulatization (2019) - Ilya Loshchilov, Frank
  *   Hutter - https://arxiv.org/abs/1711.05101
  */
 class AdamBackpropagation(
     network: FeedforwardNeuralNetwork,
     costFunction: CostFunction,
-    val stepSize: Double,
+    var stepSize: Double,
     val weightDecayRate: Double = 0.0,
     val weightDecayScalingFactor: Double = 1.0,
-    val betaM: Double = 0.99,
+    val betaM: Double = 0.9,
     val betaV: Double = 0.999,
-    val epsilon: Double = 0.0001
+    val epsilon: Double = 1E-8
 ) : Backpropagation(
     network = network,
     costFunction = costFunction

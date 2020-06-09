@@ -39,8 +39,8 @@ class DDQNTest {
         assertApproxEquals(Vector(0.1), dqn.evaluate(Vector(1)), 0.0001)
 
         dqn.learn(Vector(1), 0, 2.0, null)
-        assertApproxEquals(Vector(0.29505415218356185), dqn.targetNetwork.evaluate(Vector(1)), 0.001)
-        assertApproxEquals(Vector(0.29505415218356185), dqn.network.evaluate(Vector(1)), 0.001)
-        assertApproxEquals(Vector(0.29505415218356185), dqn.evaluate(Vector(1)), 0.001)
+        assertApproxEquals(Vector(0.2968320098527678), dqn.targetNetwork.evaluate(Vector(1)), 0.001)
+        assertApproxEquals(Vector(0.2968320098527678), dqn.network.evaluate(Vector(1)), 0.001)
+        assertApproxEquals(Vector(0.2968320098527678), dqn.evaluate(Vector(1)), 0.001)
     }
 }

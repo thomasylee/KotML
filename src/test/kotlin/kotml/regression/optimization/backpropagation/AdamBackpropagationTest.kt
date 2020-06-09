@@ -45,7 +45,7 @@ class AdamBackpropagationTest {
         val optimizer = AdamBackpropagation(
             network = network,
             costFunction = SumCost(SquaredError),
-            stepSize = 0.01,
+            stepSize = 0.015,
             weightDecayRate = 0.0001
         )
 
@@ -172,7 +172,7 @@ class AdamBackpropagationTest {
         val optimizer = AdamBackpropagation(
             network = network,
             costFunction = SumCost(HalfSquaredError),
-            stepSize = 0.01
+            stepSize = 0.015
         )
 
         (0..100).shuffled(rand).forEach { intX1 ->
@@ -232,7 +232,7 @@ class AdamBackpropagationTest {
             )
         )
         assertEquals(
-            Vector(Vector(1.2680597213646203), Vector(2.5361194427292406), Vector(3.8041791640938607)),
+            Vector(Vector(1.2749802157437462), Vector(2.5499604314874924), Vector(3.8249406472312386)),
             optimizer.batchObserveAndEvaluate(
                 Vector(Vector(1), Vector(2), Vector(3)),
                 Vector(Vector(2), Vector(4), Vector(6))

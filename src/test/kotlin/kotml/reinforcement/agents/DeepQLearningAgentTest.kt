@@ -66,7 +66,7 @@ class DeepQLearningAgentTest {
         val agent = DeepQLearningAgent(
             stateDimensions = 10,
             discount = 0.9,
-            stepSize = 0.0005,
+            stepSize = 0.001,
             layerSizes = intArrayOf(10, 2),
             behaviorPolicy = EpsilonGreedyPolicy(random = random),
             targetNetworkUpdateFrequency = 1000,

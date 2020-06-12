@@ -34,6 +34,10 @@ open class Vector private constructor(
     internal val vectorValues: Array<Vector>
 
     companion object {
+        // Minimum matrix dimension that will use Strassen for matrix
+        // multiplication.
+        var minStrassenSize = 128
+
         @JvmStatic
         fun zeros(vararg shape: Int): Vector = Vector(*shape) { 0.0 }
 
@@ -238,13 +242,40 @@ open class Vector private constructor(
                 })
             }
         }
-        return Vector(*Array<Vector>(shape[0]) { row ->
-            Vector(*DoubleArray(other.shape[1]) { col ->
-                (0 until shape[1]).fold(0.0) { acc, offset ->
-                    acc + vectorValues[row][offset] * other(offset)[col]
+        return ikjMatmul(other)
+    }
+
+    private fun ikjMatmul(other: Vector): Vector {
+        val first = Array<DoubleArray>(shape[0]) { row ->
+            DoubleArray(shape[1]) { col ->
+                this[row, col]
+            }
+        }
+        val second = Array<DoubleArray>(other.shape[0]) { row ->
+            DoubleArray(other.shape[1]) { col ->
+                other[row, col]
+            }
+        }
+        val product = ikjMatmul(first, second)
+        return Vector.ofVectors(product.size) { row ->
+            Vector(other.shape[1]) { col ->
+                product[row][col]
+            }
+        }
+    }
+
+    fun ikjMatmul(first: Array<DoubleArray>, second: Array<DoubleArray>): Array<DoubleArray> {
+        val product = Array<DoubleArray>(first.size) {
+            DoubleArray(second[0].size)
+        }
+        (0 until first.size).forEach { i ->
+            (0 until second.size).forEach { k ->
+                (0 until second[0].size).forEach { j ->
+                    product[i][j] += first[i][k] * second[k][j]
                 }
-            })
-        })
+            }
+        }
+        return product
     }
 
     private fun forEachIndexed(startIndex: Int, fn: (Int, Double) -> Unit) {

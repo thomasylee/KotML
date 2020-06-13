@@ -2,6 +2,9 @@ package kotml.math
 
 import kotlin.math.abs
 import kotlin.random.Random
+import org.bytedeco.openblas.global.openblas.CblasNoTrans
+import org.bytedeco.openblas.global.openblas.CblasRowMajor
+import org.bytedeco.openblas.global.openblas.cblas_dgemm
 
 /**
  * Vector stores a collection of values in one or more dimensions. Every
@@ -34,10 +37,6 @@ open class Vector private constructor(
     internal val vectorValues: Array<Vector>
 
     companion object {
-        // Minimum matrix dimension that will use Strassen for matrix
-        // multiplication.
-        var minStrassenSize = 256
-
         @JvmStatic
         fun zeros(vararg shape: Int): Vector = Vector(*shape) { 0.0 }
 
@@ -213,127 +212,6 @@ open class Vector private constructor(
 
     operator fun div(value: Int): Vector = map { it / value }
 
-    private fun strassenMatmul(other: Vector): Vector {
-        val first = Array<DoubleArray>(shape[0]) { row ->
-            DoubleArray(shape[1]) { col ->
-                this[row, col]
-            }
-        }
-        val second = Array<DoubleArray>(other.shape[0]) { row ->
-            DoubleArray(other.shape[1]) { col ->
-                other[row, col]
-            }
-        }
-        val product = strassenMatmul(first, second)
-        return Vector.ofVectors(product.size) { row ->
-            Vector(other.shape[1]) { col ->
-                product[row][col]
-            }
-        }
-    }
-
-    private fun strassenMatmul(first: Array<DoubleArray>, second: Array<DoubleArray>): Array<DoubleArray> {
-        val size = first.size
-
-        if (size < minStrassenSize)
-            return ikjMatmul(first, second)
-
-        val newSize = size / 2
-
-        val a11 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        val a12 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        val a21 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        val a22 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-
-        val b11 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        val b12 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        val b21 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        val b22 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-
-        var aResult = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        var bResult = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-
-        (0 until newSize).forEach { i ->
-            (0 until newSize).forEach { j ->
-                a11[i][j] = first[i][j]
-                a12[i][j] = first[i][j + newSize]
-                a21[i][j] = first[i + newSize][j]
-                a22[i][j] = first[i + newSize][j + newSize]
-
-                b11[i][j] = second[i][j]
-                b12[i][j] = second[i][j + newSize]
-                b21[i][j] = second[i + newSize][j]
-                b22[i][j] = second[i + newSize][j + newSize]
-            }
-        }
-
-        add(a11, a22, aResult)
-        add(b11, b22, bResult)
-        val p1 = strassenMatmul(aResult, bResult)
-
-        add(a21, a22, aResult)
-        val p2 = strassenMatmul(aResult, b11)
-
-        subtract(b12, b22, bResult)
-        val p3 = strassenMatmul(a11, bResult)
-
-        subtract(b21, b11, bResult)
-        val p4 = strassenMatmul(a22, bResult)
-
-        add(a11, a12, aResult)
-        val p5 = strassenMatmul(aResult, b22)
-
-        subtract(a21, a11, aResult)
-        add(b11, b12, bResult)
-        val p6 = strassenMatmul(aResult, bResult)
-
-        subtract(a12, a22, aResult)
-        add(b21, b22, bResult)
-        val p7 = strassenMatmul(aResult, bResult)
-
-        var c12 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        add(p3, p5, c12)
-
-        var c21 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        add(p2, p4, c21)
-
-        add(p1, p4, aResult)
-        add(aResult, p7, bResult)
-        var c11 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        subtract(bResult, p5, c21)
-
-        add(p1, p3, aResult)
-        add(aResult, p6, bResult)
-        var c22 = Array<DoubleArray>(newSize) { DoubleArray(newSize) }
-        subtract(bResult, p2, c22)
-
-        (0 until newSize).forEach { i ->
-            (0 until newSize).forEach { j ->
-                first[i][j] = c11[i][j]
-                first[i][j + newSize] = c12[i][j]
-                first[i + newSize][j] = c21[i][j]
-                first[i + newSize][j + newSize] = c22[i][j]
-            }
-        }
-        return first
-    }
-
-    private fun add(first: Array<DoubleArray>, second: Array<DoubleArray>, product: Array<DoubleArray>) {
-        (0 until product.size).forEach { i ->
-            (0 until product[i].size).forEach { j ->
-                product[i][j] = first[i][j] + second[i][j]
-            }
-        }
-    }
-
-    private fun subtract(first: Array<DoubleArray>, second: Array<DoubleArray>, product: Array<DoubleArray>) {
-        (0 until product.size).forEach { i ->
-            (0 until product[i].size).forEach { j ->
-                product[i][j] = first[i][j] - second[i][j]
-            }
-        }
-    }
-
     /**
      * Returns the matrix multiplication product of this vector x the
      * provided vector.
@@ -363,41 +241,18 @@ open class Vector private constructor(
                 })
             }
         }
-        // return ikjMatmul(other)
-        return strassenMatmul(other)
-    }
-
-    fun ikjMatmul(other: Vector): Vector {
-        val first = Array<DoubleArray>(shape[0]) { row ->
-            DoubleArray(shape[1]) { col ->
-                this[row, col]
-            }
+        val m = shape[0]
+        val p = shape[1]
+        val n = other.shape[1]
+        val first = toDoubleArray()
+        val second = other.toDoubleArray()
+        val product = DoubleArray(m * n)
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+            m, n, p, 1.0, first, p, second, n, 0.0, product, n)
+        var index = 0
+        return Vector.ofVectors(m) {
+            Vector(n) { product[index++] }
         }
-        val second = Array<DoubleArray>(other.shape[0]) { row ->
-            DoubleArray(other.shape[1]) { col ->
-                other[row, col]
-            }
-        }
-        val product = ikjMatmul(first, second)
-        return Vector.ofVectors(product.size) { row ->
-            Vector(other.shape[1]) { col ->
-                product[row][col]
-            }
-        }
-    }
-
-    fun ikjMatmul(first: Array<DoubleArray>, second: Array<DoubleArray>): Array<DoubleArray> {
-        val product = Array<DoubleArray>(first.size) {
-            DoubleArray(second[0].size)
-        }
-        (0 until first.size).forEach { i ->
-            (0 until second.size).forEach { k ->
-                (0 until second[0].size).forEach { j ->
-                    product[i][j] += first[i][k] * second[k][j]
-                }
-            }
-        }
-        return product
     }
 
     private fun forEachIndexed(startIndex: Int, fn: (Int, Double) -> Unit) {
@@ -704,7 +559,7 @@ open class Vector private constructor(
     fun flatten(): Vector = Vector(*toDoubleArray())
 
     /**
-     * Returns the scalar values of the vector across all dimensions. For
+     * Returns the scalar values of the vector in row major order. For
      * example, [[1, 2], [3, 4]].toDoubleArray() returns [1, 2, 3, 4].
      * @return DoubleArray containing all scalar values in the vector
      */

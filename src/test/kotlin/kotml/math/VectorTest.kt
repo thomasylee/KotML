@@ -1,5 +1,6 @@
 package kotml.math
 
+import kotlin.random.Random
 import kotml.extensions.div
 import kotml.extensions.minus
 import kotml.extensions.plus
@@ -468,6 +469,52 @@ class VectorTest {
         assertEquals(Vector(1, 2, 3, 4, 5, 6, 7, 8), Vector(
             Vector(Vector(1, 2), Vector(3, 4)),
             Vector(Vector(5, 6), Vector(7, 8))).flatten())
+    }
+
+    @Test
+    fun `shuffle() with axis = null returns a completely shuffled vector`() {
+        val random = Random(0)
+        assertEquals(Vector(4, 2, 1, 3), Vector(1, 2, 3, 4).shuffle(random = random))
+        assertEquals(
+            Vector(
+                Vector(Vector(9, 11, 10), Vector(1, 12, 6)),
+                Vector(Vector(3, 2, 7), Vector(8, 5, 4))),
+            Vector(
+                Vector(Vector(1, 2, 3), Vector(4, 5, 6)),
+                Vector(Vector(7, 8, 9), Vector(10, 11, 12))).shuffle(random = random))
+    }
+
+    @Test
+    fun `shuffle() with non-null axis returns a vector shuffled on the right axis`() {
+        val random = Random(0)
+        assertEquals(Vector(4, 2, 1, 3), Vector(1, 2, 3, 4).shuffle(0, random))
+        assertEquals(
+            Vector(
+                Vector(Vector(19, 20, 21), Vector(22, 23, 24), Vector(25, 26, 27)),
+                Vector(Vector(10, 11, 12), Vector(13, 14, 15), Vector(16, 17, 18)),
+                Vector(Vector(1, 2, 3), Vector(4, 5, 6), Vector(7, 8, 9))),
+            Vector(
+                Vector(Vector(1, 2, 3), Vector(4, 5, 6), Vector(7, 8, 9)),
+                Vector(Vector(10, 11, 12), Vector(13, 14, 15), Vector(16, 17, 18)),
+                Vector(Vector(19, 20, 21), Vector(22, 23, 24), Vector(25, 26, 27))).shuffle(0, random))
+        assertEquals(
+            Vector(
+                Vector(Vector(4, 5, 6), Vector(1, 2, 3), Vector(7, 8, 9)),
+                Vector(Vector(16, 17, 18), Vector(10, 11, 12), Vector(13, 14, 15)),
+                Vector(Vector(22, 23, 24), Vector(19, 20, 21), Vector(25, 26, 27))),
+            Vector(
+                Vector(Vector(1, 2, 3), Vector(4, 5, 6), Vector(7, 8, 9)),
+                Vector(Vector(10, 11, 12), Vector(13, 14, 15), Vector(16, 17, 18)),
+                Vector(Vector(19, 20, 21), Vector(22, 23, 24), Vector(25, 26, 27))).shuffle(1, random))
+        assertEquals(
+            Vector(
+                Vector(Vector(1, 2, 3), Vector(4, 6, 5), Vector(7, 9, 8)),
+                Vector(Vector(11, 10, 12), Vector(13, 15, 14), Vector(18, 16, 17)),
+                Vector(Vector(20, 19, 21), Vector(23, 24, 22), Vector(26, 27, 25))),
+            Vector(
+                Vector(Vector(1, 2, 3), Vector(4, 5, 6), Vector(7, 8, 9)),
+                Vector(Vector(10, 11, 12), Vector(13, 14, 15), Vector(16, 17, 18)),
+                Vector(Vector(19, 20, 21), Vector(22, 23, 24), Vector(25, 26, 27))).shuffle(2, random))
     }
 
     @Test

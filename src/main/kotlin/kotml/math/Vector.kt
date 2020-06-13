@@ -559,6 +559,49 @@ open class Vector private constructor(
     fun flatten(): Vector = Vector(*toDoubleArray())
 
     /**
+     * Returns a vector shuffled along the specified axis, or with all
+     * values shuffled if the axis is null (the default if no axis is
+     * provided).
+     * @param axis axis to shuffle
+     * @param random source of randomness
+     * @return vector shuffled along the axis (or completely shuffled if
+     *   no axis was provided
+     */
+    fun shuffle(axis: Int? = null, random: Random = Random): Vector {
+        if (axis != null && axis >= dimensions) {
+            throw ShapeException(
+                "Axis $axis does not exist on vector with dimensions ${shapeToString(shape)}"
+            )
+        }
+
+        if (dimensions == 1)
+            return Vector(*shuffleDoubles(scalarValues, random))
+
+        if (axis == null) {
+            val newValues = shuffleDoubles(toDoubleArray(), random)
+            return Vector(*shape) { newValues[it] }
+        }
+
+        if (axis == 0) {
+            return Vector(*shuffleVectors(vectorValues, random))
+        }
+
+        return Vector(*vectorValues.map {
+            it.shuffle(axis - 1, random)
+        }.toTypedArray())
+    }
+
+    private fun shuffleVectors(vectors: Array<Vector>, random: Random = Random): Array<Vector> {
+        val indices = (0 until vectors.size).shuffled(random)
+        return Array<Vector>(vectors.size) { i -> vectors[indices[i]] }
+    }
+
+    private fun shuffleDoubles(doubles: DoubleArray, random: Random = Random): DoubleArray {
+        val indices = (0 until doubles.size).shuffled(random)
+        return DoubleArray(doubles.size) { i -> doubles[indices[i]] }
+    }
+
+    /**
      * Returns the scalar values of the vector in row major order. For
      * example, [[1, 2], [3, 4]].toDoubleArray() returns [1, 2, 3, 4].
      * @return DoubleArray containing all scalar values in the vector

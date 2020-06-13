@@ -13,5 +13,5 @@ object IdentityFunction : FunctionModel {
 
     override fun derivative(input: Double): Double = 1.0
 
-    override fun derivative(input: Vector): Vector = input
+    override fun derivative(input: Vector): Vector = Vector(*input.shape) { 1.0 }
 }

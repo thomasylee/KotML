@@ -77,6 +77,20 @@ class VectorTest {
     }
 
     @Test
+    fun `random() initializes a vector with random values`() {
+        val random = Random(0)
+        assertEquals(
+            Vector(0.54963315022148, 0.8488554755054833, 0.6591029791044284),
+            Vector.random(3, random = random))
+        assertEquals(
+            Vector(
+                Vector(0.0079879341867376, 0.3249690959322964),
+                Vector(0.010111317974326073, 0.5345753913241595),
+                Vector(0.6916786784731803, 0.948378936177206)),
+            Vector.random(3, 2, random = random))
+    }
+
+    @Test
     fun `ofVectors() initializes a vector of vectors`() {
         assertEquals(Vector(Vector(0, 0), Vector(1, 1)), Vector.ofVectors(2) {
             Vector(it, it)

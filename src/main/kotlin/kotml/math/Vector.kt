@@ -37,9 +37,30 @@ open class Vector private constructor(
     internal val vectorValues: Array<Vector>
 
     companion object {
+        /**
+         * Returns a vector of all zeros with the given shape.
+         * @param shape shape of the new vector
+         * @return vector of all zeros
+         */
         @JvmStatic
         fun zeros(vararg shape: Int): Vector = Vector(*shape) { 0.0 }
 
+        /**
+         * Returns a vector of random values with the given shape.
+         * @param shape shape of the new vector
+         * @param random source of randomness
+         * @return vector of random values
+         */
+        @JvmStatic
+        fun random(vararg shape: Int, random: Random = Random): Vector =
+            Vector(*shape) { random.nextDouble() }
+
+        /**
+         * Returns a vector containing other vectors.
+         * @param numVectors number of vectors
+         * @param mapVectors function that maps indices to vectors
+         * @return vector containing the vectors provided by `mapVectors`
+         */
         @JvmStatic
         fun ofVectors(numVectors: Int, mapVectors: (Int) -> Vector): Vector =
             Vector(*Array<Vector>(numVectors) { index ->
@@ -59,6 +80,11 @@ open class Vector private constructor(
         protected fun removeDimensionFromShape(shape: IntArray): IntArray =
             IntArray(shape.size - 1) { shape[it + 1] }
 
+        /**
+         * Convenience function to format a shape `IntArray` into a string.
+         * @param shape shape to convert to a string
+         * @return string form of the shape
+         */
         @JvmStatic
         fun shapeToString(shape: IntArray): String =
             "[" + shape.joinToString(", ") + "]"

@@ -10,6 +10,9 @@ plugins {
 
     // Use ktlint for Kotlin style enforcement.
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
+
+    // Dokka for KDoc documentation generation.
+    id("org.jetbrains.dokka") version "0.10.1"
 }
 
 repositories {
@@ -30,6 +33,11 @@ tasks {
 
             exceptionFormat = TestExceptionFormat.FULL
         }
+    }
+
+    dokka {
+        outputFormat = "html"
+        outputDirectory = "$buildDir/dokka"
     }
 }
 

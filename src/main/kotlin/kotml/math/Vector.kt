@@ -155,17 +155,59 @@ open class Vector private constructor(
         return vector.scalarValues[indices.last()]
     }
 
-    operator fun invoke(vararg indices: Int): Vector {
-        if (indices.size >= dimensions) {
+    /**
+     * Retrieve vectors within this vector. Null values can be used to
+     * collect all vectors in a dimension, similarly to in Numpy.
+     * @param indices indices of vectors to collect, which can include null
+     *   to indicate all vectors in a dimension
+     * @return vector matching the requested indices
+     */
+    operator fun invoke(vararg indices: Int?): Vector {
+        var foundNonNull = false
+        var lastNullIndex = indices.size
+        var anyNulls = false
+        for (i in (indices.size - 1) downTo 0) {
+            if (indices[i] == null && !foundNonNull) {
+                lastNullIndex = i
+            } else if (indices[i] == null) {
+                anyNulls = true
+            } else {
+                foundNonNull = true
+            }
+        }
+        if (lastNullIndex == 0)
+            return this
+
+        val indicesWithoutLastNulls = Array<Int?>(lastNullIndex) {
+            indices[it]
+        }
+        if (lastNullIndex > dimensions || indices.size > dimensions) {
             throw ShapeException(
                 "Number of indices [${indices.joinToString(", ")}] must be less than the number of vector dimensions $dimensions"
             )
         }
-        var vector = this
-        indices.forEach {
-            vector = vector.vectorValues[it]
+
+        if (!anyNulls) {
+            var vector = this
+            indicesWithoutLastNulls.forEach { index ->
+                if (index == null) { println(indicesWithoutLastNulls.joinToString(", ")); println(anyNulls); println(foundNonNull) }
+                vector = vector.vectorValues[index!!]
+            }
+            return vector
         }
-        return vector
+
+        val nextIndex = indices.first()
+        val remainingIndices = Array<Int?>(indicesWithoutLastNulls.size - 1) {
+            indicesWithoutLastNulls[it + 1]
+        }
+        if (nextIndex == null) {
+            return Vector.ofVectors(shape[0]) { vectorIndex ->
+                vectorValues[vectorIndex](*remainingIndices)
+            }
+        }
+        return Vector.ofVectors(1) {
+            vectorValues[nextIndex](*remainingIndices)
+        }
     }
 
     operator fun unaryMinus(): Vector =

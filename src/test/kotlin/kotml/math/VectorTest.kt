@@ -69,6 +69,35 @@ class VectorTest {
     }
 
     @Test
+    fun `retrieving child vectors by one dimension works`() {
+        assertEquals(
+            Vector(1, 2, 3),
+            Vector(Vector(1, 2, 3), Vector(4, 5, 6))(0))
+        assertEquals(
+            Vector(3, 4),
+            Vector(
+                Vector(Vector(1, 2), Vector(3, 4)),
+                Vector(5, 6), Vector(7, 8))(0, 1))
+    }
+
+    @Test
+    fun `retrieving child vectors by multiple dimensions works`() {
+        assertEquals(
+            Vector(
+                Vector(4, 5, 6),
+                Vector(13, 14, 15)),
+            Vector(
+                Vector(Vector(1, 2, 3), Vector(4, 5, 6), Vector(7, 8, 9)),
+                Vector(Vector(10, 11, 12), Vector(13, 14, 15), Vector(16, 17, 18)))(null, 1, null))
+    }
+
+    @Test
+    fun `retrieving scalar values works`() {
+        assertEquals(5.0, Vector(5)[0])
+        assertEquals(2.0, Vector(1, 2, 3)[1])
+    }
+
+    @Test
     fun `zeros() initializes a vector with all zero values`() {
         assertEquals(Vector(0.0, 0.0, 0.0), Vector.zeros(3))
         assertEquals(
@@ -568,7 +597,7 @@ class VectorTest {
         assertEquals(Vector(0, 1, 2), Vector(0, 1).append(2))
         assertEquals(Vector(0, 1, 2), Vector(0, 1).append(2.0))
 
-        // Only row vectors can insert values.
+        // Only row vectors can append values.
         assertThrows(ShapeException::class.java) {
             Vector(Vector(1, 2), Vector(3, 4)).append(1.0)
         }

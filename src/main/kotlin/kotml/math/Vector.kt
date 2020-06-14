@@ -35,6 +35,7 @@ open class Vector private constructor(
     // Unfortunately, these need to be internal for MutableVector to access them.
     internal val scalarValues: DoubleArray
     internal val vectorValues: Array<Vector>
+    val size: Int = shape.reduce { acc, value -> acc * value }
 
     companion object {
         /**
@@ -583,6 +584,22 @@ open class Vector private constructor(
      * @return flattened row vector
      */
     fun flatten(): Vector = Vector(*toDoubleArray())
+
+    /**
+     * Reshapes the vector to the specified shape.
+     * @param shape shape of the new vector
+     * @return vector with the same values but with the new shape
+     */
+    fun reshape(vararg shape: Int): Vector {
+        val newSize = shape.reduce { acc, value -> acc * value }
+        if (size != newSize) {
+            throw ShapeException("Shape ${shapeToString(shape)} does not " +
+                "hold the same number of elements as current shape " +
+                shapeToString(this.shape))
+        }
+        val values = toDoubleArray()
+        return Vector(*shape) { values[it] }
+    }
 
     /**
      * Returns a vector shuffled along the specified axis, or with all

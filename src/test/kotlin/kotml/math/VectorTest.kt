@@ -486,6 +486,26 @@ class VectorTest {
     }
 
     @Test
+    fun `reshape() returns a vector with the desired shape`() {
+        assertEquals(
+            Vector(1, 2, 3, 4),
+            Vector(Vector(1, 2), Vector(3, 4)).reshape(4))
+        assertEquals(
+            Vector(Vector(Vector(1), Vector(2), Vector(3), Vector(4))),
+            Vector(Vector(1, 2), Vector(3, 4)).reshape(1, 4, 1))
+        assertEquals(
+            Vector(Vector(1, 2), Vector(3, 4)),
+            Vector(1, 2, 3, 4).reshape(2, 2))
+    }
+
+    @Test
+    fun `reshape() throws a ShapeException if the shapes are incompatible`() {
+        assertThrows(ShapeException::class.java) {
+            Vector(1, 2, 3).reshape(2, 2)
+        }
+    }
+
+    @Test
     fun `shuffle() with axis = null returns a completely shuffled vector`() {
         val random = Random(0)
         assertEquals(Vector(4, 2, 1, 3), Vector(1, 2, 3, 4).shuffle(random = random))

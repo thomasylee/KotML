@@ -629,4 +629,25 @@ class VectorTest {
         assertFalse(Vector(Vector(0.001, 1.001), Vector(1.95, 2.999))
             .approxEquals(Vector(Vector(0, 1), Vector(2, 3)), 0.01))
     }
+
+    @Test
+    fun `toString(null) does not truncate large vectors`() {
+        assertEquals(
+            "[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0]",
+            Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12).toString(null))
+    }
+
+    @Test
+    fun `toString() and toString(Int) truncate large vectors`() {
+        assertEquals(
+            "[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, ..., 12.0]",
+            Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12).toString())
+        assertEquals(
+            "[[1.0, 2.0, ..., 5.0]\n[6.0, 7.0, ..., 10.0]\n...\n[16.0, 17.0, ..., 20.0]]",
+            Vector(
+                Vector(1, 2, 3, 4, 5),
+                Vector(6, 7, 8, 9, 10),
+                Vector(11, 12, 13, 14, 15),
+                Vector(16, 17, 18, 19, 20)).toString(truncate = 3))
+    }
 }

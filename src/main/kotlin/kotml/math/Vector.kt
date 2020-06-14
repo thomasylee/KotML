@@ -811,13 +811,37 @@ open class Vector private constructor(
 
     /**
      * Returns a human-readable String representation of this vector.
+     * Dimensions larger than 10 are truncated.
      * @return String representation of the vector
      */
-    override fun toString(): String =
+    override fun toString(): String = toString(truncate = 10)
+
+    /**
+     * Returns a human-readable String representation of this vector,
+     * truncating vectors that have dimensions larger than the given
+     * threshold.
+     * @param truncate maximum number of characters to show without truncating
+     * @return String representation of the vector
+     */
+    fun toString(truncate: Int?): String =
         if (dimensions == 1) {
-            "[" + scalarValues.joinToString(", ") + "]"
+            if (truncate == null || shape[0] <= truncate) {
+                "[" + scalarValues.joinToString(", ") + "]"
+            } else {
+                "[" +
+                    (0..(truncate - 2)).map { scalarValues[it] }.joinToString(", ") +
+                    ", ..., " + scalarValues.last() + "]"
+            }
         } else {
-            "[" + vectorValues.joinToString("\n") + "]"
+            if (truncate == null || shape[0] <= truncate) {
+                "[" + vectorValues.joinToString("\n") + "]"
+            } else {
+                "[" +
+                    (0..(truncate - 2)).map {
+                        vectorValues[it].toString(truncate)
+                    }.joinToString("\n") +
+                    "\n...\n" + vectorValues.last().toString(truncate) + "]"
+            }
         }
 
     private fun validateSquareMatrix() {

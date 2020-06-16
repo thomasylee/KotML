@@ -2,9 +2,8 @@ package kotml.math
 
 import kotlin.math.abs
 import kotlin.random.Random
-import org.bytedeco.openblas.global.openblas.CblasNoTrans
-import org.bytedeco.openblas.global.openblas.CblasRowMajor
-import org.bytedeco.openblas.global.openblas.cblas_dgemm
+import kotml.math.blas.BlasAdapter
+import kotml.math.blas.OpenBlas
 
 /**
  * Vector stores a collection of values in one or more dimensions. Every
@@ -35,9 +34,15 @@ open class Vector private constructor(
     // Unfortunately, these need to be internal for MutableVector to access them.
     internal val scalarValues: DoubleArray
     internal val vectorValues: Array<Vector>
-    val size: Int = shape.reduce { acc, value -> acc * value }
+    private val size: Int = shape.reduce { acc, value -> acc * value }
+    protected var flattenedValues: DoubleArray? = null
 
     companion object {
+        /**
+         * Variant of BLAS used to perform accelerated matrix operations.
+         */
+        var blasAdapter: BlasAdapter = OpenBlas
+
         /**
          * Returns a vector of all zeros with the given shape.
          * @param shape shape of the new vector
@@ -310,18 +315,7 @@ open class Vector private constructor(
                 })
             }
         }
-        val m = shape[0]
-        val p = shape[1]
-        val n = other.shape[1]
-        val first = toDoubleArray()
-        val second = other.toDoubleArray()
-        val product = DoubleArray(m * n)
-        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
-            m, n, p, 1.0, first, p, second, n, 0.0, product, n)
-        var index = 0
-        return Vector.ofVectors(m) {
-            Vector(n) { product[index++] }
-        }
+        return blasAdapter.dgemm(this, other)
     }
 
     private fun forEachIndexed(startIndex: Int, fn: (Int, Double) -> Unit) {
@@ -692,17 +686,26 @@ open class Vector private constructor(
      * @return DoubleArray containing all scalar values in the vector
      */
     fun toDoubleArray(): DoubleArray {
-        if (dimensions == 1)
-            return DoubleArray(shape[0]) { scalarValues[it] }
+        val currentFlatValues = flattenedValues
+        if (currentFlatValues != null)
+            return currentFlatValues
+
+        if (dimensions == 1) {
+            val curValues = DoubleArray(shape[0]) { scalarValues[it] }
+            flattenedValues = curValues
+            return curValues
+        }
 
         val valuesPerVector = removeDimensionFromShape(shape).fold(1) { acc, dim ->
             acc * dim
         }
         val valuesOfVectors = vectorValues.map { it.toDoubleArray() }
-        return DoubleArray(shape[0] * valuesPerVector) { index ->
+        val curValues = DoubleArray(shape[0] * valuesPerVector) { index ->
             val vectorIndex = index / valuesPerVector
             valuesOfVectors[vectorIndex][index - vectorIndex * valuesPerVector]
         }
+        flattenedValues = curValues
+        return curValues
     }
 
     /**

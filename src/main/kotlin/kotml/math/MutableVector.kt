@@ -46,6 +46,7 @@ class MutableVector : Vector {
         val vector = MutableVector(*shape) { index ->
             values[index]
         }
+        vector.flattenedValues = flattenedValues
         return vector
     }
 
@@ -65,6 +66,7 @@ class MutableVector : Vector {
             vector = vector.vectorValues[indices[it]]
         }
         vector.scalarValues[indices.last()] = value
+        flattenedValues = null
     }
 
     operator fun set(vararg indices: Int, value: Vector) {
@@ -87,6 +89,7 @@ class MutableVector : Vector {
             vector = vector.vectorValues[indices[it]]
         }
         vector.vectorValues[indices.last()] = value
+        flattenedValues = null
     }
 
     /**
@@ -100,6 +103,7 @@ class MutableVector : Vector {
             vectorValues.forEach { vector ->
                 vector.toMutableVector().plusAssign(value)
             }
+        flattenedValues = null
     }
 
     /**
@@ -119,6 +123,7 @@ class MutableVector : Vector {
             vectorValues.forEach { vector ->
                 vector.toMutableVector().minusAssign(value)
             }
+        flattenedValues = null
     }
 
     /**
@@ -138,6 +143,7 @@ class MutableVector : Vector {
             vectorValues.forEach { vector ->
                 vector.toMutableVector().timesAssign(value)
             }
+        flattenedValues = null
     }
 
     /**
@@ -157,6 +163,7 @@ class MutableVector : Vector {
             vectorValues.forEach { vector ->
                 vector.toMutableVector().divAssign(value)
             }
+        flattenedValues = null
     }
 
     /**

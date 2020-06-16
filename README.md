@@ -179,3 +179,68 @@ estimator.addObservation(16.1, Vector(-4.0))
 val twoSquaredEstimate = estimator.function.evaluate(estimator.weights, Vector(2.0))
 (10.0 * twoSquaredEstimate).toInt() / 10.0 == 4.3
 ```
+
+# Support for cuBLAS
+
+CUDA-supported GPUs can speed up common matrix operations by using the `CuBlas` implementation of the `BlasAdapter` interface.
+
+As KotML uses the JCuda and JCublas libraries, you'll need to add the appropriate native platforms to be able to use `CuBlas`.
+1. Install the appropriate CUDA driver for your GPU.
+2. Add the "jcuda-natives" and "jcublas-natives" libraries as outlined [here](https://github.com/jcuda/jcuda-main/blob/master/USAGE.md#using-jcuda-with-gradle).
+3. Set `Vector.blasAdapter = kotml.math.blas.CuBlas`.
+
+For example, if you're using Gradle with Kotlin DSL, you can add the following to your `build.gradle.kts`:
+```kotlin
+dependencies {
+    val osAndArch = getOsString() + "-" + getArchString()
+    // Use the same version as KotML is using in its build.gradle.kts.
+    val jCudaVersion = "10.2.0"
+    implementation("org.jcuda:jcuda-natives:$jCudaVersion:$osAndArch")
+    implementation("org.jcuda:jcublas-natives:$jCudaVersion:$osAndArch")
+
+    // Other dependencies
+    ...
+}
+
+fun getOsString(): String {
+    val vendor = System.getProperty("java.vendor")
+    if ("The Android Project" == vendor) {
+        return "android"
+    }
+    val osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
+    if (osName.startsWith("windows"))
+        return "windows"
+    if (osName.startsWith("mac os"))
+        return "apple"
+    if (osName.startsWith("linux"))
+        return "linux"
+    if (osName.startsWith("sun"))
+        return "sun"
+    return "unknown"
+}
+
+fun getArchString(): String {
+    val osArch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH)
+    if ("i386" == osArch || "x86" == osArch || "i686" == osArch)
+        return "x86"
+    if (osArch.startsWith("amd64") || osArch.startsWith("x86_64"))
+        return "x86_64"
+    if (osArch.startsWith("arm64"))
+        return "arm64"
+    if (osArch.startsWith("arm"))
+        return "arm"
+    if ("ppc" == osArch || "powerpc" == osArch)
+        return "ppc"
+    if (osArch.startsWith("ppc"))
+        return "ppc_64"
+    if (osArch.startsWith("sparc"))
+        return "sparc"
+    if (osArch.startsWith("mips64"))
+        return "mips64"
+    if (osArch.startsWith("mips"))
+        return "mips"
+    if (osArch.contains("risc"))
+        return "risc"
+    return "unknown"
+}
+```

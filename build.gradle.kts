@@ -48,9 +48,18 @@ dependencies {
     // Use the Kotlin JDK 8 standard library.
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    // OpenBLAS for faster matrix operations.
+    // OpenBLAS for faster matrix operations on CPU.
     implementation("org.bytedeco:openblas-platform:0.3.9-1.5.3")
     implementation("org.bytedeco:mkl-platform-redist:2020.1-1.5.3")
+
+    // JCublas for cuBLAS, fast matrix operations on CUDA-supported GPU.
+    val jCudaVersion = "10.2.0"
+    implementation("org.jcuda:jcuda:$jCudaVersion") {
+        isTransitive = false
+    }
+    implementation("org.jcuda:jcublas:$jCudaVersion") {
+        isTransitive = false
+    }
 
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
